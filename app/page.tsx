@@ -1,10 +1,13 @@
+import { FeaturedWorkSection } from '@/components/sections/featured-work';
 import { HeroSection } from '@/components/sections/hero';
 import { ManifestoSection } from '@/components/sections/manifesto';
+import { OtherWorkSection } from '@/components/sections/other-work';
 import { SocialProofLine } from '@/components/sections/social-proof-line';
+import { WhatIBuildSection } from '@/components/sections/what-i-build';
 
-// Home — single-page scroll (12 seções).
-// FASE 3 já: Hero (8-layer), SocialProofLine, Manifesto.
-// FASE 4: WhatIBuild, Featured Work case studies, Other Work.
+// Home — single-page scroll storytelling.
+// FASE 3: Hero (8-layer), SocialProofLine, Manifesto.
+// FASE 4: WhatIBuildSection (#process), FeaturedWorkSection (#work preview), OtherWorkSection.
 // FASE 5: Bento Skills, Timeline.
 // FASE 6: Contato form + CalcomModal + DirectLinks.
 
@@ -13,25 +16,9 @@ export default function HomePage() {
     <>
       <HeroSection />
       <SocialProofLine />
-
-      <PlaceholderSection
-        id="work"
-        index="03"
-        eyebrow="Work"
-        title="Featured work — Content Engine, NexaCore, STJ App"
-        phase="FASE 4"
-        body="Scroll-jacked horizontal pin dos 5 squads do Content Engine. MacBook Scroll com screenshot real do NexaCore admin. Compare Slider + Tracing Beam vertical do STJ App auth flow."
-      />
-
-      <PlaceholderSection
-        id="process"
-        index="04"
-        eyebrow="Process"
-        title="O que eu construo — IA multi-agente · Product Eng full-stack · Backend crítico"
-        phase="FASE 4"
-        body="Trio Direction Aware Hover cards. Bento skills grid 6 cells. Timeline carreira com Tracing Beam vertical mostrando Eletrotécnica SENAI → AI Product Engineer."
-      />
-
+      <FeaturedWorkSection />
+      <WhatIBuildSection />
+      <OtherWorkSection />
       <ManifestoSection />
 
       <PlaceholderSection

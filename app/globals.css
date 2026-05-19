@@ -170,6 +170,10 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 
+  /* === Scroll anchor offset (single source of truth pra :target + anchor-scroll.ts).
+     96px = FloatingDock top (16px) + altura interna (~52px) + breathing (~28px). === */
+  --scroll-anchor-offset: 6rem;
+
   /* === Motion durations (raw CSS vars; usar via style or arbitrary class) === */
   --motion-instant: 50ms;
   --motion-micro: 150ms;
@@ -390,7 +394,7 @@
 
   /* Anchor targets must clear the floating dock (offset for in-page nav) */
   :target {
-    scroll-margin-top: 6rem;
+    scroll-margin-top: var(--scroll-anchor-offset);
   }
 
   /* Tabular nums em stats sections */
@@ -413,5 +417,24 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Pre-hydration anim hide — FOUC fix pra GSAP-based reveals.
+   Inline script em app/layout.tsx <head> seta html[data-pre-hydration].
+   Após mount, MotionProvider remove attr → CSS rule deixa de aplicar →
+   elemento revela (via GSAP).
+   Reduced-motion sobrescreve: elemento sempre visível.
+   Zero-JS: script não roda, attr nunca aparece, CSS não aplica → visível.
+   ============================================================ */
+
+html[data-pre-hydration] .anim-pre-hidden {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-pre-hydration] .anim-pre-hidden {
+    opacity: 1 !important;
   }
 }

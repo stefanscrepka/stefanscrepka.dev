@@ -2,12 +2,15 @@
 
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { type ReactNode, useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
-gsap.registerPlugin(SplitText, useGSAP);
+// Register all plugins used in this file (defensive — não depender de side-effect
+// de gsap-lenis-sync.ts via LenisProvider).
+gsap.registerPlugin(SplitText, ScrollTrigger, useGSAP);
 
 // Layer 1 do 8-layer choreography: split-text word-by-word headline reveal.
 // type='words' preserva children HTML (e.g., <EditorialAccent> não vira chars).

@@ -2,9 +2,13 @@
 
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
-import { useRef, useState } from 'react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
+
+// Defensive registerPlugin (não depender de side-effect transitivo).
+gsap.registerPlugin(ScrollTrigger);
 
 // Layer 7 do 8-layer choreography: stats row tabular-nums count-up 0→target.
 // 1500ms ease-dramatic, trigger via IntersectionObserver (on view).
@@ -74,29 +78,33 @@ function StatEntry({ stat, index }: { stat: StatItem; index: number }) {
 
 function CountUp({ target }: { target: number }) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [display, setDisplay] = useState(0);
   const reduced = useReducedMotionSafe();
 
   useGSAP(
     () => {
       if (!ref.current || reduced === null) return;
 
+      // Reduced-motion: snap target instantly via DOM mutation (sem React commit).
       if (reduced) {
-        setDisplay(target);
+        ref.current.textContent = String(target);
         return;
       }
 
+      const node = ref.current;
       const obj = { n: 0 };
       const tween = gsap.to(obj, {
         n: target,
         duration: 1.5,
         ease: 'cubic-bezier(0.165, 0.84, 0.44, 1)',
         scrollTrigger: {
-          trigger: ref.current,
+          trigger: node,
           start: 'top 90%',
           once: true,
         },
-        onUpdate: () => setDisplay(Math.round(obj.n)),
+        // Imperative DOM update — evita ~90 React commits/s × 3 stats em paralelo.
+        onUpdate: () => {
+          node.textContent = String(Math.round(obj.n));
+        },
       });
 
       return () => {
@@ -108,7 +116,7 @@ function CountUp({ target }: { target: number }) {
 
   return (
     <span ref={ref} className="font-semibold text-(--color-text-1)">
-      {display}
+      0
     </span>
   );
 }

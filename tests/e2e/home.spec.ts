@@ -37,6 +37,25 @@ test.describe('home', () => {
   });
 });
 
+test.describe('work routes', () => {
+  test('work index renders 4 case studies', async ({ page }) => {
+    await page.goto('/work');
+    await expect(page).toHaveTitle(/Work/);
+    // Links têm href /work/{slug} — busca via href attribute (mais estável que regex name)
+    for (const slug of ['content-engine', 'nexacore', 'stj-app', 'estetica-md']) {
+      await expect(page.locator(`a[href="/work/${slug}"]`).first()).toBeAttached();
+    }
+  });
+
+  test('each case study page returns 200 + has hero', async ({ page }) => {
+    for (const slug of ['content-engine', 'nexacore', 'stj-app', 'estetica-md']) {
+      const resp = await page.goto(`/work/${slug}`);
+      expect(resp?.status()).toBe(200);
+      await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    }
+  });
+});
+
 test.describe('design-system', () => {
   test('renders showcase route with 4 sections', async ({ page }) => {
     await page.goto('/design-system');

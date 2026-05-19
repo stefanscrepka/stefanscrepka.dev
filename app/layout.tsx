@@ -76,6 +76,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       suppressHydrationWarning
     >
       <head>
+        {/* Pre-hydration FOUC gate — seta atributo ANTES de paint inicial.
+            Script roda síncrono em <head>, antes do body renderizar. CSS rule
+            em globals.css `html[data-pre-hydration] .anim-pre-hidden { opacity: 0 }`
+            esconde elementos animados. MotionProvider remove o attr após mount. */}
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: pre-hydration boot script
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.dataset.preHydration='1'",
+          }}
+        />
         <script
           type="application/ld+json"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: structured data SSR

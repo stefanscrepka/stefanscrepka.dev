@@ -40,7 +40,10 @@ export function MonoSubhead({ children, className }: MonoSubheadProps) {
   return (
     <p
       ref={ref}
-      className={cn('max-w-prose font-mono text-sm text-(--color-text-2) sm:text-base', className)}
+      className={cn(
+        'anim-pre-hidden max-w-prose font-mono text-sm text-(--color-text-2) sm:text-base',
+        className
+      )}
     >
       {children}
     </p>

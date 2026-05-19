@@ -47,9 +47,9 @@ export function CTAGroup({ className }: CTAGroupProps) {
     <div
       ref={containerRef}
       className={cn(
-        'flex flex-wrap items-center gap-3 sm:gap-4',
-        // Pre-animation: invisible até GSAP kick in (evita flash). reduced-motion
-        // dispensa via :where guard inline.
+        'anim-pre-hidden flex flex-wrap items-center gap-3 sm:gap-4',
+        // Pre-animation: invisible até GSAP kick in (via .anim-pre-hidden + data-pre-hydration).
+        // reduced-motion: CSS rule pula override → visível direto.
         className
       )}
     >

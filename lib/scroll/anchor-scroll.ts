@@ -6,11 +6,24 @@ import { useLenis } from '@/hooks/use-lenis';
 // Smooth-scroll utility para hash anchors usando Lenis quando disponível,
 // fallback nativo (instant — respeita reduced-motion via scroll-behavior CSS) caso contrário.
 //
-// Offset -88 cobre dock altura (≈64) + breathing room (≈24). Ajustar quando dock mudar.
+// Offset default = -(--scroll-anchor-offset) CSS var (single source of truth com :target).
+// Lê em runtime; falha graceful pra -96 (=6rem).
 
 interface ScrollOptions {
   offset?: number;
   duration?: number;
+}
+
+function getDefaultOffset(): number {
+  if (typeof window === 'undefined') return -96;
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue('--scroll-anchor-offset')
+    .trim();
+  if (!raw) return -96;
+  const num = Number.parseFloat(raw);
+  if (Number.isNaN(num)) return -96;
+  const rootSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+  return raw.endsWith('rem') ? -(num * rootSize) : -num;
 }
 
 export function useAnchorScroll() {
@@ -19,7 +32,7 @@ export function useAnchorScroll() {
   return useCallback(
     (href: string, opts: ScrollOptions = {}) => {
       if (typeof window === 'undefined') return;
-      const { offset = -88, duration = 1.2 } = opts;
+      const { offset = getDefaultOffset(), duration = 1.2 } = opts;
 
       const isHash = href.startsWith('#');
       if (!isHash) {
