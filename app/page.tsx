@@ -1,4 +1,5 @@
 import { BentoSkillsSection } from '@/components/sections/bento-skills';
+import { ContactSection } from '@/components/sections/contact';
 import { FeaturedWorkSection } from '@/components/sections/featured-work';
 import { HeroSection } from '@/components/sections/hero';
 import { ManifestoSection } from '@/components/sections/manifesto';
@@ -11,7 +12,7 @@ import { WhatIBuildSection } from '@/components/sections/what-i-build';
 // FASE 3: Hero (8-layer), SocialProofLine, Manifesto.
 // FASE 4: WhatIBuildSection (#process), FeaturedWorkSection (#work preview), OtherWorkSection.
 // FASE 5: BentoSkillsSection (#skills), TimelineSection (#jornada).
-// FASE 6: Contato form + CalcomModal + DirectLinks.
+// FASE 6: ContactSection (#contato) — form Resend + CalcomModal + DirectLinks + BotID.
 
 export default function HomePage() {
   return (
@@ -24,47 +25,7 @@ export default function HomePage() {
       <BentoSkillsSection />
       <TimelineSection />
       <ManifestoSection />
-
-      <PlaceholderSection
-        id="contato"
-        index="12"
-        eyebrow="Contato"
-        title="Vamos conversar"
-        phase="FASE 6"
-        body="Form Resend Server Action + react-hook-form + Zod. Cal.com modal embedded 15min. WhatsApp pré-preenchido. Email direto. Vercel BotID anti-spam invisível."
-      />
+      <ContactSection />
     </>
-  );
-}
-
-function PlaceholderSection({
-  id,
-  index,
-  eyebrow,
-  title,
-  phase,
-  body,
-}: {
-  id: string;
-  index: string;
-  eyebrow: string;
-  title: string;
-  phase: string;
-  body: string;
-}) {
-  return (
-    <section id={id} className="container-max section-pad-y border-t border-(--color-hairline)">
-      <div className="flex max-w-3xl flex-col gap-4">
-        <p className="eyebrow">
-          {index} · {eyebrow}
-        </p>
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h2>
-        <p className="max-w-prose leading-relaxed text-(--color-text-2)">{body}</p>
-        <p className="mt-2 font-mono text-xs text-(--color-text-3)">
-          {'// preenche em '}
-          {phase}
-        </p>
-      </div>
-    </section>
   );
 }

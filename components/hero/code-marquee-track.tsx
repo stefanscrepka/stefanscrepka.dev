@@ -52,23 +52,13 @@ export function CodeMarqueeTrack({ html }: CodeMarqueeTrackProps) {
       )}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
+      style={{
+        maskImage:
+          'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+        WebkitMaskImage:
+          'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+      }}
     >
-      {/* Fade gradient nas bordas pra suavizar entrada/saída */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16"
-        style={{
-          background: 'linear-gradient(to right, var(--color-base) 0%, transparent 100%)',
-        }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16"
-        style={{
-          background: 'linear-gradient(to left, var(--color-base) 0%, transparent 100%)',
-        }}
-      />
-
       <div ref={trackRef} className="flex w-max items-center gap-16 will-change-transform">
         {/* dangerouslySetInnerHTML OK: Shiki output é trusted (build-time) */}
         <div

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { MacBookScroll } from '@/components/ui-effects/macbook-scroll';
+import { CaseStudyCover } from '@/components/work/case-study-cover';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
-import { ScreenshotPlaceholder } from '@/components/work/screenshot-placeholder';
 import { getCaseStudy } from '@/lib/work/data';
 
 const CS = getCaseStudy('nexacore');
@@ -28,13 +28,7 @@ export default function NexaCorePage() {
           </p>
         }
         screen={
-          <ScreenshotPlaceholder
-            label="nexacore-admin.png"
-            caption="Multi-tenant CRM + agenda + faturamento · placeholder"
-            tone="lime"
-            aspectRatio="16/10"
-            className="border-0"
-          />
+          <CaseStudyCover caseStudy={CS} aspectRatio="16/10" tilt="none" className="border-0" />
         }
       />
 

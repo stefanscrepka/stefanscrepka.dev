@@ -3,7 +3,7 @@
 import { m, useInView } from 'motion/react';
 import { type ReactNode, useRef } from 'react';
 import { FlipCard } from '@/components/ui-effects/flip-card';
-import { ScreenshotPlaceholder } from '@/components/work/screenshot-placeholder';
+import { ProductCover } from '@/components/work/product-cover';
 
 // Client islands para OtherWorkSection — FlipCard amber + reveal stagger.
 // AMBER scope: `data-clinic-scope` opcional pra css overrides futuros, mas aqui o
@@ -43,9 +43,10 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
       className="h-full min-h-[28rem]"
       front={
         <div className="flex h-full flex-col gap-5 p-6 sm:p-7" data-clinic-scope>
-          <ScreenshotPlaceholder
-            label="Estética MD"
-            caption="Site institucional · Dra. Martina Dona"
+          <ProductCover
+            mode="diagram"
+            diagram="estetica"
+            label="Estética MD — site institucional Dra. Martina Dona"
             tone="amber"
             aspectRatio="16/10"
           />

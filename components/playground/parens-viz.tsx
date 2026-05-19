@@ -70,7 +70,7 @@ function analyze(input: string): Outcome {
 const EXAMPLES = ['(()())', '([{}])', '({[)]}', 'function fn() { return arr[0]; }'];
 
 export function ParensViz() {
-  const [input, setInput] = useState<string>('([{ olá }])');
+  const [input, setInput] = useState<string>('');
   const reduced = useReducedMotionSafe();
   const outcome = useMemo(() => analyze(input), [input]);
 
@@ -173,7 +173,12 @@ interface StackVizProps {
 
 function StackViz({ stack, balanced, reduced }: StackVizProps) {
   // Display from TOP (last pushed) to BOTTOM (first pushed) for visual stack.
-  const reversed = useMemo(() => [...stack].reverse(), [stack]);
+  // Key estável: prefixa posição absoluta no stack (não muda em pushes futuros),
+  // evitando React reusar items errados quando o tamanho cresce/diminui.
+  const reversed = useMemo(
+    () => stack.map((bracket, depth) => ({ bracket, depth })).reverse(),
+    [stack]
+  );
 
   return (
     <div
@@ -200,9 +205,9 @@ function StackViz({ stack, balanced, reduced }: StackVizProps) {
             {balanced ? '✓ pilha vazia' : 'pilha vazia'}
           </m.p>
         ) : (
-          reversed.map((bracket, idx) => (
+          reversed.map(({ bracket, depth }, idx) => (
             <m.div
-              key={`${bracket}-${reversed.length - 1 - idx}`}
+              key={`stack-${depth}-${bracket}`}
               layout
               initial={reduced ? { opacity: 1, x: 0 } : { opacity: 0, x: 40, scale: 0.9 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}

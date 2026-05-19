@@ -131,7 +131,7 @@ export function FibonacciViz() {
             />
             <YAxis
               scale="log"
-              domain={[1, 'auto']}
+              domain={[1, Math.max(10, naiveLast * 1.4)]}
               allowDataOverflow
               stroke="var(--color-text-3)"
               tick={{ fill: 'var(--color-text-3)', fontSize: 11, fontFamily: 'monospace' }}

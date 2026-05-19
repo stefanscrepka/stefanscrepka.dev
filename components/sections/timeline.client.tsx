@@ -2,18 +2,20 @@
 
 import { m, useInView } from 'motion/react';
 import { useRef } from 'react';
+import { type InstitutionId, InstitutionLogo } from '@/components/shared/institution-logo';
 import { TracingBeam } from '@/components/ui-effects/tracing-beam';
 import { cn } from '@/lib/utils';
 
 // Timeline client: TracingBeam vertical (Aceternity, scroll-driven) +
-// 4 markers revelando sequencialmente on view (Motion 12 whileInView + stagger).
-// Reduced-motion: beam estática completa, markers snap visíveis (Motion respect).
+// 4 markers revelando sequencialmente. Year tabular-nums GRANDE lime no início
+// + institution logos abaixo do title.
 
 export interface TimelineMarker {
   year: string;
   place: string;
   title: string;
   body: string;
+  institutions: InstitutionId[];
 }
 
 const itemVariants = {
@@ -40,20 +42,21 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
           hidden: {},
           visible: { transition: { staggerChildren: 0.2, delayChildren: 0.1 } },
         }}
-        className="flex flex-col gap-14 sm:gap-20"
+        className="flex flex-col gap-16 sm:gap-24"
       >
         {markers.map((marker, idx) => (
-          <m.li key={marker.year} variants={itemVariants} className="relative flex flex-col gap-3">
+          <m.li key={marker.year} variants={itemVariants} className="relative flex flex-col gap-4">
             <MarkerDot index={idx} />
 
-            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <span className="font-mono text-sm font-semibold text-(--color-accent) tabular-nums">
-                {marker.year}
-              </span>
-              <span className="font-mono text-xs uppercase tracking-widest text-(--color-text-3)">
-                {marker.place}
-              </span>
-            </div>
+            {/* Year tabular-nums GRANDE lime — pattern Lando hero year tags */}
+            <p className="mono-stats text-3xl font-bold leading-none text-(--color-accent) tabular-nums sm:text-4xl">
+              <span className="sr-only">Ano </span>
+              {marker.year}
+            </p>
+
+            <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+              ↳ {marker.place}
+            </p>
 
             <h3 className="text-xl font-semibold tracking-tight text-(--color-text-1) sm:text-2xl">
               {marker.title}
@@ -62,6 +65,11 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
             <p className="max-w-prose text-base leading-relaxed text-(--color-text-2)">
               {marker.body}
             </p>
+
+            {/* Institution logos */}
+            {marker.institutions.length > 0 ? (
+              <InstitutionLogo ids={marker.institutions} size={16} className="pt-1" />
+            ) : null}
           </m.li>
         ))}
       </m.ol>
@@ -69,8 +77,6 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
   );
 }
 
-// Decorative dot anchored to the tracing beam rail. Sequential pulse animation
-// activated when marker enters viewport — pure CSS, no JS state.
 function MarkerDot({ index }: { index: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '0px 0px -60px 0px' });
@@ -80,7 +86,7 @@ function MarkerDot({ index }: { index: number }) {
       ref={ref}
       aria-hidden="true"
       className={cn(
-        'pointer-events-none absolute -left-12 top-1 grid size-5 place-items-center sm:-left-14',
+        'pointer-events-none absolute -left-12 top-2 grid size-5 place-items-center sm:-left-14',
         'rounded-full border border-(--color-hairline-strong) bg-(--color-base)',
         'transition-colors duration-(--motion-transition)'
       )}

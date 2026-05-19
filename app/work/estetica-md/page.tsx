@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
+import { CaseStudyCover } from '@/components/work/case-study-cover';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
-import { ScreenshotPlaceholder } from '@/components/work/screenshot-placeholder';
 import { getCaseStudy } from '@/lib/work/data';
 
 const CS = getCaseStudy('estetica-md');
@@ -22,12 +22,7 @@ export default function EsteticaMDPage() {
 
       <div className="container-max grid gap-12 lg:grid-cols-[1.4fr_1fr]">
         <div className="order-2 lg:order-1">
-          <ScreenshotPlaceholder
-            label="estetica-md-home.png"
-            caption="Site institucional pra Dra. Martina Dona · em produção desde Dez/2024"
-            tone="amber"
-            aspectRatio="3/2"
-          />
+          <CaseStudyCover caseStudy={CS} aspectRatio="3/2" tilt="subtle" />
         </div>
         <div className="order-1 flex flex-col gap-6 lg:order-2">
           <p

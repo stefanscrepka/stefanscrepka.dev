@@ -24,10 +24,11 @@ export function HeroPoster({ className, alt }: HeroPosterProps) {
       data-slot="hero-poster"
       {...ariaProps}
       className={cn(
-        'relative isolate flex aspect-square w-full items-center justify-center',
-        'overflow-hidden',
+        'isolate flex h-full w-full items-center justify-center',
+        'overflow-hidden bg-(--color-base)',
         className
       )}
+      style={{ backgroundColor: '#080A07' }}
     >
       {/* Ambient lime glow */}
       <div

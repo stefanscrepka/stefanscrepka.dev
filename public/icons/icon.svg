@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>S/H monogram</title>
+  <rect width="512" height="512" fill="#080A07" rx="96" ry="96"/>
+  <defs>
+    <radialGradient id="glow" cx="30%" cy="30%" r="55%">
+      <stop offset="0%" stop-color="#D2FF00" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#D2FF00" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#glow)" rx="96" ry="96"/>
+  <text
+    x="50%"
+    y="50%"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
+    font-size="260"
+    font-weight="700"
+    letter-spacing="-13"
+    fill="#D2FF00"
+  >S/H</text>
+</svg>

@@ -1,8 +1,9 @@
+import type { InstitutionId } from '@/components/shared/institution-logo';
 import { type TimelineMarker, TimelineMarkers } from './timeline.client';
 
 // Section 10 — Jornada / Timeline. TracingBeam vertical (Aceternity) + 4 markers
-// sequenciais. Heritage industrial mencionado SÓ aqui (HANDOFF veta no hero).
-// Reveal sequencial via Motion useInView + stagger.
+// sequenciais. Cada marker ganha logos das instituições + year tabular-nums grande lime.
+// Heritage industrial mencionado SÓ aqui (HANDOFF veta no hero).
 
 const MARKERS: TimelineMarker[] = [
   {
@@ -10,26 +11,32 @@ const MARKERS: TimelineMarker[] = [
     place: 'SENAI Ponta Grossa',
     title: 'Eletrotécnica · fundamento',
     body: 'Diagramas elétricos, automação industrial, SolidWorks. Onde aprendi a pensar em sistemas que precisam funcionar 24/7. Tolerância zero pra "deve dar certo".',
+    institutions: ['senai'],
   },
   {
     year: '2024',
     place: 'Scheffer Logística · B7Web Fullstack',
     title: 'Transição · eletromecânica + código',
     body: 'Eletromecânica de manhã, programação à noite. Primeiro produto em produção: site Estética MD (Vanilla JS + PHP + ScrollReveal). Provou que entrega importa mais que stack.',
+    institutions: ['scheffer', 'b7web'],
   },
   {
     year: '2025',
     place: 'Makita do Brasil · Engenharia de Software Unicesumar',
     title: 'Profissionalização · três produtos em paralelo',
     body: 'Stack moderno: Next 15, React 19, TypeScript strict. NexaCore SaaS pra clínicas + STJ App PWA + sites de infoprodutos. Três produtos rodando ao mesmo tempo.',
+    institutions: ['makita', 'unicesumar'],
   },
   {
     year: '2026',
     place: 'Content Engine · AI Product Engineer',
     title: 'Agora · multi-agente em produção',
     body: '22 agentes Claude SDK orquestrados em 5 squads. Prompt cache 2 camadas, anti-slop validator com 14 regex PT-BR, aprovação humana via Telegram em ≤10 min/dia. Aqui é o presente.',
+    institutions: ['content-engine'],
   },
 ];
+
+export type { InstitutionId };
 
 export function TimelineSection() {
   return (

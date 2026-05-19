@@ -1,6 +1,6 @@
 'use client';
 
-import { OrbitControls } from '@react-three/drei';
+import { OrbitControls, Text } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -119,7 +119,9 @@ export function Hanoi3D() {
     const move = moves[moveIndexRef.current];
     if (!move) return;
     applyMove(discsRef.current, move);
-    elapsedRef.current = TOTAL_MOVE; // mark phase done
+    // Zerar elapsed pra próxima frame partir do zero — caso usuário aperte Play depois.
+    // (anteriormente setávamos TOTAL_MOVE, o que fazia a animação do PRÓXIMO move ser pulada.)
+    elapsedRef.current = 0;
     moveIndexRef.current += 1;
     setMoveIndex(moveIndexRef.current);
     setPlaying(false);
@@ -296,14 +298,26 @@ function SceneContent({
       <directionalLight position={[5, 8, 4]} intensity={1.4} castShadow={false} />
       <pointLight position={[0, 4, 3]} intensity={0.4} color={LIME} distance={10} />
 
-      {/* Pegs */}
-      {[0, 1, 2].map((i) => {
+      {/* Pegs + labels A/B/C */}
+      {(['A', 'B', 'C'] as const).map((label, i) => {
         const x = pegPosition(i)[0];
         return (
-          <mesh key={`peg-${i}`} position={[x, PEG_HEIGHT / 2, 0]}>
-            <cylinderGeometry args={[PEG_RADIUS, PEG_RADIUS, PEG_HEIGHT, 24]} />
-            <meshStandardMaterial color={PEG_COLOR} roughness={0.6} metalness={0.1} />
-          </mesh>
+          <group key={`peg-${i}`}>
+            <mesh position={[x, PEG_HEIGHT / 2, 0]}>
+              <cylinderGeometry args={[PEG_RADIUS, PEG_RADIUS, PEG_HEIGHT, 24]} />
+              <meshStandardMaterial color={PEG_COLOR} roughness={0.6} metalness={0.1} />
+            </mesh>
+            <Text
+              position={[x, -0.35, 0]}
+              fontSize={0.42}
+              color={LIME}
+              anchorX="center"
+              anchorY="middle"
+              fontWeight={600}
+            >
+              {label}
+            </Text>
+          </group>
         );
       })}
 

@@ -40,20 +40,36 @@ export function Footer() {
   return (
     <footer
       data-slot="footer"
-      className="border-t border-(--color-hairline) bg-(--color-base) py-16 mt-32"
+      className="relative border-t border-(--color-hairline) bg-(--color-base) py-14 mt-16"
     >
-      <div className="container-max flex flex-col gap-12">
+      {/* Lime hairline divisor — sinaliza fim do conteúdo */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            'linear-gradient(to right, transparent 0%, var(--color-accent) 50%, transparent 100%)',
+          opacity: 0.4,
+        }}
+      />
+
+      <div className="container-max flex flex-col gap-10">
         {/* Brand row */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
-          <span className="text-(--color-accent)" aria-hidden="true">
-            <SHMonogram size={40} />
-          </span>
-          <div className="flex flex-col gap-1">
-            <p className="text-lg font-semibold text-(--color-text-1)">Stefan Heinz Screpka</p>
-            <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-              AI Product Engineer · stefanscrepka.dev
-            </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+          <div className="flex items-center gap-4">
+            <span className="text-(--color-accent)" aria-hidden="true">
+              <SHMonogram size={40} />
+            </span>
+            <div className="flex flex-col gap-1">
+              <p className="text-lg font-semibold text-(--color-text-1)">Stefan Heinz Screpka</p>
+              <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
+                AI Product Engineer · stefanscrepka.dev
+              </p>
+            </div>
           </div>
+
+          {/* Mapa Ponta Grossa mini SVG — silhouette geográfica */}
+          <PontaGrossaBadge />
         </div>
 
         {/* 3-col grid */}
@@ -167,6 +183,51 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
         {title}
       </p>
       {children}
+    </div>
+  );
+}
+
+function PontaGrossaBadge() {
+  return (
+    <div
+      aria-hidden="true"
+      className="inline-flex items-center gap-2.5 rounded-md border border-(--color-hairline-strong) bg-(--color-surface) px-3 py-2"
+    >
+      <svg
+        viewBox="0 0 32 24"
+        width="32"
+        height="24"
+        className="text-(--color-accent)"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <title>Ponta Grossa silhouette</title>
+        {/* Stylized PR (Paraná) outline + dot for PG */}
+        <path
+          d="M2 6 8 3l5 4 7-2 6 5-3 6-5 3-8-2-6-3Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+          opacity="0.5"
+        />
+        <circle cx="12" cy="11" r="2" fill="currentColor" />
+        <circle
+          cx="12"
+          cy="11"
+          r="4"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="0.6"
+          opacity="0.4"
+        />
+      </svg>
+      <div className="flex flex-col gap-0">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)">
+          BASED IN
+        </span>
+        <span className="font-mono text-xs text-(--color-text-1)">Ponta Grossa, PR</span>
+      </div>
     </div>
   );
 }

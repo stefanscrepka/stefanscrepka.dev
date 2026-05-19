@@ -6,6 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useMemo, useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
+import { ManifestoBackdrop } from './manifesto-backdrop';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -73,7 +74,12 @@ export function ManifestoSection({ text = MANIFESTO_TEXT, className }: Manifesto
   );
 
   return (
-    <section id="manifesto" className={cn('section-pad-y-lg', className)} data-slot="manifesto">
+    <section
+      id="manifesto"
+      className={cn('relative isolate section-pad-y-lg', className)}
+      data-slot="manifesto"
+    >
+      <ManifestoBackdrop />
       <div className="container-prose flex flex-col gap-8">
         <p className="eyebrow">Manifesto</p>
         <div

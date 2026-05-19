@@ -3,6 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
+import { AboutThisSiteModal } from '@/components/contact/about-this-site-modal';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { MotionProvider } from '@/components/providers/motion-provider';
 import { Footer } from '@/components/sections/footer';
@@ -55,6 +56,8 @@ const personJsonLd = {
   jobTitle: 'AI Product Engineer',
   url: baseUrl,
   email: 'stefanheinz2006@gmail.com',
+  description:
+    'AI Product Engineer brasileiro. Multi-agent IA com Claude SDK + product engineering full-stack. Três produtos em produção: Content Engine, NexaCore SaaS, STJ App.',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Ponta Grossa',
@@ -65,7 +68,40 @@ const personJsonLd = {
     'https://github.com/stefanscrepka',
     'https://www.linkedin.com/in/stefan-heinz-screpka-323ab9242/',
   ],
-  knowsAbout: ['AI', 'TypeScript', 'Next.js', 'Claude SDK', 'PostgreSQL', 'React', 'Three.js'],
+  knowsAbout: [
+    'AI',
+    'Claude SDK',
+    'Claude Code',
+    'MCP',
+    'Prompt Caching',
+    'RAG',
+    'pgvector',
+    'TypeScript',
+    'Next.js',
+    'React',
+    'Tailwind CSS',
+    'Three.js',
+    'r3f',
+    'GSAP',
+    'Motion',
+    'Node.js',
+    'Postgres',
+    'Drizzle ORM',
+    'Prisma',
+    'Redis',
+    'BullMQ',
+    'Socket.io',
+    'Stripe',
+    'Asaas',
+    'Evolution API',
+    'WhatsApp Business',
+    'Resend',
+    'Vercel',
+    'Sentry',
+    'Langfuse',
+    'Docker',
+    'LGPD',
+  ],
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -105,6 +141,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Footer />
           </LenisProvider>
         </MotionProvider>
+        <AboutThisSiteModal />
         <GrainOverlay />
         <Analytics />
         <SpeedInsights />

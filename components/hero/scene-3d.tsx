@@ -30,12 +30,15 @@ const GLASS_FILL = new THREE.Color('#1a1f17');
 const PLATE_GEOMETRY = new THREE.BoxGeometry(1.65, 2.35, 0.07);
 
 interface HeroScene3DProps {
-  className?: string;
+  className?: string | undefined;
 }
 
 export default function HeroScene3D({ className }: HeroScene3DProps) {
   return (
-    <div className={className}>
+    <div
+      className={className}
+      style={{ width: '100%', height: '100%', backgroundColor: '#080A07' }}
+    >
       <Canvas
         dpr={[1, 1.75]}
         camera={{ position: [0, 0, 5], fov: 32 }}
@@ -44,7 +47,7 @@ export default function HeroScene3D({ className }: HeroScene3DProps) {
           alpha: true,
           powerPreference: 'high-performance',
         }}
-        style={{ background: 'transparent' }}
+        style={{ background: 'transparent', width: '100%', height: '100%' }}
       >
         <SceneContent />
       </Canvas>

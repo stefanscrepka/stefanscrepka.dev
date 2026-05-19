@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ScreenshotPlaceholder } from '@/components/work/screenshot-placeholder';
+import { ProductCover, type ProductDiagramKey } from '@/components/work/product-cover';
 import { OtherWorkReveal } from './other-work.client';
 
 // Section 7 — Other Work (~80vh). Estética MD FlipCard amber + 2 mini-cards.
@@ -27,26 +27,30 @@ export function OtherWorkSection() {
       </header>
 
       <OtherWorkReveal>
-        {/* Layout 3-col desktop (3fr/1fr/1fr ≈ 60/20/20), stack mobile */}
-        <div className="grid gap-5 sm:gap-6 lg:grid-cols-[3fr_1fr_1fr]">
-          {/* Featured: Estética MD com FlipCard amber */}
+        {/* Layout asimétrico: Estética MD card grande à esquerda (2/3) +
+            coluna direita com Caronas (top) e Estrutura C (bottom). */}
+        <div className="grid gap-5 sm:gap-6 lg:grid-cols-[2fr_1fr]">
+          {/* Featured: Estética MD FlipCard amber — 2/3 largura, altura total */}
           <EsteticaCard />
 
-          {/* Mini 1: Caronas */}
-          <MiniCard
-            label="Caronas Java CLI"
-            line="Records + java.time + java.util.concurrent · Repository Pattern do zero · academic but real."
-            href="https://github.com/stefanscrepka/sistema-caronas"
-          />
+          {/* Coluna direita stacked: Caronas (top) + Estrutura C (bottom) */}
+          <div className="grid grid-cols-1 gap-5 sm:gap-6">
+            <MiniCard
+              label="Caronas Java CLI"
+              diagram="caronas"
+              line="Records + java.time + java.util.concurrent · Repository Pattern do zero · academic but real."
+              href="https://github.com/stefanscrepka/sistema-caronas"
+            />
 
-          {/* Mini 2: Estrutura C */}
-          <MiniCard
-            label="Estrutura de Dados (C)"
-            line="17 arquivos .c · Hanoi recursivo · Fibonacci memoizado · parênteses balanceamento. Veja Hanoi rodando no Playground."
-            href="https://github.com/stefanscrepka/estrutura-de-dados"
-            secondaryHref="/playground"
-            secondaryLabel="Playground →"
-          />
+            <MiniCard
+              label="Estrutura de Dados (C)"
+              diagram="estrutura-c"
+              line="17 arquivos .c · Hanoi recursivo · Fibonacci memoizado · parênteses balanceamento. Veja Hanoi rodando no Playground."
+              href="https://github.com/stefanscrepka/estrutura-de-dados"
+              secondaryHref="/playground"
+              secondaryLabel="Playground →"
+            />
+          </div>
         </div>
       </OtherWorkReveal>
     </section>
@@ -65,19 +69,26 @@ import { EsteticaFlipCardClient } from './other-work.client';
 
 interface MiniCardProps {
   label: string;
+  diagram: ProductDiagramKey;
   line: string;
   href: string;
   secondaryHref?: string;
   secondaryLabel?: string;
 }
 
-function MiniCard({ label, line, href, secondaryHref, secondaryLabel }: MiniCardProps) {
+function MiniCard({ label, diagram, line, href, secondaryHref, secondaryLabel }: MiniCardProps) {
   return (
     <div
       data-other-card="mini"
       className="group/mini flex h-full flex-col gap-4 rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-5 transition-[border-color,transform,box-shadow] duration-(--motion-fast) hover:-translate-y-1 hover:border-(--color-accent) hover:shadow-(--shadow-glow-lime-sm)"
     >
-      <ScreenshotPlaceholder label={label.split(' ')[0] ?? label} aspectRatio="16/10" tone="lime" />
+      <ProductCover
+        mode="diagram"
+        diagram={diagram}
+        label={label}
+        aspectRatio="16/10"
+        tone="lime"
+      />
       <div className="flex flex-1 flex-col gap-3">
         <p className="text-sm font-semibold text-(--color-text-1)">{label}</p>
         <p className="flex-1 text-xs leading-relaxed text-(--color-text-2)">{line}</p>

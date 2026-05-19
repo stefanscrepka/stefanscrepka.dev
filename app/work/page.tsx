@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ScreenshotPlaceholder } from '@/components/work/screenshot-placeholder';
+import { CaseStudyCover } from '@/components/work/case-study-cover';
 import { CASE_STUDIES, CASE_STUDY_SLUGS } from '@/lib/work/data';
 
 export const metadata: Metadata = {
@@ -31,12 +31,7 @@ export default function WorkIndexPage() {
                 href={`/work/${slug}`}
                 className="group/work-card block h-full rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-6 outline-none transition-[border-color,transform,box-shadow] duration-(--motion-fast) hover:-translate-y-1 hover:border-(--color-accent) hover:shadow-(--shadow-glow-lime-sm) focus-visible:-translate-y-1 focus-visible:border-(--color-accent) focus-visible:shadow-(--shadow-glow-lime-sm)"
               >
-                <ScreenshotPlaceholder
-                  label={cs.title}
-                  tone={cs.accent}
-                  aspectRatio="16/10"
-                  className="mb-5"
-                />
+                <CaseStudyCover caseStudy={cs} aspectRatio="16/10" className="mb-5" />
                 <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
                   {cs.status}
                 </p>

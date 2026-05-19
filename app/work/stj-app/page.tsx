@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { CompareSlider } from '@/components/ui-effects/compare-slider';
 import { TracingBeam } from '@/components/ui-effects/tracing-beam';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
-import { ScreenshotPlaceholder } from '@/components/work/screenshot-placeholder';
+import { ProductCover } from '@/components/work/product-cover';
 import { getCaseStudy } from '@/lib/work/data';
 
 const CS = getCaseStudy('stj-app');
@@ -47,20 +47,34 @@ export default function STJAppPage() {
           beforeLabel="Antes"
           afterLabel="Depois"
           before={
-            <ScreenshotPlaceholder
-              label="WORKFLOW MANUAL"
-              caption="WhatsApp + Excel · processo manual"
-              tone="neutral"
-              aspectRatio="16/10"
-              className="h-full border-0"
-            />
-          }
-          after={
-            <ScreenshotPlaceholder
-              label="EVOLUTION API"
-              caption="Automação real-time + dashboard"
+            <ProductCover
+              mode="mockup"
+              label="WORKFLOW MANUAL — antes Evolution API"
               tone="lime"
               aspectRatio="16/10"
+              tilt="none"
+              className="h-full border-0"
+            >
+              <div className="flex h-full flex-col items-center justify-center gap-3 bg-(--color-base) p-4 font-mono text-xs text-(--color-text-3)">
+                <span className="text-[11px] uppercase tracking-widest text-(--color-text-3)">
+                  ANTES
+                </span>
+                <span className="text-(--color-text-1)">WhatsApp + Excel</span>
+                <span className="text-(--color-text-3)">processo manual · 4-6h/dia</span>
+                <span className="mt-2 inline-flex items-center gap-1 text-(--color-danger)">
+                  ✕ erros copy-paste · sem audit · sem histórico
+                </span>
+              </div>
+            </ProductCover>
+          }
+          after={
+            <ProductCover
+              mode="diagram"
+              diagram="stj"
+              label="EVOLUTION API — automação real-time STJ App"
+              tone="lime"
+              aspectRatio="16/10"
+              tilt="none"
               className="h-full border-0"
             />
           }

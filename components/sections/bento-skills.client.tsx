@@ -2,18 +2,28 @@
 
 import { m, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
+import { type TechId, TechLogo } from '@/components/shared/tech-logo';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
-// Bento Grid client: stagger reveal + hover lime border + SVG tracing line
-// perimeter draw (top→right→bottom→left, 600ms).
-// Reduced-motion: hover keeps subtle scale only, sem tracing line, sem stagger.
+// Bento Grid client: stagger reveal + hover lime border + tracing line perimeter.
+// Cells especiais ('feature') ganham visual destaque: número grande tabular-nums
+// + mini diagram, ou status indicators verde pulsantes.
 
 export interface BentoSkillsCell {
   size: 'large' | 'small';
   heading: string;
-  tags: string[];
+  /** Tags primárias com logos TechLogo associados. */
+  techs: TechId[];
+  /** Tags adicionais sem logo (versões, sub-features) — exibidas como chips text-only. */
+  extras?: string[];
   note?: string;
+  /** Feature visual extra. 'count' = número gigante. 'live' = status pulsantes. */
+  feature?: 'count' | 'live';
+  /** Quando feature='count', número exibido (ex: '22'). */
+  count?: number;
+  /** Quando feature='count', sufixo (ex: 'agentes'). */
+  countSuffix?: string;
 }
 
 const ROW1_GRID = 'col-span-1 sm:col-span-4 lg:col-span-4';
@@ -70,16 +80,16 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
   const reduced = useReducedMotionSafe();
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: decorative hover container; tag elements remain focusable
     <article
       data-slot="bento-cell"
       data-size={cell.size}
+      data-feature={cell.feature}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onFocus={() => setHover(true)}
       onBlur={() => setHover(false)}
       className={cn(
-        'group/cell relative isolate flex h-full flex-col gap-5 overflow-hidden p-6 sm:p-7',
+        'group/cell relative isolate flex h-full flex-col gap-4 overflow-hidden p-6 sm:p-7',
         'rounded-2xl border border-(--color-hairline) bg-(--color-surface)',
         'transition-[border-color,transform,box-shadow]',
         'duration-(--motion-fast) ease-(--ease-standard)',
@@ -89,8 +99,6 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         reduced ? 'hover:scale-[1.005]' : 'hover:scale-[1.015] hover:-translate-y-0.5'
       )}
     >
-      {/* Animated perimeter trace (SVG path, drawn top→right→bottom→left).
-          Pointer-events none, aria-hidden — pure decoration. */}
       {!reduced ? <PerimeterTrace active={hover} /> : null}
 
       <header className="flex items-baseline justify-between gap-3">
@@ -105,23 +113,77 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </span>
       </header>
 
-      <ul className="flex flex-wrap gap-1.5 text-xs">
-        {cell.tags.map((tag) => (
-          <li
-            key={tag}
-            className={cn(
-              'rounded-md border border-(--color-hairline-strong)',
-              'bg-(--color-surface-elevated) px-2 py-1',
-              'font-mono text-[11px] text-(--color-text-2)',
-              'transition-colors duration-(--motion-fast)',
-              'group-hover/cell:border-(--color-accent-emissive)',
-              'group-hover/cell:text-(--color-text-1)'
-            )}
+      {/* Feature visual — number ou live indicators */}
+      {cell.feature === 'count' && cell.count !== undefined ? (
+        <div className="flex items-baseline gap-3 pb-1">
+          <span
+            aria-hidden="true"
+            className="mono-stats text-6xl font-bold leading-none text-(--color-accent) tabular-nums sm:text-7xl"
           >
-            {tag}
-          </li>
-        ))}
-      </ul>
+            {cell.count}
+          </span>
+          {cell.countSuffix ? (
+            <span className="font-mono text-xs uppercase tracking-widest text-(--color-text-3)">
+              <span className="sr-only">{`${cell.count} `}</span>
+              {cell.countSuffix}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* Tech logos row — ícones + nomes oficiais (estilizados) */}
+      {cell.techs.length > 0 ? (
+        <ul className="flex flex-wrap gap-x-3 gap-y-2">
+          {cell.techs.map((id) => (
+            <li key={id}>
+              <TechLogo
+                id={id}
+                size={16}
+                showLabel
+                className="text-(--color-text-1) group-hover/cell:text-(--color-text-1)"
+              />
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {/* Extras chip list (versões / sub-features) */}
+      {cell.extras && cell.extras.length > 0 ? (
+        <ul className="flex flex-wrap gap-1.5">
+          {cell.extras.map((tag) => (
+            <li
+              key={tag}
+              className={cn(
+                'rounded-md border border-(--color-hairline-strong)',
+                'bg-(--color-surface-elevated) px-2 py-0.5',
+                'font-mono text-[10px] text-(--color-text-3)',
+                'transition-colors duration-(--motion-fast)',
+                'group-hover/cell:border-(--color-accent-emissive)',
+                'group-hover/cell:text-(--color-text-2)'
+              )}
+            >
+              {tag}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
+      {cell.feature === 'live' ? (
+        <ul className="flex flex-col gap-2 pt-2">
+          {['Vercel deploy', 'Coolify VPS', 'Sentry errors', 'Langfuse traces'].map((service) => (
+            <li
+              key={service}
+              className="flex items-center gap-2 font-mono text-xs text-(--color-text-2)"
+            >
+              <LiveDot reduced={reduced ?? false} />
+              <span>{service}</span>
+              <span className="ml-auto text-[10px] uppercase tracking-widest text-(--color-success)">
+                ok
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {cell.note ? (
         <p className="mt-auto pt-2 text-sm leading-relaxed text-(--color-text-2)">{cell.note}</p>
@@ -130,9 +192,25 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
   );
 }
 
-// SVG perimeter trace — 4 segments synced via stagger.
-// Path total length normalized to ~400 (relative units). Use pathLength="1"
-// to make stroke-dashoffset/dasharray work as 0..1 progress.
+function LiveDot({ reduced }: { reduced: boolean }) {
+  return (
+    <span className="relative flex size-2 items-center justify-center">
+      {!reduced ? (
+        <span
+          aria-hidden="true"
+          className="absolute inline-flex size-full animate-ping rounded-full opacity-50"
+          style={{ background: 'var(--color-success)' }}
+        />
+      ) : null}
+      <span
+        aria-hidden="true"
+        className="relative inline-flex size-2 rounded-full"
+        style={{ background: 'var(--color-success)', boxShadow: '0 0 6px var(--color-success)' }}
+      />
+    </span>
+  );
+}
+
 function PerimeterTrace({ active }: { active: boolean }) {
   return (
     <svg

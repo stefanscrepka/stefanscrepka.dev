@@ -11,6 +11,14 @@ export interface CaseStudyCTA {
   external?: boolean;
 }
 
+export type ProductDiagramKey =
+  | 'squads'
+  | 'nexacore'
+  | 'stj'
+  | 'estetica'
+  | 'caronas'
+  | 'estrutura-c';
+
 export interface CaseStudy {
   slug: CaseStudySlug;
   title: string;
@@ -20,8 +28,10 @@ export interface CaseStudy {
   stack: string[];
   details: string[];
   ctas: CaseStudyCTA[];
-  /** Path real em /public quando Stefan entregar. Null = placeholder SVG. */
+  /** Path real em /public quando Stefan entregar. Null = usa diagram fallback. */
   screenshot: string | null;
+  /** Diagrama SVG fallback enquanto screenshot for null. */
+  diagram: ProductDiagramKey;
   accent: 'lime' | 'amber';
   /** Microcopy do card "Other Work" + index gallery */
   shortLine: string;
@@ -62,6 +72,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       { label: 'Ler arquitetura completa →', href: '#architecture', variant: 'outline' },
     ],
     screenshot: null,
+    diagram: 'squads',
     accent: 'lime',
     shortLine:
       'Sistema multi-agente Claude SDK · 22 agentes em 5 squads · substitui agência inteira.',
@@ -102,6 +113,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       { label: 'Agendar call 15min →', href: '/#contato', variant: 'outline' },
     ],
     screenshot: null,
+    diagram: 'nexacore',
     accent: 'lime',
     shortLine: 'B2B SaaS clínicas estéticas · Next 14 + Clerk + WhatsApp + 61 componentes design.',
   },
@@ -141,6 +153,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       { label: 'Post-mortem técnico →', href: '#post-mortem', variant: 'outline' },
     ],
     screenshot: null,
+    diagram: 'stj',
     accent: 'lime',
     shortLine: 'PWA cockpit · Claude Haiku 4.5 streaming · prompt cache 2 camadas · 162 testes.',
   },
@@ -182,6 +195,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       },
     ],
     screenshot: null,
+    diagram: 'estetica',
     accent: 'amber',
     shortLine: 'Site clínica premium · vanilla JS + PHP · prova de motion design antes do React.',
   },

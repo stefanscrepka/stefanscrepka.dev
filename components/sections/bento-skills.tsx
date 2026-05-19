@@ -2,16 +2,18 @@ import { type BentoSkillsCell, BentoSkillsGrid } from './bento-skills.client';
 
 // Section 9 — Stack confirmado em formato Bento Grid asimétrico.
 // 6 células: 2 large (2×1: IA AGENTIC + INFRA) + 4 standard.
-// Layout grid 6-col desktop, stack mobile.
-// Hover lime emissive border + tracing line perimeter draw (anim via Motion).
-// Reveal stagger 100ms on view.
+// Cada cell tem TechLogo SVG (não só chip text), e duas cells ganham
+// feature visual extra: count grande ("22 agentes") e status indicators verde ("ok").
 
 const CELLS: BentoSkillsCell[] = [
   {
     size: 'large',
     heading: 'IA AGENTIC',
-    tags: [
-      'Claude Agent SDK',
+    feature: 'count',
+    count: 22,
+    countSuffix: 'agentes em 5 squads',
+    techs: ['anthropic', 'shiki'],
+    extras: [
       'Opus 4.7',
       'Sonnet 4.6',
       'Haiku 4.5',
@@ -21,78 +23,46 @@ const CELLS: BentoSkillsCell[] = [
       'vision',
       'streaming SSE',
     ],
-    note: '22 agentes Claude orquestrados em 5 squads. Substitui times humanos.',
+    note: 'Claude Agent SDK orquestra squads especializados. Substitui agência inteira.',
   },
   {
     size: 'small',
     heading: 'RAG + VECTOR',
-    tags: [
-      'pgvector',
-      'Qdrant',
-      'BGE-M3',
-      'Gemini embedding-004',
-      'Ollama local',
-      're-ranking',
-      'hybrid search',
-    ],
+    techs: ['postgres'],
+    extras: ['pgvector', 'Qdrant', 'BGE-M3', 'Gemini emb-004', 'Ollama local', 're-ranking'],
   },
   {
     size: 'small',
     heading: 'FRONTEND',
-    tags: [
-      'Next 16',
-      'React 19',
-      'TypeScript strict',
-      'Tailwind v4',
-      'shadcn/ui',
-      'Motion 12',
-      'GSAP',
-      'Three.js + r3f',
-    ],
+    techs: ['nextjs', 'react', 'tailwind', 'three', 'gsap', 'motion'],
+    extras: ['TypeScript strict', 'shadcn/ui', 'r3f + drei'],
   },
   {
     size: 'small',
     heading: 'BACKEND',
-    tags: [
-      'Node 22',
-      'Postgres 17',
-      'Drizzle',
-      'Prisma',
-      'Redis',
-      'BullMQ',
-      'Socket.io',
-      'Fastify',
-      'Inngest',
-      'Server Actions',
-    ],
+    techs: ['typescript', 'postgres', 'drizzle', 'redis'],
+    extras: ['Node 22', 'BullMQ', 'Socket.io', 'Fastify', 'Inngest', 'Server Actions'],
   },
   {
     size: 'small',
     heading: 'INTEGRAÇÕES',
-    tags: [
-      'Stripe',
-      'Asaas',
-      'Evolution API',
-      'Telegram (grammy)',
-      'Google Calendar',
-      'Google Drive',
-      'Resend',
-      'Cal.com',
-    ],
+    techs: ['stripe', 'whatsapp', 'telegram', 'supabase'],
+    extras: ['Asaas', 'Evolution API', 'Google Calendar', 'Google Drive', 'Resend', 'Cal.com'],
   },
   {
     size: 'large',
     heading: 'INFRA + OBSERVABILITY',
-    tags: [
+    feature: 'live',
+    techs: ['vercel', 'sentry'],
+    extras: [
       'Vercel Fluid Compute',
       'Docker multi-stage',
-      'Coolify VPS',
-      'Sentry',
+      'Coolify VPS · GPU local',
       'Langfuse',
       'GitHub Actions',
       'Playwright E2E',
     ],
-    note: 'Three.js fonte da verdade pra deploy → Vercel gru1 region. Coolify VPS roda Content Engine 24/7 com GPU local.',
+    note: 'Vercel gru1 (frontend público) + Coolify VPS rodando Content Engine 24/7 com GPU local.',
   },
 ];
 
