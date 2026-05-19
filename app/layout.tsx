@@ -4,7 +4,19 @@ import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
 import { LenisProvider } from '@/components/providers/lenis-provider';
+import { MotionProvider } from '@/components/providers/motion-provider';
+import { Footer } from '@/components/sections/footer';
+import { ContactIcon, ManifestoIcon, ProcessIcon, WorkIcon } from '@/components/shared/nav-icons';
+import { FloatingDock, type FloatingDockItem } from '@/components/ui-effects/floating-dock';
+import { GrainOverlay } from '@/components/ui-effects/grain-overlay';
 import './globals.css';
+
+const navItems: FloatingDockItem[] = [
+  { label: 'Work', href: '#work', icon: <WorkIcon />, subtitle: 'Três produtos em produção' },
+  { label: 'Process', href: '#process', icon: <ProcessIcon />, subtitle: 'Como eu construo' },
+  { label: 'Manifesto', href: '#manifesto', icon: <ManifestoIcon />, subtitle: 'Princípios' },
+  { label: 'Contato', href: '#contato', icon: <ContactIcon />, subtitle: 'Respondo em <12h' },
+];
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://stefanscrepka.dev';
 
@@ -71,7 +83,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
       </head>
       <body className="antialiased">
-        <LenisProvider>{children}</LenisProvider>
+        <a href="#main" className="skip-link">
+          Pular para o conteúdo
+        </a>
+        <MotionProvider>
+          <LenisProvider>
+            <FloatingDock items={navItems} />
+            <main id="main" className="relative">
+              {children}
+            </main>
+            <Footer />
+          </LenisProvider>
+        </MotionProvider>
+        <GrainOverlay />
         <Analytics />
         <SpeedInsights />
       </body>

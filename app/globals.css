@@ -1,54 +1,166 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
-/* === OKLCH PALETTE — LIME A (single accent) + AMBER (sub-accent Estética MD only) === */
+/* OKLCH design tokens — Lime A primary, Amber sub-accent only.
+   Tailwind v4 auto-gera utilities a partir dos namespaces color, font, text,
+   tracking, leading, breakpoint, radius, shadow, ease, animate.
+   Motion durations sao CSS vars cruas; usar via style ou arbitrary class. */
+
 @theme {
-  /* Base & surfaces */
+  /* === Surfaces === */
   --color-base: oklch(13% 0.005 130);
   --color-surface: oklch(18% 0.008 130);
   --color-surface-elevated: oklch(22% 0.010 130);
   --color-surface-overlay: oklch(26% 0.012 130);
 
-  /* Accent primário — Lime A */
+  /* === Accent — Lime A === */
   --color-accent: oklch(94% 0.22 124);
   --color-accent-hover: oklch(90% 0.24 124);
+  --color-accent-subtle: oklch(94% 0.22 124 / 0.08);
+  --color-accent-emissive: oklch(94% 0.22 124 / 0.4);
+  --color-accent-glow: oklch(94% 0.22 124 / 0.15);
 
-  /* Sub-accent — Amber (APENAS dentro de seções clínica/Estética MD) */
+  /* === Sub-accent — Amber (only inside /work/estetica-md scope).
+     Nullify Tailwind default amber-50..950 scale (--color-amber-*: initial)
+     pra evitar drift: `bg-amber-400` por engano = pega default v4. Aqui só
+     bg-amber + bg-amber-glow custom existem como utilities. === */
+  --color-amber-50: initial;
+  --color-amber-100: initial;
+  --color-amber-200: initial;
+  --color-amber-300: initial;
+  --color-amber-400: initial;
+  --color-amber-500: initial;
+  --color-amber-600: initial;
+  --color-amber-700: initial;
+  --color-amber-800: initial;
+  --color-amber-900: initial;
+  --color-amber-950: initial;
   --color-amber: oklch(82% 0.18 75);
+  --color-amber-glow: oklch(82% 0.18 75 / 0.15);
 
-  /* Text */
+  /* === Text === */
   --color-text-1: oklch(98% 0.005 130);
   --color-text-2: oklch(75% 0.005 130);
   --color-text-3: oklch(55% 0.005 130);
   --color-text-on-accent: oklch(13% 0.005 130);
 
-  /* Borders & hairlines */
+  /* === Borders & hairlines === */
   --color-hairline: oklch(22% 0.010 130);
   --color-hairline-strong: oklch(30% 0.010 130);
   --color-border-focus: oklch(94% 0.22 124);
 
-  /* Semantic */
+  /* === Semantic === */
   --color-success: oklch(75% 0.15 142);
   --color-warning: oklch(80% 0.18 100);
   --color-danger: oklch(65% 0.20 10);
   --color-info: oklch(72% 0.14 250);
 
-  /* Fonts */
-  --font-display: 'Geist', system-ui, -apple-system, sans-serif;
-  --font-body: 'Geist', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
-  --font-editorial: 'PP Editorial New', 'Times New Roman', Georgia, serif;
+  /* === Fonts (chain through next/font Geist CSS vars set on <html>) === */
+  --font-display: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-body: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-editorial: 'PP Editorial New', 'GT Sectra', Georgia, 'Times New Roman', serif;
 
-  /* Motion durations */
-  --motion-instant: 50ms;
-  --motion-micro: 150ms;
-  --motion-fast: 200ms;
-  --motion-transition: 300ms;
-  --motion-modal: 400ms;
-  --motion-page: 600ms;
-  --motion-scroll: 800ms;
-  --motion-hero: 1200ms;
+  /* === Fluid type scale (ratio 1.333 perfect fourth, clamp 320→1920px) === */
+  --text-xs: clamp(0.75rem, 0.7272rem + 0.1136vw, 0.875rem);
+  --text-xs--line-height: 1.5;
+  --text-xs--letter-spacing: 0;
 
-  /* Easings */
+  --text-sm: clamp(0.875rem, 0.8409rem + 0.1705vw, 1rem);
+  --text-sm--line-height: 1.5;
+  --text-sm--letter-spacing: 0;
+
+  --text-base: clamp(1rem, 0.9545rem + 0.2273vw, 1.125rem);
+  --text-base--line-height: 1.6;
+  --text-base--letter-spacing: 0;
+
+  --text-lg: clamp(1.125rem, 1.0227rem + 0.5114vw, 1.5rem);
+  --text-lg--line-height: 1.5;
+  --text-lg--letter-spacing: -0.005em;
+
+  --text-xl: clamp(1.5rem, 1.2955rem + 1.0227vw, 2rem);
+  --text-xl--line-height: 1.3;
+  --text-xl--letter-spacing: -0.01em;
+
+  --text-2xl: clamp(2rem, 1.6136rem + 1.9318vw, 2.75rem);
+  --text-2xl--line-height: 1.2;
+  --text-2xl--letter-spacing: -0.015em;
+
+  --text-3xl: clamp(2.75rem, 2.0455rem + 3.4091vw, 3.75rem);
+  --text-3xl--line-height: 1.1;
+  --text-3xl--letter-spacing: -0.02em;
+
+  --text-4xl: clamp(3.75rem, 2.5568rem + 5.6818vw, 5rem);
+  --text-4xl--line-height: 1.0;
+  --text-4xl--letter-spacing: -0.025em;
+
+  --text-5xl: clamp(5rem, 3.1818rem + 9.0909vw, 6.75rem);
+  --text-5xl--line-height: 0.95;
+  --text-5xl--letter-spacing: -0.025em;
+
+  --text-6xl: clamp(6.75rem, 3.8864rem + 14.0909vw, 9rem);
+  --text-6xl--line-height: 0.92;
+  --text-6xl--letter-spacing: -0.03em;
+
+  --text-7xl: clamp(9rem, 4.9545rem + 20.4545vw, 12rem);
+  --text-7xl--line-height: 0.9;
+  --text-7xl--letter-spacing: -0.035em;
+
+  /* === Tracking === */
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.08em;
+  --tracking-widest: 0.16em;
+
+  /* === Leading ===
+     ATENÇÃO: --leading-tight conservador (1.1) pra não cortar descendentes
+     em body text. Display brutalist (0.95) vive no @utility headline-display
+     diretamente, não no namespace --leading-*. === */
+  --leading-display: 0.95;
+  --leading-tight: 1.1;
+  --leading-snug: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+  --leading-loose: 2;
+
+  /* === Breakpoints (mobile-first) === */
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 90rem;
+
+  /* === Radii === */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 18px;
+  --radius-pill: 9999px;
+
+  /* === Shadows (3-layer cinema — Linear/Vercel signature) === */
+  --shadow-sm: 0 1px 1px oklch(0% 0 0 / 0.04);
+  --shadow-md:
+    0 1px 1px oklch(0% 0 0 / 0.04),
+    0 4px 8px oklch(0% 0 0 / 0.06);
+  --shadow-lg:
+    0 1px 1px oklch(0% 0 0 / 0.04),
+    0 8px 16px oklch(0% 0 0 / 0.08),
+    0 16px 32px oklch(0% 0 0 / 0.10);
+  --shadow-cinema:
+    0 1px 1px oklch(0% 0 0 / 0.04),
+    0 8px 24px oklch(0% 0 0 / 0.12),
+    0 32px 64px oklch(0% 0 0 / 0.18);
+  --shadow-inner-highlight: inset 0 1px 0 oklch(100% 0 0 / 0.06);
+  --shadow-inner-highlight-emissive: inset 0 1px 0 oklch(100% 0 0 / 0.10);
+  --shadow-glow-lime-sm: 0 0 16px var(--color-accent-emissive);
+  --shadow-glow-lime-md: 0 0 32px var(--color-accent-emissive);
+  --shadow-glow-amber-sm: 0 0 16px oklch(82% 0.18 75 / 0.4);
+
+  /* === Easings === */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-enter: cubic-bezier(0.05, 0.7, 0.1, 1);
   --ease-exit: cubic-bezier(0.3, 0, 0.8, 0.15);
@@ -58,17 +170,198 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* Radii */
-  --radius-none: 0;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 18px;
-  --radius-pill: 9999px;
+  /* === Motion durations (raw CSS vars; usar via style or arbitrary class) === */
+  --motion-instant: 50ms;
+  --motion-micro: 150ms;
+  --motion-fast: 200ms;
+  --motion-transition: 300ms;
+  --motion-modal: 400ms;
+  --motion-page: 600ms;
+  --motion-scroll: 800ms;
+  --motion-hero: 1200ms;
+  --motion-marquee: 40s;
+  --motion-drift: 60s;
+
+  /* === Custom animations (v4 namespace --animate-* → animate-* utilities) === */
+  --animate-grain-drift: grain-drift 60s linear infinite;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-fade-up: fade-up 600ms cubic-bezier(0.165, 0.84, 0.44, 1) both;
+  --animate-shimmer: shimmer 2400ms linear infinite;
 }
 
-/* === Base layer === */
+/* ============================================================
+   Keyframes (top-level — referenced by --animate-* tokens above)
+   ============================================================ */
+
+@keyframes grain-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  10% {
+    transform: translate(-2%, -3%);
+  }
+  20% {
+    transform: translate(-4%, 2%);
+  }
+  30% {
+    transform: translate(3%, -4%);
+  }
+  40% {
+    transform: translate(-2%, 5%);
+  }
+  50% {
+    transform: translate(-4%, 2%);
+  }
+  60% {
+    transform: translate(3%, 0);
+  }
+  70% {
+    transform: translate(0, 3%);
+  }
+  80% {
+    transform: translate(-3%, 0);
+  }
+  90% {
+    transform: translate(2%, 2%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+/* ============================================================
+   Custom utility classes (Tailwind v4 @utility — variant-aware)
+   ============================================================ */
+
+@utility headline-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: var(--leading-display);
+  font-feature-settings: 'ss01' 1, 'calt' 1, 'liga' 1, 'kern' 1;
+  font-optical-sizing: auto;
+}
+
+@utility headline-editorial-accent {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-weight: 400;
+  font-feature-settings: 'dlig' 1, 'calt' 1, 'kern' 1;
+}
+
+@utility mono-stats {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'calt' 1, 'zero' 1;
+}
+
+@utility eyebrow {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--color-text-3);
+}
+
+@utility hairline {
+  border: 1px solid var(--color-hairline);
+}
+
+@utility hairline-strong {
+  border: 1px solid var(--color-hairline-strong);
+}
+
+@utility hairline-top {
+  border-top: 1px solid var(--color-hairline);
+}
+
+@utility hairline-bottom {
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+@utility container-max {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@utility container-narrow {
+  width: 100%;
+  max-width: 61.25rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@utility container-prose {
+  width: 100%;
+  max-width: 72ch;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+@utility section-pad-y {
+  padding-block: clamp(4rem, 6vw, 8rem);
+}
+
+@utility section-pad-y-lg {
+  padding-block: clamp(6rem, 10vw, 12rem);
+}
+
+@utility skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  background-color: var(--color-accent);
+  color: var(--color-text-on-accent);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--motion-fast) var(--ease-snappy);
+
+  &:focus-visible {
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   Base layer
+   ============================================================ */
+
 @layer base {
   html {
     color-scheme: dark;
@@ -95,7 +388,12 @@
     border-radius: var(--radius-sm);
   }
 
-  /* Tabular nums em stats automaticamente */
+  /* Anchor targets must clear the floating dock (offset for in-page nav) */
+  :target {
+    scroll-margin-top: 6rem;
+  }
+
+  /* Tabular nums em stats sections */
   .stats-row,
   [data-tabular] {
     font-variant-numeric: tabular-nums;
@@ -103,7 +401,10 @@
   }
 }
 
-/* === Reduced motion override global (gotcha #9 mitigação base) === */
+/* ============================================================
+   Reduced-motion override (gotcha #9 baseline mitigation)
+   ============================================================ */
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
