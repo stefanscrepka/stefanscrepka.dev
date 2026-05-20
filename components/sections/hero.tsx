@@ -1,40 +1,33 @@
-import { CodeMarquee } from '@/components/hero/code-marquee';
 import { CTAGroup } from '@/components/hero/cta-group';
 import { EditorialAccent } from '@/components/hero/editorial-accent';
-import { HeroSceneClient } from '@/components/hero/hero-scene.client';
 import { MonoSubhead } from '@/components/hero/mono-subhead';
 import { PartnerMarquee } from '@/components/hero/partner-marquee';
 import { SplitTextHeadline } from '@/components/hero/split-text-headline';
 import { StatsRow } from '@/components/hero/stats-row';
 
 // ============================================================
-// Section 1 — Hero (HUD detox + cinematic atmosphere)
+// Section 1 — Hero (Wave 1: stripped, Wave 2: HeroVideo entra)
 //
-// Removido (HUD competindo com headline):
-//   - StatusBadge "disponível pra projetos" → vai pro footer
-//   - TimeClock decorativo → eliminado (Argus pattern, slop tendency)
+// Removido em Wave 1:
+//   - HeroSceneClient + scene-3d r3f + hero-poster (visual "3 retângulos
+//     flutuantes" rejeitado pelo Stefan + bug Canvas null/alpha)
+//   - CodeMarquee (R-15 anti-slop validator regex strip — Stefan: "nada a ver")
 //
-// Repositionado:
-//   - CodeMarquee descido pra "abaixo do hero principal", opacity reduzida,
-//     mask gradient mais agressivo nas bordas. Não compete mais com headline.
+// Mantém:
+//   - Atmosphere radial lime beam CSS (continua útil mesmo sem canvas)
+//   - Top vignette
+//   - Headline travada com "multi-agente" italic
+//   - MonoSubhead, CTAGroup, StatsRow, PartnerMarquee
 //
-// Estrutura:
-//   1. Atmosphere layer (radial lime beam — palco)
-//   2. Main grid 2-col: headline + r3f scene (lg+)
-//   3. CodeMarquee sutil (separator strip)
-//   4. StatsRow (mono-tabular)
-//   5. PartnerMarquee (logos infinite scroll)
-//
-// Atmosfera vem 100% do canvas r3f (volumetric beam + bloom). O radial
-// background CSS reforça a continuidade do beam pra fora do canvas até o
-// resto da page — vinheta unificada.
+// Wave 2 vai adicionar <HeroVideo /> no slot direito (vídeo loop Veo 3.1
+// atmospheric beam pure, conforme plano §B).
 // ============================================================
 
 export async function HeroSection() {
   return (
     <section id="hero" className="relative overflow-hidden">
-      {/* Atmosphere — radial lime beam emanating from bottom-center (continua o beam do canvas).
-          Stage-light pattern (Nextronium). Layered atrás do grid, mix-blend screen pra
+      {/* Atmosphere — radial lime beam emanating from bottom-center.
+          Stage-light pattern. Layered atrás do grid, mix-blend screen pra
           reforçar luz emergente sem clarear texto/CTA por cima. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-0">
         <div
@@ -51,7 +44,7 @@ export async function HeroSection() {
       </div>
 
       {/* Top vignette — escurece levemente o topo pra deixar headline respirando
-          contra o palco escuro (vs. competir com brilho do beam). */}
+          contra o palco escuro. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[40%]"
@@ -60,7 +53,7 @@ export async function HeroSection() {
         }}
       />
 
-      {/* Main grid — headline + r3f scene */}
+      {/* Main grid — headline left + hero visual slot right (Wave 2 preenche com <HeroVideo />) */}
       <div
         className={[
           'container-max relative z-10 grid items-center gap-10',
@@ -81,25 +74,19 @@ export async function HeroSection() {
           <CTAGroup />
         </div>
 
-        {/* Hero scene container — sem border decorativo (atmosfera vem do conteúdo,
-            não da moldura). Aspect square mobile, fill desktop. Background base
-            via inline fallback caso OKLCH falhe. */}
+        {/* Hero visual slot — Wave 1: stub vazio (sem r3f). Wave 2: <HeroVideo /> entra aqui
+            com vídeo loop atmospheric Veo 3.1. */}
         <div
+          aria-hidden="true"
           className={[
             'relative aspect-square w-full max-w-[560px] overflow-hidden',
-            'bg-(--color-base) place-self-center',
+            'place-self-center',
             'lg:aspect-auto lg:min-h-[600px] lg:max-w-none lg:place-self-stretch',
+            // Slot stub: reforça atmosphere com gradient interno até Wave 2 chegar
+            'rounded-2xl',
           ].join(' ')}
-        >
-          <HeroSceneClient className="absolute inset-0 h-full w-full" />
-        </div>
-      </div>
-
-      {/* Code marquee — sutil separator strip abaixo do hero principal.
-          Opacity reduced + mask gradient agressivo. Não compete com headline,
-          funciona como "engine room" hint (R-15 anti-slop validator real code). */}
-      <div className="relative z-10 opacity-50 transition-opacity duration-300 hover:opacity-90">
-        <CodeMarquee />
+          data-slot="hero-visual-placeholder"
+        />
       </div>
 
       {/* Stats row strip */}

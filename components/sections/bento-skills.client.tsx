@@ -132,9 +132,23 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </span>
       </header>
 
-      {/* Feature visual XL — ORBITAL DIAGRAM 22 AGENTS */}
+      {/* Feature visual XL — Wave 1 stub: count textual mono grande.
+          Wave 4 vai substituir por <video> real do Telegram HITL (reusa asset
+          do bento-processos cell 1, conforme plano §D.2). */}
       {cell.feature === 'count' && cell.count !== undefined ? (
-        <AgentsOrbital count={cell.count} suffix={cell.countSuffix} reduced={reduced ?? false} />
+        <div className="relative flex flex-1 flex-col items-center justify-center gap-3 py-4">
+          <span
+            className="mono-stats font-bold tabular-nums leading-none text-(--color-accent)"
+            style={{ fontSize: 'clamp(5rem, 12vw, 9rem)', letterSpacing: '-0.04em' }}
+          >
+            {cell.count}
+          </span>
+          {cell.countSuffix ? (
+            <p className="text-center font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+              {cell.countSuffix}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       {/* Tech logos */}
@@ -213,268 +227,22 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
 }
 
 // =================================================================
-// AgentsOrbital — Hero visual da cell XL IA AGENTIC.
+// AgentsOrbital REMOVIDO (Wave 1).
 //
-// Substitui "22" 220px gigante por:
-//   - Lime radial beam background (do center)
-//   - SVG orbital: HITL E-0 central emissive + 5 squad cores (O · I · S · C · R)
-//     em ring outer + 22 agent satellites distribuídos por squad
-//     (O:6, I:4, S:2, C:8, R:4 → ratio real Content Engine, ajustado pra
-//     hit 22 — atual contagem oficial é O:6 I:4 S:2 C:8 R:4 = 24, ajustamos
-//     visualmente pra match 22)
-//   - Dashed edges radial: squad → central
-//   - Idle rotation 60s linear (desligado em reduced-motion)
-//   - Label "22 agentes orquestrados em 5 squads" abaixo
+// Era o SVG orbital com 5 squad cores + 22 agentes satélites rotacionando
+// 60s. Stefan classificou como visual "perdido" / "SVG procedural" — mesmo
+// padrão visual que foi removido em outras seções.
+//
+// Wave 4 vai substituir por <video> real do Telegram HITL (Stefan grava
+// screencap do bot recebendo aprovação). Mesmo asset será reusado no
+// bento-processos cell 1.
+//
+// Por enquanto (Wave 1) a célula IA AGENTIC mostra apenas o count textual
+// grande (ver BentoCell acima, branch cell.feature === 'count').
 // =================================================================
 
-interface SquadDef {
-  label: string;
-  satellites: number;
-  // posição em ring (degrees, top=0)
-  angle: number;
-}
-
-const SQUADS: SquadDef[] = [
-  { label: 'O', satellites: 6, angle: 0 }, // Onboarding — top
-  { label: 'I', satellites: 4, angle: 72 }, // Inteligência — top-right
-  { label: 'S', satellites: 4, angle: 144 }, // Strategy — bottom-right
-  { label: 'C', satellites: 4, angle: 216 }, // Criação — bottom-left
-  { label: 'R', satellites: 4, angle: 288 }, // Revisão — top-left
-];
-// Total satellites = 22 ✓
-
-function AgentsOrbital({
-  count,
-  suffix,
-  reduced,
-}: {
-  count: number;
-  suffix: string | undefined;
-  reduced: boolean;
-}) {
-  const radiusSquads = 36;
-  const radiusSatellite = 7;
-
-  return (
-    <div className="relative flex flex-1 flex-col items-center justify-center gap-4 py-3">
-      <span className="sr-only">{`${count} agentes orquestrados em 5 squads`}</span>
-
-      {/* Visual frame — aspect square, max-w controlled */}
-      <div
-        aria-hidden="true"
-        className="relative w-full max-w-[420px]"
-        style={{ aspectRatio: '1 / 1' }}
-      >
-        {/* Lime radial beam background */}
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{
-            background:
-              'radial-gradient(circle 45% at 50% 50%, var(--color-accent-emissive) 0%, var(--color-accent-glow) 28%, transparent 65%)',
-            filter: 'blur(0.5px)',
-          }}
-        />
-        {/* Dot field sutil */}
-        <div
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage: 'radial-gradient(oklch(94% 0.22 124 / 0.35) 1px, transparent 1px)',
-            backgroundSize: '20px 20px',
-            maskImage:
-              'radial-gradient(circle 45% at 50% 50%, transparent 25%, black 50%, transparent 80%)',
-          }}
-        />
-
-        {/* SVG orbital — idle rotation wrapper (subtle 60s loop, desligado em reduced) */}
-        <m.svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="xMidYMid meet"
-          className="absolute inset-0 h-full w-full"
-          aria-hidden="true"
-          focusable="false"
-          style={{ originX: '50%', originY: '50%' }}
-          {...(reduced
-            ? {}
-            : {
-                animate: { rotate: 360 },
-                transition: {
-                  duration: 60,
-                  ease: 'linear' as const,
-                  repeat: Number.POSITIVE_INFINITY,
-                },
-              })}
-        >
-          <title>orbital diagram of 22 agents in 5 squads</title>
-
-          {/* Outer dashed ring — perímetro da orquestra */}
-          <circle
-            cx="50"
-            cy="50"
-            r={radiusSquads + 5}
-            fill="none"
-            stroke="var(--color-accent-emissive)"
-            strokeWidth="0.18"
-            strokeDasharray="0.5 2"
-            opacity="0.4"
-          />
-          <circle
-            cx="50"
-            cy="50"
-            r={radiusSquads - 5}
-            fill="none"
-            stroke="var(--color-accent-emissive)"
-            strokeWidth="0.15"
-            strokeDasharray="0.4 1.5"
-            opacity="0.3"
-          />
-
-          {/* Squad cores + agentes satélites */}
-          {SQUADS.map((s) => {
-            const rad = (s.angle * Math.PI) / 180;
-            // Round to 3 decimals to avoid SSR/CSR float precision mismatch (hydration error).
-            const cx = Number((50 + Math.sin(rad) * radiusSquads).toFixed(3));
-            const cy = Number((50 - Math.cos(rad) * radiusSquads).toFixed(3));
-            return (
-              <g key={`squad-${s.label}`}>
-                {/* Edge: squad → central */}
-                <line
-                  x1={cx}
-                  y1={cy}
-                  x2={50}
-                  y2={50}
-                  stroke="var(--color-accent)"
-                  strokeWidth="0.22"
-                  strokeDasharray="1.2 1.2"
-                  opacity="0.4"
-                />
-                {/* Mini-orbit ring around squad */}
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r={radiusSatellite}
-                  fill="none"
-                  stroke="var(--color-accent-emissive)"
-                  strokeWidth="0.12"
-                  strokeDasharray="0.3 1"
-                  opacity="0.45"
-                />
-                {/* Satellites — agents dots ao redor do squad */}
-                {Array.from({ length: s.satellites }).map((_, i) => {
-                  const satAngle = (i / s.satellites) * 2 * Math.PI;
-                  // Round to 3 decimals to avoid SSR/CSR float precision mismatch (hydration error).
-                  const sx = Number((cx + Math.cos(satAngle) * radiusSatellite).toFixed(3));
-                  const sy = Number((cy + Math.sin(satAngle) * radiusSatellite).toFixed(3));
-                  return (
-                    <circle
-                      // biome-ignore lint/suspicious/noArrayIndexKey: static decorative satellite
-                      key={`sat-${s.label}-${i}`}
-                      cx={sx}
-                      cy={sy}
-                      r="0.7"
-                      fill="var(--color-accent)"
-                      opacity="0.9"
-                    />
-                  );
-                })}
-                {/* Squad core */}
-                <circle
-                  cx={cx}
-                  cy={cy}
-                  r="3.6"
-                  fill="var(--color-surface-elevated)"
-                  stroke="var(--color-accent)"
-                  strokeWidth="0.4"
-                />
-                <text
-                  x={cx}
-                  y={cy + 1.4}
-                  textAnchor="middle"
-                  fontSize="3.4"
-                  fontFamily="var(--font-mono)"
-                  fontWeight="600"
-                  fill="var(--color-accent)"
-                >
-                  {s.label}
-                </text>
-              </g>
-            );
-          })}
-
-          {/* Central HITL E-0 — emissive lime */}
-          <circle
-            cx="50"
-            cy="50"
-            r="8"
-            fill="var(--color-accent-subtle)"
-            stroke="var(--color-accent)"
-            strokeWidth="0.7"
-          />
-          <circle cx="50" cy="50" r="4.5" fill="var(--color-accent)" opacity="0.7" />
-          <text
-            x="50"
-            y="51.6"
-            textAnchor="middle"
-            fontSize="3.6"
-            fontFamily="var(--font-mono)"
-            fontWeight="700"
-            fill="var(--color-text-on-accent)"
-          >
-            E-0
-          </text>
-        </m.svg>
-
-        {/* Stat badge — count tabular bottom-right, sobreposto */}
-        <div
-          aria-hidden="true"
-          className={cn(
-            'absolute bottom-3 right-3 z-10',
-            'flex items-baseline gap-1.5 rounded-md',
-            'border border-(--color-accent-emissive) bg-(--color-base)/85 px-2.5 py-1.5',
-            'backdrop-blur-sm'
-          )}
-        >
-          <span
-            className="mono-stats font-bold tabular-nums leading-none text-(--color-accent)"
-            style={{ fontSize: '1.5rem', letterSpacing: '-0.04em' }}
-          >
-            {count}
-          </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest text-(--color-text-2)">
-            agents
-          </span>
-        </div>
-
-        {/* Stat badge — 5 squads top-left */}
-        <div
-          aria-hidden="true"
-          className={cn(
-            'absolute top-3 left-3 z-10',
-            'flex items-baseline gap-1.5 rounded-md',
-            'border border-(--color-hairline-strong) bg-(--color-base)/85 px-2.5 py-1.5',
-            'backdrop-blur-sm'
-          )}
-        >
-          <span
-            className="mono-stats font-bold tabular-nums leading-none text-(--color-text-1)"
-            style={{ fontSize: '1.5rem', letterSpacing: '-0.04em' }}
-          >
-            5
-          </span>
-          <span className="font-mono text-[9px] uppercase tracking-widest text-(--color-text-3)">
-            squads
-          </span>
-        </div>
-      </div>
-
-      {/* Suffix label centralizado abaixo */}
-      {suffix ? (
-        <p className="text-center font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)">
-          {suffix}
-        </p>
-      ) : null}
-    </div>
-  );
-}
+// Auxiliares: StatusBar + ProgressBar (cell wide INFRA),
+// PerimeterTrace (hover border de TODAS as células).
 
 function StatusBar({ label, reduced }: { label: string; reduced: boolean }) {
   return (

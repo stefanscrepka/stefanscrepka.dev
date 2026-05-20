@@ -1,40 +1,28 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import type { CaseStudy } from '@/lib/work/data';
-import { CinematicCover } from './cinematic-cover';
 import { MockupFrame } from './product-mockup';
 
 // CaseStudyCover — dispatcher inteligente entre dois renderers:
 //
 //   1. screenshot existe (PNG real entregue pelo Stefan)
-//      → ProductMockup wrapper via MockupFrame + next/image cover
+//      → MockupFrame premium + next/image cover (Apple/Huly-style)
 //
-//   2. screenshot == null (estado atual)
-//      → CinematicCover com a variant declarada no CaseStudy
-//        (radial-beam | arc-glow | portrait-glow | amber-soft)
+//   2. screenshot == null (Wave 1 stub state)
+//      → MockupFrame VAZIO com micro-label (até Wave 4 entregar Aceternity
+//        MacBookScroll + screenshots reais + Imagen 3 compositions)
 //
-// Substitui o legacy fallback de ProductCover mode='diagram' nos featured tiles
-// — diagramas SVG continuam vivos pra uso explícito (other-work mini cards,
-// MacBookScroll screen interno, STJ before/after CompareSlider). Aqui o que
-// estamos REMOVENDO é o look genérico "placeholder Loading skeleton" e
-// substituindo por composições cinematográficas com identidade.
+// Wave 1 removeu o CinematicCover (4 variants procedurais SVG). Wave 4 vai
+// preencher cada cover com asset real ou composição Aceternity.
 
 interface CaseStudyCoverProps {
   caseStudy: CaseStudy;
   aspectRatio?: '16/10' | '16/9' | '4/3' | '3/2' | '1/1' | undefined;
   tilt?: 'none' | 'subtle' | 'cinema' | undefined;
-  /** Habilita hover lift no CinematicCover. Default false (parent usually é Link). */
+  /** Habilita hover lift. Default false (parent usually é Link). */
   interactive?: boolean;
   className?: string | undefined;
 }
-
-const ASPECT_CSS: Record<NonNullable<CaseStudyCoverProps['aspectRatio']>, string> = {
-  '16/10': '16 / 10',
-  '16/9': '16 / 9',
-  '4/3': '4 / 3',
-  '3/2': '3 / 2',
-  '1/1': '1 / 1',
-};
 
 const ASPECT_CLASS: Record<NonNullable<CaseStudyCoverProps['aspectRatio']>, string> = {
   '16/10': 'aspect-[16/10]',
@@ -48,11 +36,11 @@ export function CaseStudyCover({
   caseStudy,
   aspectRatio = '16/10',
   tilt = 'subtle',
-  interactive = false,
+  interactive: _interactive = false,
   className,
 }: CaseStudyCoverProps) {
   // ─────────────────────────────────────────────────────────────────────
-  // PATH 1: Screenshot real existe → premium ProductMockup
+  // PATH 1: Screenshot real existe → premium MockupFrame
   // ─────────────────────────────────────────────────────────────────────
   if (caseStudy.screenshot) {
     return (
@@ -74,16 +62,19 @@ export function CaseStudyCover({
   }
 
   // ─────────────────────────────────────────────────────────────────────
-  // PATH 2: Sem screenshot → CinematicCover com variant do case
+  // PATH 2 (Wave 1 stub): Sem screenshot → MockupFrame vazio com micro-label
   // ─────────────────────────────────────────────────────────────────────
   return (
-    <CinematicCover
-      variant={caseStudy.cinematicVariant}
-      caseSlug={caseStudy.slug}
-      caseTitle={caseStudy.title}
-      aspectRatio={ASPECT_CSS[aspectRatio]}
-      interactive={interactive}
-      className={className}
-    />
+    <MockupFrame
+      glow={caseStudy.accent}
+      tilted={tilt !== 'none'}
+      className={cn(ASPECT_CLASS[aspectRatio], className)}
+    >
+      <div aria-hidden="true" className="absolute inset-0 flex items-end justify-start p-6">
+        <span className="font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)">
+          {caseStudy.title} — asset em produção
+        </span>
+      </div>
+    </MockupFrame>
   );
 }

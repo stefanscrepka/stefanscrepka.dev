@@ -19,13 +19,17 @@ export type ProductDiagramKey =
   | 'caronas'
   | 'estrutura-c';
 
-/** Variant cinematográfica usada por CinematicCover quando screenshot=null.
- *  - radial-beam   → Content Engine (Nextronium triptych + lime beam radial)
- *  - arc-glow      → NexaCore (NEONE arc topo + painel SaaS abstrato)
- *  - portrait-glow → STJ App (device PWA vertical + halo lime)
- *  - amber-soft    → Estética MD (warm amber radial + curves orgânicas)
- */
-export type CinematicVariant = 'radial-beam' | 'arc-glow' | 'portrait-glow' | 'amber-soft';
+/** Hero asset (image OR video) usado nos featured covers + case study heroes.
+ *  Wave 1 = null (CinematicCover morreu junto com SVGs procedurais).
+ *  Wave 2-4 = path real quando Stefan entregar screencaps/screenshots reais + Aceternity mockups. */
+export interface HeroAsset {
+  src: string;
+  type: 'image' | 'video';
+  /** Poster .webp obrigatório quando type='video' (LCP + reduced-motion fallback). */
+  poster?: string;
+  /** Aspect ratio explícito pra evitar CLS. */
+  aspect: '16/10' | '16/9' | '4/3' | '3/2' | '1/1' | '9/16' | '4/5';
+}
 
 export interface CaseStudy {
   slug: CaseStudySlug;
@@ -36,12 +40,12 @@ export interface CaseStudy {
   stack: string[];
   details: string[];
   ctas: CaseStudyCTA[];
-  /** Path real em /public quando Stefan entregar. Null = usa CinematicCover. */
+  /** Path real em /public quando Stefan entregar. Null = MockupFrame vazio (Wave 1). */
   screenshot: string | null;
+  /** Hero asset estruturado (Wave 2-4). Null até Stefan dropar assets. */
+  heroAsset: HeroAsset | null;
   /** Diagrama SVG fallback custom por produto (consumido por ProductCover diagram mode). */
   diagram: ProductDiagramKey;
-  /** Variant cinematográfica usada pelos featured covers quando screenshot=null. */
-  cinematicVariant: CinematicVariant;
   accent: 'lime' | 'amber';
   /** Microcopy do card "Other Work" + index gallery */
   shortLine: string;
@@ -82,8 +86,8 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       { label: 'Ler arquitetura completa →', href: '#architecture', variant: 'outline' },
     ],
     screenshot: null,
+    heroAsset: null,
     diagram: 'squads',
-    cinematicVariant: 'radial-beam',
     accent: 'lime',
     shortLine:
       'Sistema multi-agente Claude SDK · 22 agentes em 5 squads · substitui agência inteira.',
@@ -124,8 +128,8 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       { label: 'Agendar call 15min →', href: '/#contato', variant: 'outline' },
     ],
     screenshot: null,
+    heroAsset: null,
     diagram: 'nexacore',
-    cinematicVariant: 'arc-glow',
     accent: 'lime',
     shortLine: 'B2B SaaS clínicas estéticas · Next 14 + Clerk + WhatsApp + 61 componentes design.',
   },
@@ -165,8 +169,8 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       { label: 'Post-mortem técnico →', href: '#post-mortem', variant: 'outline' },
     ],
     screenshot: null,
+    heroAsset: null,
     diagram: 'stj',
-    cinematicVariant: 'portrait-glow',
     accent: 'lime',
     shortLine: 'PWA cockpit · Claude Haiku 4.5 streaming · prompt cache 2 camadas · 162 testes.',
   },
@@ -208,8 +212,8 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       },
     ],
     screenshot: null,
+    heroAsset: null,
     diagram: 'estetica',
-    cinematicVariant: 'amber-soft',
     accent: 'amber',
     shortLine: 'Site clínica premium · vanilla JS + PHP · prova de motion design antes do React.',
   },
