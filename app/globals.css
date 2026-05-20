@@ -44,9 +44,14 @@
   --color-text-3: oklch(55% 0.005 130);
   --color-text-on-accent: oklch(13% 0.005 130);
 
-  /* === Borders & hairlines === */
+  /* === Borders & hairlines ===
+     Dois sabores: solid (curve cards/inputs) e alpha (overlays/cinematic surfaces
+     onde luminance precisa atravessar). Alpha versions reproduzem o
+     `rgba(255,255,255,0.06)` signature de Linear/Vercel/Stripe via OKLCH puro. */
   --color-hairline: oklch(22% 0.010 130);
   --color-hairline-strong: oklch(30% 0.010 130);
+  --color-hairline-alpha: oklch(98% 0.005 130 / 0.06);
+  --color-hairline-alpha-strong: oklch(98% 0.005 130 / 0.10);
   --color-border-focus: oklch(94% 0.22 124);
 
   /* === Semantic === */
@@ -156,6 +161,12 @@
     0 8px 24px oklch(0% 0 0 / 0.12),
     0 32px 64px oklch(0% 0 0 / 0.18);
   --shadow-inner-highlight: inset 0 1px 0 oklch(100% 0 0 / 0.06);
+  /* Inset bisel = Vercel/Linear signature edge lift. Combina 1px stroke interior
+     + highlight no top edge. Aplicar via `shadow-(--shadow-inset-bisel)` em cards
+     interativos pra dar luminância sem competir com hairline externa. */
+  --shadow-inset-bisel:
+    inset 0 0 0 1px oklch(98% 0.005 130 / 0.06),
+    inset 0 1px 0 0 oklch(98% 0.005 130 / 0.04);
   --shadow-glow-lime-sm: 0 0 16px var(--color-accent-emissive);
   --shadow-glow-lime-md: 0 0 32px var(--color-accent-emissive);
   --shadow-glow-amber-sm: 0 0 16px oklch(82% 0.18 75 / 0.4);
@@ -262,10 +273,20 @@
 @utility eyebrow {
   font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-widest);
   font-size: 0.6875rem;
   font-weight: 500;
   color: var(--color-text-3);
+  font-feature-settings: 'tnum' 1, 'calt' 1;
+}
+
+/* Reading-pace body — Apple's 17px sweet spot pra body text em superficies
+   premium. Não substitui --text-base no scale; use em paragraph hero, lead-in,
+   manifesto. Combina leading 1.55 + tracking quase zero pra readability máxima. */
+@utility text-reading {
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  line-height: 1.55;
+  letter-spacing: -0.003em;
 }
 
 @utility hairline {
@@ -341,6 +362,25 @@
     inset 0 1px 0 oklch(100% 0 0 / 0.10);
 }
 
+/* Inset bisel — luminance-based elevation pra cards interativos em dark mode.
+   Combina hairline alpha + highlight top edge num único shadow. Aplica via
+   `class="inset-bisel"` ou `shadow-(--shadow-inset-bisel)` direto. */
+@utility inset-bisel {
+  box-shadow: var(--shadow-inset-bisel);
+}
+
+/* Focus ring sólido double-layer (signature shadcn premium).
+   Outer: 4px lime accent · Inner: 2px base color (separator). Use em vez de
+   outline pra elementos com border-radius custom. */
+@utility focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--color-base),
+      0 0 0 4px var(--color-accent);
+  }
+}
+
 @utility skip-link {
   position: fixed;
   top: 0.5rem;
@@ -400,11 +440,24 @@
     scroll-margin-top: var(--scroll-anchor-offset);
   }
 
-  /* Tabular nums em stats sections */
+  /* Tabular nums em stats sections + qualquer .font-mono.
+     Mono sem tabular-nums = '7' e '1' com widths diferentes → flicker em
+     count-ups e clocks. Force tabular sempre em mono. */
   .stats-row,
-  [data-tabular] {
+  [data-tabular],
+  .font-mono,
+  [class*='font-mono'] {
     font-variant-numeric: tabular-nums;
-    font-feature-settings: 'tnum' 1, 'calt' 1;
+    font-feature-settings: 'tnum' 1, 'calt' 1, 'zero' 1;
+  }
+
+  /* Display headlines (h1/h2 ≥ text-3xl) ganham kern + ss01 automaticamente
+     pra evitar inconsistências entre componentes que não usam @utility
+     headline-display. Reforça optical sizing em qualquer h1/h2 grande. */
+  h1,
+  h2 {
+    font-optical-sizing: auto;
+    font-feature-settings: 'ss01' 1, 'calt' 1, 'liga' 1, 'kern' 1;
   }
 }
 

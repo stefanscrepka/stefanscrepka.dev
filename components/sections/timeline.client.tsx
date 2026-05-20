@@ -6,11 +6,14 @@ import { type InstitutionId, InstitutionLogo } from '@/components/shared/institu
 import { TracingBeam } from '@/components/ui-effects/tracing-beam';
 import { cn } from '@/lib/utils';
 
-// Timeline com proporções tipográficas DRAMÁTICAS:
-//   - Year tabular-nums 96px peso bold lime (era 28px)
-//   - Microdetail hairline 60px conector entre year e marker (signature editorial)
-//   - Institution logos 80x80 em cards hairline outline (era inline 16px)
-//   - Last marker (2026) ganha badge "NOW" + beam end glow blur (não corta seco)
+// Timeline editorial polish:
+//   - Espaçamento vertical generoso entre markers (min 12rem)
+//   - Year tabular-nums 80–96px peso bold lime (editorial)
+//   - Microdetail hairline 60px conector entre year e place — signature
+//   - Title h3 sans tight + body curta + institution chips com hairline
+//   - MarkerDot lime emissive sobre o beam
+//   - 2026 marker → NOW badge animated + glow ending no beam
+//   - Lime único accent — zero AMBER
 
 export interface TimelineMarker {
   year: string;
@@ -27,7 +30,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.5, ease: [0.165, 0.84, 0.44, 1] as const },
+    transition: { duration: 0.6, ease: [0.165, 0.84, 0.44, 1] as const },
   },
 };
 
@@ -44,20 +47,22 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
         viewport={{ once: true, margin: '0px 0px -100px 0px' }}
         variants={{
           hidden: {},
-          visible: { transition: { staggerChildren: 0.25, delayChildren: 0.1 } },
+          // Disney overlapping action: 50ms stagger (era 220ms — lento demais pra
+          // sequência editorial). Tightening dá ritmo sem perder leitura.
+          visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
         }}
-        className="flex flex-col gap-20 sm:gap-28"
+        className="flex flex-col gap-[8rem] sm:gap-[12rem] lg:gap-[14rem]"
       >
         {markers.map((marker, idx) => (
-          <m.li key={marker.year} variants={itemVariants} className="relative flex flex-col gap-5">
+          <m.li key={marker.year} variants={itemVariants} className="relative flex flex-col gap-6">
             <MarkerDot index={idx} isCurrent={marker.isCurrent} />
 
-            {/* Year tabular-nums GIGANTE 96px peso bold lime */}
+            {/* Year + NOW badge row */}
             <div className="flex items-baseline gap-4">
               <p
                 className={cn(
-                  'mono-stats font-bold leading-[0.9] tabular-nums text-(--color-accent)',
-                  'text-5xl sm:text-6xl lg:text-7xl'
+                  'mono-stats font-bold leading-[0.88] tabular-nums text-(--color-accent)',
+                  'text-[3.5rem] sm:text-[4.5rem] lg:text-[5.5rem]'
                 )}
                 style={{ letterSpacing: '-0.04em' }}
               >
@@ -71,9 +76,10 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
                   className={cn(
                     'inline-flex items-center gap-1.5 rounded-md',
                     'border border-(--color-accent) bg-(--color-accent-subtle)',
-                    'px-2 py-1 font-mono text-[10px] uppercase tracking-widest',
+                    'px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest',
                     'text-(--color-accent)'
                   )}
+                  style={{ boxShadow: 'inset 0 1px 0 oklch(100% 0 0 / 0.10)' }}
                 >
                   <span className="relative flex size-1.5 items-center justify-center">
                     <span
@@ -92,7 +98,7 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
               ) : null}
             </div>
 
-            {/* Microdetail hairline 60px conector — signature editorial */}
+            {/* Microdetail hairline 64px conector + place label — signature editorial */}
             <div className="flex items-center gap-3">
               <span
                 aria-hidden="true"
@@ -104,16 +110,25 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
               </p>
             </div>
 
-            <h3 className="text-2xl font-semibold tracking-tight text-(--color-text-1) sm:text-3xl">
+            {/* Title — sans tight, editorial */}
+            <h3
+              className={cn(
+                'text-(--color-text-1) font-semibold tracking-tight',
+                'text-2xl sm:text-3xl lg:text-[2.5rem]',
+                '!leading-[1.05]'
+              )}
+            >
               {marker.title}
             </h3>
 
-            <p className="max-w-prose text-base leading-relaxed text-(--color-text-2)">
-              {marker.body}
-            </p>
+            {/* Body — reading pace 17px */}
+            <p className="max-w-prose text-reading text-(--color-text-2)">{marker.body}</p>
 
+            {/* Institutions — cards hairline com inset highlight */}
             {marker.institutions.length > 0 ? (
-              <InstitutionLogo ids={marker.institutions} size={20} className="pt-2" />
+              <div className="pt-3">
+                <InstitutionLogo ids={marker.institutions} size={20} />
+              </div>
             ) : null}
           </m.li>
         ))}
@@ -122,7 +137,7 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
       {/* Beam end glow — soft lime blur depois do último marker (não corta seco) */}
       <div
         aria-hidden="true"
-        className="pointer-events-none mt-12 ml-4 h-32 w-px"
+        className="pointer-events-none mt-16 ml-3 h-32 w-px sm:ml-4 md:ml-6"
         style={{
           background:
             'linear-gradient(to bottom, var(--color-accent) 0%, oklch(94% 0.22 124 / 0.4) 40%, transparent 100%)',
@@ -143,9 +158,12 @@ function MarkerDot({ index, isCurrent }: { index: number; isCurrent?: boolean | 
       ref={ref}
       aria-hidden="true"
       className={cn(
-        'pointer-events-none absolute -left-12 top-3 grid size-6 place-items-center sm:-left-14',
+        // Position: align with TracingBeam left rail (left-3 sm:left-4 md:left-6).
+        // Negative offsets from the .pl-10/.pl-12/.pl-14 wrapper.
+        'pointer-events-none absolute top-3 grid size-7 place-items-center',
+        '-left-[1.875rem] sm:-left-[2rem] md:-left-[2.125rem]',
         'rounded-full border border-(--color-hairline-strong) bg-(--color-base)',
-        'transition-colors duration-(--motion-transition)',
+        'transition-all duration-(--motion-transition)',
         isCurrent && 'border-(--color-accent)'
       )}
       data-active={inView ? '' : undefined}

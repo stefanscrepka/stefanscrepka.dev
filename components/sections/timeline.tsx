@@ -53,7 +53,7 @@ export function TimelineSection() {
           <br />
           pra IA multi-agente.
         </h2>
-        <p className="mt-2 max-w-prose text-(--color-text-2) leading-relaxed">
+        <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Cinco anos. Quatro estágios. Um fio condutor: construir sistemas que funcionam quando
           ninguém está olhando.
         </p>

@@ -20,12 +20,7 @@ interface MagneticCTAProps {
   className?: string | undefined;
 }
 
-export function MagneticCTA({
-  children,
-  strength = 6,
-  range = 80,
-  className,
-}: MagneticCTAProps) {
+export function MagneticCTA({ children, strength = 6, range = 80, className }: MagneticCTAProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionSafe();
 

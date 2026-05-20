@@ -79,13 +79,13 @@ export function PartnerMarquee({ className }: PartnerMarqueeProps) {
       }}
     >
       <div ref={trackRef} className="flex w-max items-center gap-10 will-change-transform">
-        {/* Cópia 1 */}
-        {TECH_ITEMS.map((id, i) => (
-          <PartnerItem key={`a-${id}-${i}`} id={id} />
+        {/* Cópia 1 — key=id é único dentro da cópia (TECH_ITEMS não tem duplicates). */}
+        {TECH_ITEMS.map((id) => (
+          <PartnerItem key={`a-${id}`} id={id} />
         ))}
-        {/* Cópia 2 — pra seamless loop */}
-        {TECH_ITEMS.map((id, i) => (
-          <PartnerItem key={`b-${id}-${i}`} id={id} />
+        {/* Cópia 2 — prefix 'b-' difere da cópia 1 mas dentro da cópia 2 o id é único. */}
+        {TECH_ITEMS.map((id) => (
+          <PartnerItem key={`b-${id}`} id={id} />
         ))}
       </div>
     </div>

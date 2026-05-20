@@ -23,8 +23,10 @@ export default function DesignSystemPage() {
     <div className="container-max section-pad-y pt-32 flex flex-col gap-16">
       <header className="flex flex-col gap-5 max-w-3xl">
         <p className="eyebrow">/design-system</p>
-        <h1 className="text-5xl font-semibold tracking-tight leading-[0.95]">Design system</h1>
-        <p className="text-(--color-text-2) leading-relaxed max-w-prose">
+        <h1 className="text-5xl font-semibold !tracking-[-0.03em] !leading-[0.95]">
+          Design system
+        </h1>
+        <p className="text-reading text-(--color-text-2) max-w-prose">
           Sandbox de tokens + primitivos + diálogos + effects. Tudo hand-written em{' '}
           <code className="font-mono">components/ui/</code> e{' '}
           <code className="font-mono">components/ui-effects/</code> usando{' '}

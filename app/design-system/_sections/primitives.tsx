@@ -48,7 +48,7 @@ export function PrimitivesSection() {
     <section id="primitives" className="flex flex-col gap-12">
       <header className="flex flex-col gap-2 hairline-bottom pb-6">
         <p className="eyebrow">02 · Primitivos</p>
-        <h2 className="text-3xl font-semibold tracking-tight">
+        <h2 className="text-3xl font-semibold !tracking-[-0.025em] !leading-[1.05]">
           Buttons, cards, form fields, navigation
         </h2>
         <p className="max-w-prose text-(--color-text-2) leading-relaxed text-sm">

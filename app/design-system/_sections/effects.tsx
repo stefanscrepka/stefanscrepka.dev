@@ -6,7 +6,9 @@ export function EffectsSection() {
     <section id="effects" className="flex flex-col gap-12">
       <header className="flex flex-col gap-2 hairline-bottom pb-6">
         <p className="eyebrow">04 · Effects</p>
-        <h2 className="text-3xl font-semibold tracking-tight">ProductMockup + GrainOverlay</h2>
+        <h2 className="text-3xl font-semibold !tracking-[-0.025em] !leading-[1.05]">
+          ProductMockup + GrainOverlay
+        </h2>
         <p className="max-w-prose text-(--color-text-2) leading-relaxed text-sm">
           <code className="font-mono">{'<ProductMockup />'}</code> aplica chrome CSS-only sobre
           screenshots raw (zero re-encode de pixels).{' '}

@@ -17,7 +17,7 @@ export function DialogsSection() {
     <section id="dialogs" className="flex flex-col gap-8">
       <header className="flex flex-col gap-2 hairline-bottom pb-6">
         <p className="eyebrow">03 · Diálogos</p>
-        <h2 className="text-3xl font-semibold tracking-tight">4 tipos</h2>
+        <h2 className="text-3xl font-semibold !tracking-[-0.025em] !leading-[1.05]">4 tipos</h2>
         <p className="max-w-prose text-(--color-text-2) leading-relaxed text-sm">
           Radix Dialog com backdrop blur + spring entrance via{' '}
           <code className="font-mono">data-[state=open]:animate-in</code>. Focus trap + Esc fecha

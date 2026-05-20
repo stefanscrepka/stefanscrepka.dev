@@ -12,11 +12,13 @@ export const metadata: Metadata = {
 // Index gallery dos 4 case studies + link pra cada page detalhe.
 export default function WorkIndexPage() {
   return (
-    <section className="container-max pb-24">
+    <section className="container-max pt-32 pb-24 sm:pt-36">
       <header className="mb-12 flex flex-col gap-3">
         <p className="eyebrow">/work</p>
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Work</h1>
-        <p className="max-w-prose text-(--color-text-2) leading-relaxed">
+        <h1 className="text-4xl font-semibold sm:text-5xl lg:text-6xl !leading-[1.02] !tracking-[-0.03em]">
+          Work
+        </h1>
+        <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Três produtos em produção e projetos menores que mostram amplitude. Cada case documentado
           com stack real, escopo entregue e o que aprendi no processo.
         </p>
@@ -29,13 +31,13 @@ export default function WorkIndexPage() {
             <li key={slug}>
               <Link
                 href={`/work/${slug}`}
-                className="group/work-card block h-full rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-6 outline-none transition-[border-color,transform,box-shadow] duration-(--motion-fast) hover:-translate-y-1 hover:border-(--color-accent) hover:shadow-(--shadow-glow-lime-sm) focus-visible:-translate-y-1 focus-visible:border-(--color-accent) focus-visible:shadow-(--shadow-glow-lime-sm)"
+                className="group/work-card block h-full rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-6 shadow-(--shadow-inset-bisel) outline-none transition-[border-color,transform,box-shadow] duration-(--motion-fast) hover:-translate-y-1 hover:border-(--color-accent) hover:shadow-[var(--shadow-inset-bisel),var(--shadow-glow-lime-sm)] focus-visible:-translate-y-1 focus-visible:border-(--color-accent) focus-visible:shadow-[var(--shadow-inset-bisel),var(--shadow-glow-lime-sm)]"
               >
                 <CaseStudyCover caseStudy={cs} aspectRatio="16/10" className="mb-5" />
                 <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
                   {cs.status}
                 </p>
-                <h2 className="mt-2 text-xl font-semibold tracking-tight text-(--color-text-1)">
+                <h2 className="mt-2 text-xl font-semibold !tracking-[-0.02em] !leading-[1.15] text-(--color-text-1)">
                   {cs.title}
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-(--color-text-2)">{cs.shortLine}</p>

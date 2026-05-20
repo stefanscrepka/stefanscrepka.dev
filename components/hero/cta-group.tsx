@@ -29,10 +29,14 @@ export function CTAGroup({ className }: CTAGroupProps) {
 
       const buttons = containerRef.current.querySelectorAll<HTMLElement>('[data-slot="button"]');
       const tween = gsap.from(buttons, {
-        scale: 0.95,
+        // y lift em vez de scale evita anti-pattern (scale hover decoração).
+        // back.out spring overshoot dá feel de spring tight stiffness 300 damping 10.
+        y: 8,
         opacity: 0,
         duration: 0.35,
-        stagger: 0.08,
+        // Disney overlapping action: 50ms stagger (era 80ms — tightening pra
+        // ritmo "snap-snap" em vez de "tic-toc").
+        stagger: 0.05,
         delay: 0.6,
         ease: 'back.out(1.6)',
       });

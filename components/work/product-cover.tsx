@@ -8,15 +8,18 @@ import {
   SquadsDiagram,
   StjAppDiagram,
 } from './diagrams';
-import { ProductMockup } from './product-mockup';
+import { MockupFrame } from './product-mockup';
 
 // ProductCover — multiplexer:
 //   - mode='image'   → next/image com src (quando screenshot real chega)
 //   - mode='diagram' → SVG diagram custom por produto (fallback até screenshot)
-//   - mode='mockup'  → ProductMockup wrapper de qualquer child
+//   - mode='mockup'  → MockupFrame wrapper de qualquer child custom
 //
 // Substitui ScreenshotPlaceholder (deprecated) com identidade visual ÚNICA por
 // produto. Cada case study tem seu próprio diagrama — nunca o mesmo "SH" genérico.
+//
+// Para covers cinematográficos (radial-beam, arc-glow, portrait-glow, amber-soft)
+// usados quando screenshot=null nos case studies featured, ver CinematicCover.
 
 export type ProductDiagramKey =
   | 'squads'
@@ -74,12 +77,32 @@ type ProductCoverProps = {
     }
 );
 
+const ASPECT_CLASSES: Record<AspectRatio, string> = {
+  '16/10': 'aspect-[16/10]',
+  '16/9': 'aspect-video',
+  '4/3': 'aspect-[4/3]',
+  '3/2': 'aspect-[3/2]',
+  '1/1': 'aspect-square',
+};
+
+// Translate legacy tilt → boolean tilted prop esperado por MockupFrame.
+// 'subtle' e 'cinema' ambos => tilted=true (a intensidade real é gerenciada
+// por CSS perspective dentro do MockupFrame, valor único sutil pra evitar
+// distorção pesada em screenshots).
+function tiltToBoolean(tilt: Tilt): boolean {
+  return tilt !== 'none';
+}
+
 export function ProductCover(props: ProductCoverProps) {
   const { tone = 'lime', aspectRatio = '16/10', tilt = 'subtle', className, label } = props;
 
   if (props.mode === 'image') {
     return (
-      <ProductMockup tone={tone} aspectRatio={aspectRatio} tilt={tilt} className={className}>
+      <MockupFrame
+        glow={tone}
+        tilted={tiltToBoolean(tilt)}
+        className={cn(ASPECT_CLASSES[aspectRatio], className)}
+      >
         <Image
           src={props.src}
           alt={label}
@@ -88,22 +111,30 @@ export function ProductCover(props: ProductCoverProps) {
           className="object-cover"
           priority={false}
         />
-      </ProductMockup>
+      </MockupFrame>
     );
   }
 
   if (props.mode === 'mockup') {
     return (
-      <ProductMockup tone={tone} aspectRatio={aspectRatio} tilt={tilt} className={className}>
+      <MockupFrame
+        glow={tone}
+        tilted={tiltToBoolean(tilt)}
+        className={cn(ASPECT_CLASSES[aspectRatio], className)}
+      >
         {props.children}
-      </ProductMockup>
+      </MockupFrame>
     );
   }
 
   // mode === 'diagram'
   const DiagramComponent = DIAGRAM_MAP[props.diagram];
   return (
-    <ProductMockup tone={tone} aspectRatio={aspectRatio} tilt={tilt} className={className}>
+    <MockupFrame
+      glow={tone}
+      tilted={tiltToBoolean(tilt)}
+      className={cn(ASPECT_CLASSES[aspectRatio], className)}
+    >
       <div
         className={cn(
           'flex h-full w-full items-center justify-center p-3 sm:p-4',
@@ -112,6 +143,6 @@ export function ProductCover(props: ProductCoverProps) {
       >
         <DiagramComponent label={label} className="h-full w-full" />
       </div>
-    </ProductMockup>
+    </MockupFrame>
   );
 }

@@ -298,11 +298,11 @@ function SceneContent({
       <directionalLight position={[5, 8, 4]} intensity={1.4} castShadow={false} />
       <pointLight position={[0, 4, 3]} intensity={0.4} color={LIME} distance={10} />
 
-      {/* Pegs + labels A/B/C */}
+      {/* Pegs + labels A/B/C — label é único, usa como key. */}
       {(['A', 'B', 'C'] as const).map((label, i) => {
         const x = pegPosition(i)[0];
         return (
-          <group key={`peg-${i}`}>
+          <group key={`peg-${label}`}>
             <mesh position={[x, PEG_HEIGHT / 2, 0]}>
               <cylinderGeometry args={[PEG_RADIUS, PEG_RADIUS, PEG_HEIGHT, 24]} />
               <meshStandardMaterial color={PEG_COLOR} roughness={0.6} metalness={0.1} />

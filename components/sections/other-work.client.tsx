@@ -4,6 +4,7 @@ import { m, useInView } from 'motion/react';
 import { type ReactNode, useRef } from 'react';
 import { FlipCard } from '@/components/ui-effects/flip-card';
 import { ProductCover } from '@/components/work/product-cover';
+import { cn } from '@/lib/utils';
 
 // Client islands para OtherWorkSection — FlipCard amber + reveal stagger.
 // AMBER scope: `data-clinic-scope` opcional pra css overrides futuros, mas aqui o
@@ -105,7 +106,15 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="mt-auto inline-flex items-center justify-center gap-2 rounded-pill px-5 py-3 font-semibold text-sm shadow-(--shadow-md) transition-[transform,box-shadow,opacity] hover:scale-[0.98]"
+            className={cn(
+              'mt-auto inline-flex items-center justify-center gap-2 rounded-pill px-5 py-3',
+              'font-semibold text-sm shadow-(--shadow-md)',
+              // Hover: translateY lift (NÃO scale) + glow expand. Active: micro
+              // press feedback 0.98 (única vez que scale é OK = tactile button press).
+              'transition-[transform,box-shadow] duration-(--motion-transition) ease-(--ease-smooth)',
+              'hover:-translate-y-[2px] active:translate-y-0 active:scale-[0.98]',
+              'focus-visible:-translate-y-[2px] outline-none'
+            )}
             style={{
               backgroundColor: 'var(--color-amber)',
               color: 'var(--color-base)',

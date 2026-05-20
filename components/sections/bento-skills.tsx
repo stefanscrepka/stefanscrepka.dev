@@ -82,7 +82,7 @@ export function BentoSkillsSection() {
         <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl !leading-[0.95]">
           Ferramentas que entram em produção.
         </h2>
-        <p className="mt-2 max-w-prose text-(--color-text-2) leading-relaxed">
+        <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Stack confirmado pelos três produtos rodando. Não é uma lista de cursos — é o que está no{' '}
           <code className="font-mono text-(--color-text-1)">package.json</code> e no{' '}
           <code className="font-mono text-(--color-text-1)">docker-compose.yml</code> agora.

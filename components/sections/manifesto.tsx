@@ -10,11 +10,13 @@ import { ManifestoBackdrop } from './manifesto-backdrop';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Section 11 — Manifesto em 3 atos editorial:
-//   ATO 1 — Pull-quote serif italic 32-40px (primeira frase isolada, o gancho)
-//   ATO 2 — 4 hairlines horizontais 60-100px stagger (break editorial)
-//   ATO 3 — Prose corpo 18px text-1 72ch normal (parágrafos do meio com word-stagger)
-//   ATO 4 — Último parágrafo serif italic 28px peso heavy (assinatura final)
+// Section 11 — Manifesto em 4 atos editorial:
+//   ATO 1 — Pull-quote serif italic 32-44px (primeira frase isolada, o gancho).
+//   ATO 2 — 4 hairlines horizontais 60-100px stagger (break editorial).
+//   ATO 3 — Prose corpo 18-19px text-1 72ch leading 1.6 (parágrafos do meio com
+//           word-stagger GSAP — ritmo, não decoração).
+//   ATO 4 — Assinatura final serif italic 28-32px peso heavy (close emocional).
+//   ATO 5 — Mono signature row: nome · cidade · disponibilidade (footer da seção).
 // Backdrop existente expande full-section com light beam vertical lime.
 
 const MANIFESTO_PULL_QUOTE =
@@ -22,7 +24,7 @@ const MANIFESTO_PULL_QUOTE =
 
 const MANIFESTO_BODY_PARAGRAPHS = [
   'Eu construo nesse padrão. TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude SDK orquestrado em squads. Três produtos em produção — NexaCore, Content Engine, STJ App — provam.',
-  'Não vendo "ajudo empresas a inovar". Vendo entrega que paga conta. Aprovação humana em ≤10 minutos por dia. Anti-slop validator com 14 regex pt-BR. Stack local GPU subsidiando custo de inferência.',
+  'Não vendo “ajudo empresas a inovar”. Vendo entrega que paga conta. Aprovação humana em ≤10 minutos por dia. Anti-slop validator com 14 regex pt-BR. Stack local GPU subsidiando custo de inferência.',
 ];
 
 const MANIFESTO_SIGNATURE =
@@ -80,18 +82,16 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       data-slot="manifesto"
     >
       <ManifestoBackdrop />
-      <div className="container-prose flex flex-col gap-10">
+      <div className="container-prose flex flex-col gap-12 sm:gap-14">
         <p className="eyebrow">Manifesto</p>
 
-        {/* ATO 1 — Pull-quote serif italic (primeira frase, o gancho) */}
-        <blockquote
-          className="border-l-2 border-(--color-accent) pl-6 py-2"
-          style={{ borderLeftWidth: '2px' }}
-        >
+        {/* ATO 1 — Pull-quote serif italic editorial.
+            Tracking -0.02em + leading 1.05 = pull-quote display tightness. */}
+        <blockquote className="border-l-2 border-(--color-accent) pl-6 sm:pl-8 py-2">
           <p
             className={cn(
-              'leading-[1.05] tracking-[-0.01em]',
-              'text-2xl sm:text-3xl lg:text-[2.25rem]',
+              'leading-[1.05] tracking-[-0.02em]',
+              'text-[1.875rem] sm:text-[2.25rem] lg:text-[2.625rem]',
               'text-(--color-text-1)'
             )}
             style={{
@@ -105,43 +105,55 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
         </blockquote>
 
         {/* ATO 2 — 4 hairlines horizontais break editorial */}
-        <div aria-hidden="true" className="my-2 flex flex-col gap-1.5">
+        <div aria-hidden="true" className="my-1 flex flex-col gap-1.5">
           {[60, 80, 100, 70].map((w, i) => (
             <span
-              key={`break-${i}-${w}`}
+              // Width único por linha → key estável; índice apenas pra opacity calc.
+              key={`break-width-${w}`}
               className="block h-px bg-(--color-accent)"
               style={{ width: `${w}px`, opacity: 0.45 - i * 0.08 }}
             />
           ))}
         </div>
 
-        {/* ATO 3 — Prose corpo 18px com word-stagger GSAP */}
+        {/* ATO 3 — Prose corpo Apple-sweet-spot 17-19px (text-reading utility).
+            tracking -0.003em + leading 1.6 = readability máxima em parágrafos longos
+            sem perder densidade editorial. Word-stagger GSAP scroll-driven. */}
         <div
           ref={ref}
-          className="flex flex-col gap-6 text-lg leading-relaxed text-(--color-text-1)"
+          className={cn(
+            'flex flex-col gap-7 text-(--color-text-1)',
+            'text-reading [&_p]:leading-[1.6]'
+          )}
         >
-          {paragraphsWithWords.map((para, pIdx) => (
-            <p key={`p-${pIdx}-${para.text.slice(0, 24)}`}>
-              {para.words.map((word, wIdx) => {
-                const key = `w-${pIdx}-${wIdx}-${word.length}`;
-                if (word.trim() === '') {
-                  return <span key={key}>{word}</span>;
-                }
-                return (
-                  <span key={key} data-word className="inline-block">
-                    {word}
-                  </span>
-                );
-              })}
-            </p>
-          ))}
+          {paragraphsWithWords.map((para) => {
+            const paraId = para.text.slice(0, 24);
+            return (
+              <p key={`p-${paraId}-${para.words.length}`}>
+                {para.words.map((word, wIdx) => {
+                  // Word + index dentro do parágrafo + tamanho dão chave estável.
+                  // (paraId no prefix evita colisão entre parágrafos com mesma word.)
+                  const key = `w-${paraId}-${wIdx}-${word.length}`;
+                  if (word.trim() === '') {
+                    return <span key={key}>{word}</span>;
+                  }
+                  return (
+                    <span key={key} data-word className="inline-block">
+                      {word}
+                    </span>
+                  );
+                })}
+              </p>
+            );
+          })}
         </div>
 
-        {/* ATO 4 — Assinatura final serif italic peso heavy */}
+        {/* ATO 4 — Assinatura emocional serif italic peso heavy lime.
+            tracking -0.025em + leading 1.1 = signature display tightness. */}
         <p
           className={cn(
-            'leading-tight tracking-tight',
-            'text-xl sm:text-2xl lg:text-3xl',
+            'leading-[1.1] tracking-[-0.025em]',
+            'text-[1.75rem] sm:text-[2rem] lg:text-[2.25rem]',
             'text-(--color-accent)'
           )}
           style={{
@@ -153,9 +165,30 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
           {MANIFESTO_SIGNATURE}
         </p>
 
-        <p className="mt-4 font-mono text-xs text-(--color-text-3)">
-          — Stefan Heinz Screpka · Ponta Grossa, PR · ✺
-        </p>
+        {/* ATO 5 — Mono signature row (peak-end pre-close).
+            Hairline curta + nome completo + cidade + disponibilidade.
+            Lime ✺ glyph faz eco com o accent da seção sem competir. */}
+        <div className="mt-2 flex flex-col gap-3">
+          <span
+            aria-hidden="true"
+            className="block h-px w-12 bg-(--color-accent)"
+            style={{ opacity: 0.6 }}
+          />
+          <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3) leading-relaxed">
+            Stefan Heinz Screpka{' '}
+            <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
+              ·
+            </span>
+            Ponta Grossa, Paraná{' '}
+            <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
+              ·
+            </span>
+            <span className="text-(--color-accent)">disponível</span>{' '}
+            <span aria-hidden="true" className="text-(--color-accent)">
+              ✺
+            </span>
+          </p>
+        </div>
       </div>
     </section>
   );

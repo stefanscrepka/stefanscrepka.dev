@@ -89,7 +89,9 @@ export function TokensSection() {
     <section id="tokens" className="flex flex-col gap-12">
       <header className="flex flex-col gap-2 hairline-bottom pb-6">
         <p className="eyebrow">01 · Tokens</p>
-        <h2 className="text-3xl font-semibold tracking-tight">Cor, tipografia, espaço, motion</h2>
+        <h2 className="text-3xl font-semibold !tracking-[-0.025em] !leading-[1.05]">
+          Cor, tipografia, espaço, motion
+        </h2>
         <p className="max-w-prose text-(--color-text-2) leading-relaxed text-sm">
           Single source of truth em <code className="font-mono">@theme</code> em
           <code className="font-mono"> globals.css</code>. Lime A primária em todo o site, Amber

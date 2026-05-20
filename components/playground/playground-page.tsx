@@ -56,10 +56,10 @@ export function PlaygroundPage() {
     <section className="container-max section-pad-y" data-slot="playground">
       <header className="mb-10 flex flex-col gap-3 sm:mb-14">
         <p className="eyebrow">PLAYGROUND</p>
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+        <h1 className="text-3xl font-semibold sm:text-4xl lg:text-5xl !leading-[1.02] !tracking-[-0.025em]">
           Algoritmos C que aprendi na faculdade — visualizados.
         </h1>
-        <p className="max-w-prose text-(--color-text-2) leading-relaxed">
+        <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Hanoi recursivo, Fibonacci memoizado vs ingênuo, e balanceamento de parênteses com pilha.
           Saíram do repo{' '}
           <a
@@ -74,7 +74,6 @@ export function PlaygroundPage() {
         </p>
       </header>
 
-      {/* biome-ignore lint/a11y/useSemanticElements: role=tablist precisa do div pra agrupar tabs no padrão WAI-ARIA */}
       <div
         role="tablist"
         aria-label="Visualizações de algoritmos"

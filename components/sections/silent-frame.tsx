@@ -16,8 +16,7 @@ interface SilentFrameProps {
   className?: string | undefined;
 }
 
-const DEFAULT_QUOTE =
-  'Construo sistemas que pensam — não produtos que apenas funcionam.';
+const DEFAULT_QUOTE = 'Construo sistemas que pensam — não produtos que apenas funcionam.';
 
 export function SilentFrame({ quote = DEFAULT_QUOTE, className }: SilentFrameProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -52,7 +51,9 @@ export function SilentFrame({ quote = DEFAULT_QUOTE, className }: SilentFramePro
         animate={inView ? { opacity: 1, y: 0, filter: 'blur(0px)' } : {}}
         transition={{ duration: 1.2, ease: [0.165, 0.84, 0.44, 1], delay: 0.3 }}
         className={cn(
-          'max-w-[22ch] text-center leading-[1.15] tracking-[-0.015em]',
+          // Italic editorial display: tracking -0.025em + leading 1.1
+          // = signature cinema tightness.
+          'max-w-[22ch] text-center leading-[1.1] tracking-[-0.025em]',
           'text-2xl sm:text-3xl lg:text-[2.5rem]',
           'text-(--color-text-1)'
         )}

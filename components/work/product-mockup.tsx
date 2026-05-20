@@ -1,64 +1,114 @@
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-// ProductMockup — CSS perspective + 3-layer cinema shadow + inner highlight + lime
-// emissive border. Wrap qualquer child (Image, video, SVG diagram) pra ganhar
-// presença "device on display" estilo Apple/Linear/Vercel landing.
+// ProductMockup — premium frame pra screenshots reais (PNGs entregues pelo Stefan).
 //
-// Anti-AI-slop: NÃO usa gradient decorativo no fundo, NÃO escala 1.05 genérico.
-// Inspiração: Quantum + Argus prints (perspective tilted device on dark surface).
+// Tratamento Apple/Huly:
+//   - Border radius 18px (var(--radius-2xl))
+//   - 3-layer cinema shadow (var(--shadow-cinema))
+//   - Inset highlight 1px rgba(255,255,255,0.06)
+//   - Frame opcional: 'browser' (3 dots topo) | 'device' (notch) | 'none'
+//   - Tilt opcional sutil: rotateX(2deg) rotateY(-1deg)
+//   - Glow opcional: 'lime' | 'amber' | 'none'
+//   - next/image com sizes + priority opcional
+//   - alt obrigatório (acessibilidade)
 //
-// Safari fallback: @supports (transform-style: preserve-3d) — se não houver suporte,
-// o elemento renderiza flat sem o tilt, mantendo cinema shadow.
+// Para wrappar children custom (diagrams SVG, MacBookScroll content, FlipCards),
+// use MockupFrame — primitivo compartilhado abaixo.
 
 interface ProductMockupProps {
-  children: ReactNode;
-  /** Aspect ratio do conteúdo interno. Default 16/10 — formato dashboard típico. */
-  aspectRatio?: '16/10' | '16/9' | '4/3' | '3/2' | '1/1';
-  /** Tom do glow accent ao redor — lime padrão, amber pra Estética MD only. */
-  tone?: 'lime' | 'amber';
-  /** Intensidade do tilt 3D. 'none' = flat (mobile / reduced-motion). */
-  tilt?: 'none' | 'subtle' | 'cinema';
-  /** Classes extras no wrapper externo (sizing, layout). */
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  frame?: 'browser' | 'device' | 'none' | undefined;
+  tilted?: boolean | undefined;
+  glow?: 'lime' | 'amber' | 'none' | undefined;
+  priority?: boolean | undefined;
   className?: string | undefined;
 }
 
-const ASPECT_CLASSES: Record<NonNullable<ProductMockupProps['aspectRatio']>, string> = {
-  '16/10': 'aspect-[16/10]',
-  '16/9': 'aspect-video',
-  '4/3': 'aspect-[4/3]',
-  '3/2': 'aspect-[3/2]',
-  '1/1': 'aspect-square',
-};
-
-const TILT_STYLES: Record<NonNullable<ProductMockupProps['tilt']>, string | undefined> = {
-  none: undefined,
-  subtle: 'perspective(1400px) rotateX(3deg) rotateY(-2deg)',
-  cinema: 'perspective(1200px) rotateX(6deg) rotateY(-4deg)',
-};
-
-const TONE_GLOW = {
-  lime: 'var(--color-accent-emissive)',
-  amber: 'oklch(82% 0.18 75 / 0.4)',
-} as const;
-
-const TONE_BORDER = {
-  lime: 'var(--color-accent)',
-  amber: 'oklch(82% 0.18 75)',
-} as const;
-
 export function ProductMockup({
-  children,
-  aspectRatio = '16/10',
-  tone = 'lime',
-  tilt = 'subtle',
+  src,
+  alt,
+  width,
+  height,
+  frame = 'none',
+  tilted = false,
+  glow = 'lime',
+  priority = false,
   className,
 }: ProductMockupProps) {
   return (
+    <MockupFrame frame={frame} tilted={tilted} glow={glow} className={className}>
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        priority={priority}
+        sizes="(min-width: 1024px) 50vw, 100vw"
+        className="h-full w-full object-cover"
+      />
+    </MockupFrame>
+  );
+}
+
+/* ============================================================
+   MockupFrame — primitivo compartilhado que aplica:
+     - radius 2xl + 3-layer cinema shadow + inset highlight 1px
+     - chrome opcional (browser dots / device notch / none)
+     - tilt opcional sutil 3D
+     - glow ambient opcional (lime/amber/none)
+   Usado por:
+     - ProductMockup (com next/image)
+     - ProductCover (legacy children-based wrapper pra diagrams + mockup mode)
+   ============================================================ */
+
+interface MockupFrameProps {
+  children: ReactNode;
+  frame?: 'browser' | 'device' | 'none' | undefined;
+  tilted?: boolean | undefined;
+  glow?: 'lime' | 'amber' | 'none' | undefined;
+  className?: string | undefined;
+}
+
+const GLOW_TONE_MAP = {
+  lime: 'var(--color-accent-emissive)',
+  amber: 'oklch(82% 0.18 75 / 0.4)',
+  none: 'transparent',
+} as const;
+
+const BORDER_TONE_MAP = {
+  lime: 'var(--color-hairline-strong)',
+  amber: 'oklch(82% 0.18 75 / 0.3)',
+  none: 'var(--color-hairline-strong)',
+} as const;
+
+const TOP_GLARE_TONE_MAP = {
+  lime: 'var(--color-accent)',
+  amber: 'oklch(82% 0.18 75)',
+  none: 'oklch(100% 0 0 / 0.2)',
+} as const;
+
+export function MockupFrame({
+  children,
+  frame = 'none',
+  tilted = false,
+  glow = 'lime',
+  className,
+}: MockupFrameProps) {
+  // Tilt: perspective 3D sutil. Safari fallback automático se transform-style
+  // não suportado (degrada para flat sem quebrar).
+  const tiltTransform = tilted ? 'perspective(1400px) rotateX(2deg) rotateY(-1deg)' : undefined;
+
+  return (
     <div
       data-slot="product-mockup"
-      data-tone={tone}
-      data-tilt={tilt}
+      data-frame={frame}
+      data-tilted={tilted ? 'true' : 'false'}
+      data-glow={glow}
       className={cn(
         'group/mockup relative w-full',
         '[transform-style:preserve-3d]',
@@ -68,47 +118,113 @@ export function ProductMockup({
     >
       <div
         className={cn(
-          'relative w-full overflow-hidden rounded-xl',
-          'border border-(--color-hairline-strong)',
-          'transition-transform duration-(--motion-modal) ease-(--ease-smooth)',
-          ASPECT_CLASSES[aspectRatio]
+          'relative w-full overflow-hidden',
+          'rounded-2xl',
+          'transition-transform duration-(--motion-modal) ease-(--ease-smooth)'
         )}
         style={{
-          transform: TILT_STYLES[tilt],
+          transform: tiltTransform,
+          border: `1px solid ${BORDER_TONE_MAP[glow]}`,
           boxShadow: [
             'var(--shadow-cinema)',
-            `0 0 60px ${TONE_GLOW[tone]}`,
-            `inset 0 1px 0 oklch(100% 0 0 / 0.08)`,
-            `inset 0 0 0 1px ${tone === 'lime' ? 'oklch(94% 0.22 124 / 0.06)' : 'oklch(82% 0.18 75 / 0.06)'}`,
-          ].join(', '),
-          borderColor:
-            tone === 'lime' ? 'var(--color-hairline-strong)' : 'oklch(82% 0.18 75 / 0.3)',
+            glow !== 'none' ? `0 0 60px ${GLOW_TONE_MAP[glow]}` : null,
+            // Inset highlight 1px — Linear/Vercel signature.
+            'inset 0 1px 0 oklch(100% 0 0 / 0.08)',
+            `inset 0 0 0 1px ${
+              glow === 'lime'
+                ? 'oklch(94% 0.22 124 / 0.06)'
+                : glow === 'amber'
+                  ? 'oklch(82% 0.18 75 / 0.06)'
+                  : 'oklch(100% 0 0 / 0.06)'
+            }`,
+          ]
+            .filter(Boolean)
+            .join(', '),
         }}
       >
-        {/* Inner content — preenchimento full */}
-        <div className="absolute inset-0">{children}</div>
+        {/* Frame chrome */}
+        {frame === 'browser' ? <BrowserChrome /> : null}
+        {frame === 'device' ? <DeviceNotch /> : null}
 
-        {/* Top glare — subtle highlight line topo do mockup (estilo glass) */}
+        {/* Content area — flex pra preencher resto após chrome */}
+        <div
+          className={cn(
+            'relative w-full overflow-hidden',
+            frame === 'browser' && 'rounded-b-[14px]',
+            frame === 'device' && 'rounded-[14px]'
+          )}
+          style={{
+            height: frame === 'browser' ? 'calc(100% - 28px)' : '100%',
+          }}
+        >
+          {children}
+        </div>
+
+        {/* Top glare — subtle highlight line topo do mockup (glass shimmer) */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 top-0 h-px"
           style={{
-            background: `linear-gradient(to right, transparent, ${TONE_BORDER[tone]} 50%, transparent)`,
+            background: `linear-gradient(to right, transparent, ${TOP_GLARE_TONE_MAP[glow]} 50%, transparent)`,
             opacity: 0.4,
           }}
         />
       </div>
 
-      {/* Floor reflection — gradiente suave abaixo do mockup */}
-      {tilt !== 'none' ? (
+      {/* Floor reflection — gradiente suave sob o mockup (só com tilt) */}
+      {tilted && glow !== 'none' ? (
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -bottom-4 left-1/2 h-8 w-3/4 -translate-x-1/2 opacity-30 blur-2xl"
           style={{
-            background: `radial-gradient(ellipse at center, ${TONE_GLOW[tone]} 0%, transparent 70%)`,
+            background: `radial-gradient(ellipse at center, ${GLOW_TONE_MAP[glow]} 0%, transparent 70%)`,
           }}
         />
       ) : null}
     </div>
+  );
+}
+
+/* ============================================================
+   Browser chrome — barra superior com 3 dots (macOS-style)
+   ============================================================ */
+
+function BrowserChrome() {
+  return (
+    <div
+      aria-hidden="true"
+      className="flex h-7 items-center gap-1.5 border-b px-3"
+      style={{
+        backgroundColor: 'var(--color-surface-overlay)',
+        borderColor: 'var(--color-hairline-strong)',
+      }}
+    >
+      <span
+        className="h-2 w-2 rounded-full"
+        style={{ backgroundColor: 'oklch(65% 0.20 10 / 0.7)' }}
+      />
+      <span
+        className="h-2 w-2 rounded-full"
+        style={{ backgroundColor: 'oklch(80% 0.18 100 / 0.7)' }}
+      />
+      <span
+        className="h-2 w-2 rounded-full"
+        style={{ backgroundColor: 'oklch(75% 0.15 142 / 0.7)' }}
+      />
+    </div>
+  );
+}
+
+/* ============================================================
+   Device notch — pill superior central (mobile/PWA)
+   ============================================================ */
+
+function DeviceNotch() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute left-1/2 top-1.5 z-10 h-1 w-16 -translate-x-1/2 rounded-full"
+      style={{ backgroundColor: 'var(--color-base)' }}
+    />
   );
 }

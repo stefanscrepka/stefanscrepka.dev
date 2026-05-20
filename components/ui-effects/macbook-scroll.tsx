@@ -76,7 +76,7 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
             }
             className={cn(
               'relative w-[90vw] max-w-[860px] origin-bottom rounded-t-xl',
-              'border-2 border-[#222] bg-[#0a0b09]',
+              'border-2 border-(--color-hairline-strong) bg-(--color-base)',
               'p-2 shadow-(--shadow-cinema)'
             )}
           >
@@ -91,7 +91,7 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
             {/* Notch */}
             <div
               aria-hidden="true"
-              className="absolute top-0 left-1/2 h-3 w-16 -translate-x-1/2 rounded-b-md bg-[#0a0b09]"
+              className="absolute top-0 left-1/2 h-3 w-16 -translate-x-1/2 rounded-b-md bg-(--color-base)"
             />
           </m.div>
 
@@ -100,12 +100,12 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
             aria-hidden="true"
             className={cn(
               'relative w-[92vw] max-w-[880px] h-6',
-              'rounded-b-2xl border-2 border-t-0 border-[#222]',
-              'bg-gradient-to-b from-[#1a1c19] to-[#0a0b09]',
+              'rounded-b-2xl border-2 border-t-0 border-(--color-hairline-strong)',
+              'bg-gradient-to-b from-(--color-surface) to-(--color-base)',
               'shadow-(--shadow-cinema)'
             )}
           >
-            <div className="absolute top-1/2 left-1/2 h-1 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0a0b09]" />
+            <div className="absolute top-1/2 left-1/2 h-1 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--color-base)" />
           </div>
         </div>
 

@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { type ContactState, submitContact } from '@/lib/server-actions/contact';
@@ -20,20 +19,28 @@ import {
   type PrefereCanal,
 } from '@/lib/validation/contact-schema';
 
-// ContactForm — RHF + useActionState. Server Action recebe FormData via
-// jsonToFormData bridge (gotcha #5). Progressive enhancement: <form action>
-// fallback funciona sem JS (Server Action chamada nativamente pelo browser).
+// ContactForm cinematic — RHF + useActionState. Server Action recebe FormData via
+// jsonToFormData bridge. Progressive enhancement: <form action> fallback funciona
+// sem JS (Server Action chamada nativamente pelo browser).
+//
+// Visual:
+//   - Inputs hairline strong + focus lime glow (signature inset-bisel premium)
+//   - "Como prefere conversar?" vira pill segmented control (não radio circle)
+//   - Submit é pill lime grande com hover -2px translateY + glow expand
+//   - Success state: TextGenerateEffect-like word reveal "Recebido. Respondo em <12h."
 //
 // States: idle / submitting / success / error / validation.
-// aria-live polite num status panel; spring overshoot na success card.
+// aria-live polite + spring overshoot na success card pra fechar o loop emocional.
 
 const PREFERE_LABELS: Record<PrefereCanal, string> = {
   whatsapp: 'WhatsApp',
   email: 'Email',
-  calcom: 'Cal.com',
+  calcom: 'Cal.com 15min',
 };
 
 const initialState: ContactState = { status: 'idle' };
+
+const SUCCESS_HEADLINE = 'Recebido. Respondo em <12h.';
 
 export function ContactForm() {
   const reduced = useReducedMotionSafe();
@@ -62,7 +69,7 @@ export function ContactForm() {
 
   const prefereValue = watch('prefere');
 
-  // Quando o action retorna success, mostrar card e resetar form depois.
+  // Quando action retorna success, mostrar card e resetar form.
   useEffect(() => {
     if (state.status === 'success') {
       setShowSuccess(true);
@@ -74,15 +81,12 @@ export function ContactForm() {
   useEffect(() => {
     if (state.status !== 'validation') return;
     // RHF não tem setError tipado pra batch — caso necessário, expandir aqui.
-    // Por enquanto deixamos a UI mostrar o erro genérico do server.
   }, [state]);
 
   const onValid = (data: ContactInput) => {
     if (!formRef.current) return;
     const fd = jsonToFormData(data);
     formRef.current.requestSubmit();
-    // o requestSubmit acima dispara o action via form action — mas usamos
-    // o jsonToFormData só pra garantir formato. RHF gerencia inputs nativos.
     void fd;
   };
 
@@ -91,7 +95,13 @@ export function ContactForm() {
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // ───────────── SUCCESS STATE ─────────────
+  // Word-stagger reveal do headline ("Recebido. Respondo em <12h.") —
+  // ecoa o pattern do Manifesto e fecha o loop motion. Spring overshoot
+  // no container + check icon com glow lime.
   if (showSuccess) {
+    const headlineWords = SUCCESS_HEADLINE.split(' ');
+
     return (
       <m.div
         role="status"
@@ -99,21 +109,21 @@ export function ContactForm() {
         initial={reduced ? { opacity: 1 } : { opacity: 0, y: 12, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={
-          reduced ? { duration: 0 } : { type: 'spring', stiffness: 300, damping: 18, mass: 1 }
+          reduced ? { duration: 0 } : { type: 'spring', stiffness: 280, damping: 22, mass: 1 }
         }
         className={cn(
-          'flex flex-col gap-4 rounded-2xl border border-(--color-accent)',
-          'bg-(--color-accent-subtle) p-6 sm:p-8'
+          'flex flex-col gap-5 rounded-2xl border border-(--color-accent)',
+          'bg-(--color-accent-subtle) p-7 sm:p-9 shadow-(--shadow-glow-lime-sm)'
         )}
       >
         <span
           aria-hidden="true"
           className={cn(
-            'inline-flex size-10 items-center justify-center rounded-full',
-            'bg-(--color-accent) text-(--color-text-on-accent) shadow-(--shadow-glow-lime-sm)'
+            'inline-flex size-12 items-center justify-center rounded-full',
+            'bg-(--color-accent) text-(--color-text-on-accent) shadow-(--shadow-glow-lime-md)'
           )}
         >
-          <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" className="size-6" aria-hidden="true">
             <path
               d="M5 12.5 10 17.5 19.5 8"
               stroke="currentColor"
@@ -123,21 +133,56 @@ export function ContactForm() {
             />
           </svg>
         </span>
-        <div className="flex flex-col gap-2">
-          <h3 className="text-2xl font-semibold tracking-tight text-(--color-text-1)">
-            Recebido. Respondo em &lt;12h.
+
+        <div className="flex flex-col gap-3">
+          <h3
+            className={cn(
+              'text-2xl sm:text-3xl font-semibold tracking-[-0.025em] leading-[1.1]',
+              'text-(--color-text-1)'
+            )}
+          >
+            {reduced ? (
+              SUCCESS_HEADLINE
+            ) : (
+              <>
+                {/* SR-only full headline → leitores de tela anunciam a frase inteira de
+                  uma só vez. Visual word-stagger fica aria-hidden — evita word-by-word
+                  speech robotizado. */}
+                <span className="sr-only">{SUCCESS_HEADLINE}</span>
+                <span aria-hidden="true">
+                  {headlineWords.map((word, idx) => (
+                    <m.span
+                      // biome-ignore lint/suspicious/noArrayIndexKey: SUCCESS_HEADLINE constante (split estático); word + idx + length pra unicidade caso palavra se repita
+                      key={`success-w-${word}-${idx}-${word.length}`}
+                      initial={{ opacity: 0, y: 8, filter: 'blur(6px)' }}
+                      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                      transition={{
+                        duration: 0.5,
+                        delay: 0.15 + idx * 0.05,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="inline-block"
+                    >
+                      {word}
+                      {idx < headlineWords.length - 1 ? ' ' : ''}
+                    </m.span>
+                  ))}
+                </span>
+              </>
+            )}
           </h3>
           <p className="text-sm leading-relaxed text-(--color-text-2)">
-            Confirmação automática chegou no seu email. Se for urgente, WhatsApp direto: (42)
-            99859-2522.
+            Confirmação automática chegou no seu email. Se for urgente, WhatsApp direto:{' '}
+            <span className="font-mono text-(--color-text-1)">(42) 99859-2522</span>.
           </p>
         </div>
+
         <button
           type="button"
           onClick={handleSendAnother}
           className={cn(
-            'self-start font-mono text-xs text-(--color-accent) underline-offset-4',
-            'outline-none transition-colors hover:underline focus-visible:underline'
+            'self-start font-mono text-xs uppercase tracking-widest text-(--color-accent)',
+            'outline-none underline-offset-4 transition-colors hover:underline focus-visible:underline'
           )}
         >
           Enviar outra mensagem →
@@ -146,17 +191,18 @@ export function ContactForm() {
     );
   }
 
+  // ───────────── FORM ─────────────
   return (
     <form
       ref={formRef}
       action={action}
       onSubmit={handleSubmit(onValid)}
       noValidate
-      className="flex flex-col gap-5"
+      className="flex flex-col gap-6 sm:gap-7"
       aria-describedby={`${formId}-status`}
       aria-busy={isPending}
     >
-      {/* Honeypot: invisível pra humanos, visível pra bots */}
+      {/* Honeypot — invisível pra humanos, visível pra bots */}
       <input
         type="text"
         tabIndex={-1}
@@ -166,10 +212,9 @@ export function ContactForm() {
         aria-hidden="true"
       />
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
         <Field
           label="Nome"
-          name="nome"
           error={errors.nome?.message}
           input={
             <Input
@@ -179,6 +224,7 @@ export function ContactForm() {
               autoComplete="name"
               aria-invalid={!!errors.nome}
               aria-describedby={errors.nome ? `${formId}-nome-error` : undefined}
+              className="h-12 text-base"
             />
           }
           errorId={`${formId}-nome-error`}
@@ -187,7 +233,6 @@ export function ContactForm() {
 
         <Field
           label="Email"
-          name="email"
           error={errors.email?.message}
           input={
             <Input
@@ -199,6 +244,7 @@ export function ContactForm() {
               inputMode="email"
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? `${formId}-email-error` : undefined}
+              className="h-12 text-base"
             />
           }
           errorId={`${formId}-email-error`}
@@ -206,29 +252,60 @@ export function ContactForm() {
         />
       </div>
 
+      {/* Pill segmented control "Como prefere conversar?".
+          Native radios (a11y), styled como pills lime-on-active. */}
       <fieldset className="flex flex-col gap-3">
-        <legend className="text-sm font-medium text-(--color-text-1)">
+        <legend className="text-sm font-medium leading-none text-(--color-text-1)">
           Como prefere conversar?
         </legend>
-        <RadioGroup
-          value={prefereValue}
-          onValueChange={(v) => setValue('prefere', v as PrefereCanal, { shouldValidate: true })}
-          className="flex flex-wrap gap-x-6 gap-y-3"
+        <div
+          role="radiogroup"
           aria-invalid={!!errors.prefere}
+          aria-labelledby={errors.prefere ? `${formId}-prefere-error` : undefined}
+          className={cn(
+            'inline-flex flex-wrap gap-2 rounded-pill p-1',
+            'border border-(--color-hairline) bg-(--color-surface)/40 shadow-(--shadow-inset-bisel)'
+          )}
         >
-          {PREFERE_OPTIONS.map((option) => (
-            <label
-              key={option}
-              htmlFor={`${formId}-prefere-${option}`}
-              className="group/radio inline-flex cursor-pointer items-center gap-2.5"
-            >
-              <RadioGroupItem id={`${formId}-prefere-${option}`} value={option} />
-              <span className="text-sm text-(--color-text-2) group-hover/radio:text-(--color-text-1)">
-                {PREFERE_LABELS[option]}
-              </span>
-            </label>
-          ))}
-        </RadioGroup>
+          {PREFERE_OPTIONS.map((option) => {
+            const active = prefereValue === option;
+            const id = `${formId}-prefere-${option}`;
+            return (
+              <label key={option} htmlFor={id} className="contents">
+                <input
+                  id={id}
+                  type="radio"
+                  value={option}
+                  checked={active}
+                  onChange={() => setValue('prefere', option, { shouldValidate: true })}
+                  className="peer sr-only"
+                />
+                <span
+                  className={cn(
+                    'inline-flex cursor-pointer items-center justify-center gap-2',
+                    'rounded-pill px-4 py-2 sm:px-5 sm:py-2.5',
+                    'font-mono text-xs uppercase tracking-widest',
+                    'border outline-none transition-all duration-(--motion-fast) ease-(--ease-standard)',
+                    'peer-focus-visible:shadow-(--shadow-glow-lime-sm)',
+                    active
+                      ? [
+                          'border-(--color-accent) bg-(--color-accent)',
+                          'text-(--color-text-on-accent)',
+                          'shadow-(--shadow-glow-lime-sm)',
+                        ].join(' ')
+                      : [
+                          'border-(--color-hairline)/0 bg-transparent',
+                          'text-(--color-text-2) hover:text-(--color-text-1)',
+                          'hover:bg-(--color-surface-elevated)/60',
+                        ].join(' ')
+                  )}
+                >
+                  {PREFERE_LABELS[option]}
+                </span>
+              </label>
+            );
+          })}
+        </div>
         {errors.prefere ? (
           <p
             id={`${formId}-prefere-error`}
@@ -242,7 +319,6 @@ export function ContactForm() {
 
       <Field
         label="Sobre o que?"
-        name="mensagem"
         error={errors.mensagem?.message}
         input={
           <Textarea
@@ -252,20 +328,29 @@ export function ContactForm() {
             rows={5}
             aria-invalid={!!errors.mensagem}
             aria-describedby={errors.mensagem ? `${formId}-mensagem-error` : undefined}
+            className="min-h-32 text-base leading-relaxed"
           />
         }
         errorId={`${formId}-mensagem-error`}
         fieldId={`${formId}-mensagem`}
       />
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Submit row: pill lime grande + microcopy mono.
+          Hover -2px translateY + glow expand (sem scale per anti-pattern). */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <Button
           type="submit"
           variant="default"
           size="lg"
           loading={isPending}
           aria-label={isPending ? 'Enviando mensagem' : 'Enviar mensagem'}
-          className="sm:self-start"
+          className={cn(
+            'h-14 px-9 text-base font-semibold sm:self-start',
+            'transition-[transform,box-shadow] duration-(--motion-fast) ease-(--ease-standard)',
+            'hover:-translate-y-0.5 hover:shadow-(--shadow-glow-lime-md)',
+            // Cancela o scale active default — usamos translateY only.
+            'active:scale-100'
+          )}
         >
           {isPending ? 'Enviando…' : 'Enviar →'}
         </Button>
@@ -275,13 +360,11 @@ export function ContactForm() {
           role="status"
           aria-live="polite"
           className={cn(
-            'font-mono text-xs leading-relaxed',
+            'font-mono text-[11px] uppercase tracking-widest leading-relaxed',
             state.status === 'error' ? 'text-(--color-danger)' : 'text-(--color-text-3)'
           )}
         >
-          {state.status === 'error'
-            ? state.message
-            : 'Respondo em <12h em dias úteis. Se for urgente, WhatsApp direto: (42) 99859-2522.'}
+          {state.status === 'error' ? state.message : 'Resposta em <12h em dias úteis.'}
         </p>
       </div>
     </form>
@@ -290,7 +373,6 @@ export function ContactForm() {
 
 interface FieldProps {
   label: string;
-  name: string;
   error: string | undefined;
   input: React.ReactNode;
   errorId: string;
@@ -299,8 +381,13 @@ interface FieldProps {
 
 function Field({ label, error, input, errorId, fieldId }: FieldProps) {
   return (
-    <div className="group/field flex flex-col gap-2" data-disabled="false">
-      <Label htmlFor={fieldId}>{label}</Label>
+    <div className="group/field flex flex-col gap-2.5" data-disabled="false">
+      <Label
+        htmlFor={fieldId}
+        className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)"
+      >
+        {label}
+      </Label>
       {input}
       {error ? (
         <p id={errorId} role="alert" className="font-mono text-xs text-(--color-danger)">

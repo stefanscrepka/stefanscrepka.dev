@@ -13,7 +13,7 @@ import { WhatIBuildSection } from '@/components/sections/what-i-build';
 // FASE 3: Hero (8-layer), SocialProofLine, Manifesto.
 // FASE 4: WhatIBuildSection (#process), FeaturedWorkSection (#work preview), OtherWorkSection.
 // FASE 5: BentoSkillsSection (#skills), TimelineSection (#jornada).
-// FASE 6: ContactSection (#contato) — form Resend + CalcomModal + DirectLinks + BotID.
+// FASE 6: ContactSection (#contato) — form Resend + CalcomModal + DirectLinksRow + BotID.
 
 export default function HomePage() {
   return (

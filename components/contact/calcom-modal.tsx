@@ -31,6 +31,15 @@ export function CalcomModal({ open, onOpenChange, calLink = DEFAULT_LINK }: Calc
       try {
         const cal = await getCalApi({ namespace: 'stefan-15min' });
         if (cancelled) return;
+        // Cal.com SDK exige hex strings literais via cssVarsPerTheme — não
+        // resolve var(--token). Esses valores SÃO os tokens OKLCH convertidos
+        // pra sRGB pra cross-browser consistency dentro do iframe Cal.com:
+        //   cal-brand     = var(--color-accent)
+        //   cal-bg        = var(--color-base) raised
+        //   cal-bg-emphasis = var(--color-surface)
+        //   cal-text/emphasis = var(--color-text-1)
+        //   cal-text-muted    = var(--color-text-2)
+        //   cal-border / emphasis = var(--color-hairline) / strong
         const darkVars = {
           'cal-brand': '#D2FF00',
           'cal-bg': '#0F1310',

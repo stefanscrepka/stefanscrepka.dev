@@ -10,11 +10,15 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
+        // default: hairline outside + inset bisel (Vercel/Linear signature edge lift).
+        // Inset bisel = 1px highlight stroke interior + 1px top edge highlight.
+        // Em dark mode: luminance-based elevation, sem shadow plana.
         default:
-          'bg-(--color-surface) border border-(--color-hairline) shadow-(--shadow-inner-highlight)',
+          'bg-(--color-surface) border border-(--color-hairline) shadow-(--shadow-inset-bisel)',
         elevated: [
           'bg-(--color-surface-elevated) border border-(--color-hairline)',
-          'shadow-(--shadow-md) shadow-(--shadow-inner-highlight)',
+          // ambient md shadow combinada com inset bisel pra dupla profundidade
+          'shadow-[var(--shadow-md),var(--shadow-inset-bisel)]',
         ].join(' '),
         overlay: [
           'bg-(--color-surface-overlay) border border-(--color-hairline-strong)',
@@ -23,6 +27,7 @@ const cardVariants = cva(
         ].join(' '),
         tracing: [
           'bg-(--color-surface) border border-(--color-hairline)',
+          'shadow-(--shadow-inset-bisel)',
           'hover:border-(--color-accent) hover:shadow-(--shadow-glow-lime-sm)',
           'hover:-translate-y-0.5',
         ].join(' '),

@@ -122,17 +122,15 @@ export function ScrollPinnedHorizontal({
           style={{ width: `${panelCount * 100}vw` }}
         >
           {panels.map((panel, idx) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: panels prop is static, never reorders
-            // biome-ignore lint/a11y/useSemanticElements: role=group preserves slide semantics in pinned context
-            <div
+            <section
+              // biome-ignore lint/suspicious/noArrayIndexKey: panels prop é static (case study slug-keyed), nunca reordena
               key={`pinned-${idx}`}
               className="flex h-screen w-screen shrink-0 items-center justify-center px-6 md:px-12"
-              role="group"
               aria-roledescription="slide"
               aria-label={`Painel ${idx + 1} de ${panelCount}`}
             >
               {panel}
-            </div>
+            </section>
           ))}
         </div>
 
