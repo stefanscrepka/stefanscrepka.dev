@@ -10,39 +10,39 @@ import { ManifestoBackdrop } from './manifesto-backdrop';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Section 11 — Manifesto. Text Generate Effect (word-by-word reveal stagger 80ms,
-// 600ms ease-dramatic). Trigger on view via ScrollTrigger.
-// Reduced-motion: snap full text immediately.
-//
-// PLACEHOLDER COPY — substituir pela §C13 (Asset Bible) quando Stefan entregar.
-// HANDOFF veta "chão de fábrica" / "eletrotécnica" no hero ou headline; manifesto
-// pode tocar heritage industrial mas com moderação (Stefan: "você tá focando demais").
+// Section 11 — Manifesto em 3 atos editorial:
+//   ATO 1 — Pull-quote serif italic 32-40px (primeira frase isolada, o gancho)
+//   ATO 2 — 4 hairlines horizontais 60-100px stagger (break editorial)
+//   ATO 3 — Prose corpo 18px text-1 72ch normal (parágrafos do meio com word-stagger)
+//   ATO 4 — Último parágrafo serif italic 28px peso heavy (assinatura final)
+// Backdrop existente expande full-section com light beam vertical lime.
 
-const MANIFESTO_TEXT = `Software sério tem o mesmo padrão de qualquer sistema crítico: ou funciona 24/7 ou alguém perde dinheiro. Eu construo nesse padrão.
+const MANIFESTO_PULL_QUOTE =
+  'Software sério tem o mesmo padrão de qualquer sistema crítico: ou funciona 24/7 ou alguém perde dinheiro.';
 
-TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude SDK orquestrado em squads. Três produtos em produção — NexaCore, Content Engine, STJ App — provam.
+const MANIFESTO_BODY_PARAGRAPHS = [
+  'Eu construo nesse padrão. TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude SDK orquestrado em squads. Três produtos em produção — NexaCore, Content Engine, STJ App — provam.',
+  'Não vendo "ajudo empresas a inovar". Vendo entrega que paga conta. Aprovação humana em ≤10 minutos por dia. Anti-slop validator com 14 regex pt-BR. Stack local GPU subsidiando custo de inferência.',
+];
 
-Não vendo "ajudo empresas a inovar". Vendo entrega que paga conta. Aprovação humana em ≤10 minutos por dia. Anti-slop validator com 14 regex pt-BR. Stack local GPU subsidiando custo de inferência.
-
-Construo IA multi-agente em produção — e o produto inteiro ao redor dela.`;
+const MANIFESTO_SIGNATURE =
+  'Construo IA multi-agente em produção — e o produto inteiro ao redor dela.';
 
 interface ManifestoSectionProps {
-  text?: string;
   className?: string;
 }
 
-export function ManifestoSection({ text = MANIFESTO_TEXT, className }: ManifestoSectionProps) {
+export function ManifestoSection({ className }: ManifestoSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionSafe();
 
-  // Split em paragraphs preservando line breaks
-  const paragraphs = useMemo(
+  const paragraphsWithWords = useMemo(
     () =>
-      text
-        .split(/\n\n+/)
-        .map((p) => p.trim())
-        .filter(Boolean),
-    [text]
+      MANIFESTO_BODY_PARAGRAPHS.map((para) => ({
+        text: para,
+        words: para.split(/(\s+)/),
+      })),
+    []
   );
 
   useGSAP(
@@ -57,7 +57,7 @@ export function ManifestoSection({ text = MANIFESTO_TEXT, className }: Manifesto
         y: 8,
         filter: 'blur(8px)',
         duration: 0.6,
-        stagger: 0.04,
+        stagger: 0.035,
         ease: 'expo.out',
         scrollTrigger: {
           trigger: ref.current,
@@ -70,7 +70,7 @@ export function ManifestoSection({ text = MANIFESTO_TEXT, className }: Manifesto
         tween.kill();
       };
     },
-    { dependencies: [reduced, paragraphs.length] }
+    { dependencies: [reduced] }
   );
 
   return (
@@ -80,16 +80,49 @@ export function ManifestoSection({ text = MANIFESTO_TEXT, className }: Manifesto
       data-slot="manifesto"
     >
       <ManifestoBackdrop />
-      <div className="container-prose flex flex-col gap-8">
+      <div className="container-prose flex flex-col gap-10">
         <p className="eyebrow">Manifesto</p>
+
+        {/* ATO 1 — Pull-quote serif italic (primeira frase, o gancho) */}
+        <blockquote
+          className="border-l-2 border-(--color-accent) pl-6 py-2"
+          style={{ borderLeftWidth: '2px' }}
+        >
+          <p
+            className={cn(
+              'leading-[1.05] tracking-[-0.01em]',
+              'text-2xl sm:text-3xl lg:text-[2.25rem]',
+              'text-(--color-text-1)'
+            )}
+            style={{
+              fontFamily: 'var(--font-editorial)',
+              fontStyle: 'italic',
+              fontWeight: 500,
+            }}
+          >
+            “{MANIFESTO_PULL_QUOTE}”
+          </p>
+        </blockquote>
+
+        {/* ATO 2 — 4 hairlines horizontais break editorial */}
+        <div aria-hidden="true" className="my-2 flex flex-col gap-1.5">
+          {[60, 80, 100, 70].map((w, i) => (
+            <span
+              key={`break-${i}-${w}`}
+              className="block h-px bg-(--color-accent)"
+              style={{ width: `${w}px`, opacity: 0.45 - i * 0.08 }}
+            />
+          ))}
+        </div>
+
+        {/* ATO 3 — Prose corpo 18px com word-stagger GSAP */}
         <div
           ref={ref}
           className="flex flex-col gap-6 text-lg leading-relaxed text-(--color-text-1)"
         >
-          {paragraphs.map((para, pIdx) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: manifesto text is static, paragraphs never reorder
-            <p key={`p-${pIdx}-${para.slice(0, 24)}`}>
-              {para.split(/(\s+)/).map((word, wIdx) => {
+          {paragraphsWithWords.map((para, pIdx) => (
+            <p key={`p-${pIdx}-${para.text.slice(0, 24)}`}>
+              {para.words.map((word, wIdx) => {
                 const key = `w-${pIdx}-${wIdx}-${word.length}`;
                 if (word.trim() === '') {
                   return <span key={key}>{word}</span>;
@@ -103,8 +136,25 @@ export function ManifestoSection({ text = MANIFESTO_TEXT, className }: Manifesto
             </p>
           ))}
         </div>
-        <p className="font-mono text-xs text-(--color-text-3)">
-          — Stefan Heinz Screpka · Ponta Grossa, PR
+
+        {/* ATO 4 — Assinatura final serif italic peso heavy */}
+        <p
+          className={cn(
+            'leading-tight tracking-tight',
+            'text-xl sm:text-2xl lg:text-3xl',
+            'text-(--color-accent)'
+          )}
+          style={{
+            fontFamily: 'var(--font-editorial)',
+            fontStyle: 'italic',
+            fontWeight: 600,
+          }}
+        >
+          {MANIFESTO_SIGNATURE}
+        </p>
+
+        <p className="mt-4 font-mono text-xs text-(--color-text-3)">
+          — Stefan Heinz Screpka · Ponta Grossa, PR · ✺
         </p>
       </div>
     </section>

@@ -1,12 +1,13 @@
 'use client';
 
-import { domAnimation, LazyMotion } from 'motion/react';
+import { domMax, LazyMotion } from 'motion/react';
 import { type ReactNode, useEffect } from 'react';
 
-// LazyMotion strict: força uso de <m.X> em vez de <motion.X> (~4-6KB savings
-// tree-shaking inicial). features=domAnimation cobre animations + variants +
-// exit + hover/tap/focus gestures usados no FloatingDock. Hooks (useMotionValue,
-// useSpring, useTransform, useReducedMotion) funcionam normalmente.
+// LazyMotion strict: força uso de <m.X> em vez de <motion.X>.
+// features=domMax cobre animations + variants + exit + gestures + layout + popLayout
+// + drag — necessário pra <AnimatePresence mode="popLayout"> + <m.div layout> do
+// parens-viz no playground (domAnimation antes quebrava silenciosamente o overshoot).
+// Custo: ~+5KB gzip vs domAnimation (aceitável dado feature unlock).
 //
 // Também responsável por liberar o gate FOUC `data-pre-hydration` no <html>
 // após mount client (set inline em app/layout.tsx <head> script).
@@ -24,7 +25,7 @@ export function MotionProvider({ children }: MotionProviderProps) {
   }, []);
 
   return (
-    <LazyMotion features={domAnimation} strict>
+    <LazyMotion features={domMax} strict>
       {children}
     </LazyMotion>
   );

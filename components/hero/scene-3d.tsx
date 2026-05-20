@@ -82,7 +82,7 @@ function PlatesGroup() {
     // Reduced-motion ou pre-mount: freeze posição base, sem drift nem parallax.
     if (reduced !== false) return;
 
-    const t = state.clock.elapsedTime;
+    const t = state.clock.getElapsedTime();
     // Idle drift sutil (sine inOut periods desalinhados pra Lissajous não-repetitivo)
     const idleY = Math.sin(t * 0.31) * 0.04;
     const idleX = Math.cos(t * 0.27) * 0.025;
@@ -98,14 +98,16 @@ function PlatesGroup() {
 
   return (
     <group ref={groupRef}>
-      {/* Plate L — left, rotated -8° */}
-      <Plate position={[-1.55, 0.15, -0.4]} rotation={[0, -0.14, 0.02]} />
+      {/* V-shape composition — center plate dramatically forward, laterals recuadas (Nextronium pattern) */}
 
-      {/* Plate R — right, rotated +8° */}
-      <Plate position={[1.55, -0.05, -0.25]} rotation={[0, 0.14, -0.02]} />
+      {/* Plate L — left, rotated -10° (mais agressivo), recuado em Z */}
+      <Plate position={[-1.6, 0.18, -0.9]} rotation={[0, -0.18, 0.03]} />
 
-      {/* Plate C — centro, frontmost com emissive lime edges */}
-      <Plate position={[0, 0, 0.45]} rotation={[0, 0, 0]} emissive />
+      {/* Plate R — right, rotated +10°, recuado em Z */}
+      <Plate position={[1.6, -0.08, -0.9]} rotation={[0, 0.18, -0.03]} />
+
+      {/* Plate C — frontmost, +1.1 Z (era 0.45 → empurrado 0.65 forward) */}
+      <Plate position={[0, 0, 1.1]} rotation={[0, 0, 0]} emissive />
     </group>
   );
 }

@@ -1,13 +1,15 @@
 import { type BentoSkillsCell, BentoSkillsGrid } from './bento-skills.client';
 
 // Section 9 — Stack confirmado em formato Bento Grid asimétrico.
-// 6 células: 2 large (2×1: IA AGENTIC + INFRA) + 4 standard.
-// Cada cell tem TechLogo SVG (não só chip text), e duas cells ganham
-// feature visual extra: count grande ("22 agentes") e status indicators verde ("ok").
+// Hierarquia declarada (não tudo importante):
+//   - IA AGENTIC XL (col-span 4 row-span 3, "22" 220px gigante)
+//   - RAG/FRONTEND/BACKEND stack vertical à direita (col-span 2 cada)
+//   - INFRA + OBSERVABILITY full-width abaixo (col-span 6) com status bars +
+//     INTEGRAÇÕES chip strip embedded
 
 const CELLS: BentoSkillsCell[] = [
   {
-    size: 'large',
+    size: 'xl',
     heading: 'IA AGENTIC',
     feature: 'count',
     count: 22,
@@ -23,7 +25,7 @@ const CELLS: BentoSkillsCell[] = [
       'vision',
       'streaming SSE',
     ],
-    note: 'Claude Agent SDK orquestra squads especializados. Substitui agência inteira.',
+    note: 'Claude Agent SDK orquestra squads especializados (Onboarding · Inteligência · Estratégia · Criação · Revisão). Substitui agência inteira.',
   },
   {
     size: 'small',
@@ -44,13 +46,7 @@ const CELLS: BentoSkillsCell[] = [
     extras: ['Node 22', 'BullMQ', 'Socket.io', 'Fastify', 'Inngest', 'Server Actions'],
   },
   {
-    size: 'small',
-    heading: 'INTEGRAÇÕES',
-    techs: ['stripe', 'whatsapp', 'telegram', 'supabase'],
-    extras: ['Asaas', 'Evolution API', 'Google Calendar', 'Google Drive', 'Resend', 'Cal.com'],
-  },
-  {
-    size: 'large',
+    size: 'wide',
     heading: 'INFRA + OBSERVABILITY',
     feature: 'live',
     techs: ['vercel', 'sentry'],
@@ -62,6 +58,18 @@ const CELLS: BentoSkillsCell[] = [
       'GitHub Actions',
       'Playwright E2E',
     ],
+    integrations: [
+      'Stripe',
+      'Asaas',
+      'WhatsApp',
+      'Evolution API',
+      'Telegram',
+      'Cal.com',
+      'Resend',
+      'Supabase',
+      'Google Cal',
+      'Google Drive',
+    ],
     note: 'Vercel gru1 (frontend público) + Coolify VPS rodando Content Engine 24/7 com GPU local.',
   },
 ];
@@ -71,10 +79,10 @@ export function BentoSkillsSection() {
     <section id="skills" className="container-max section-pad-y border-t border-(--color-hairline)">
       <header className="mb-10 flex flex-col gap-3 sm:mb-14">
         <p className="eyebrow">STACK</p>
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Ferramentas que entram em produção
+        <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl !leading-[0.95]">
+          Ferramentas que entram em produção.
         </h2>
-        <p className="max-w-prose text-(--color-text-2) leading-relaxed">
+        <p className="mt-2 max-w-prose text-(--color-text-2) leading-relaxed">
           Stack confirmado pelos três produtos rodando. Não é uma lista de cursos — é o que está no{' '}
           <code className="font-mono text-(--color-text-1)">package.json</code> e no{' '}
           <code className="font-mono text-(--color-text-1)">docker-compose.yml</code> agora.

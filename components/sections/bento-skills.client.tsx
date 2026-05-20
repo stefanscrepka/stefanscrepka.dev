@@ -6,32 +6,34 @@ import { type TechId, TechLogo } from '@/components/shared/tech-logo';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
-// Bento Grid client: stagger reveal + hover lime border + tracing line perimeter.
-// Cells especiais ('feature') ganham visual destaque: número grande tabular-nums
-// + mini diagram, ou status indicators verde pulsantes.
+// Bento Grid 6-col com hierarquia declarada:
+//   - 'xl'      → col-span 4, row-span 3 (IA AGENTIC com "22" 220px)
+//   - 'small'   → col-span 2, row-span 1 (RAG/Frontend/Backend stack vertical)
+//   - 'wide'    → col-span 6, row-span 1 (INFRA full-width com status bars + integrations strip)
 
 export interface BentoSkillsCell {
-  size: 'large' | 'small';
+  size: 'xl' | 'small' | 'wide';
   heading: string;
-  /** Tags primárias com logos TechLogo associados. */
   techs: TechId[];
-  /** Tags adicionais sem logo (versões, sub-features) — exibidas como chips text-only. */
   extras?: string[];
   note?: string;
-  /** Feature visual extra. 'count' = número gigante. 'live' = status pulsantes. */
   feature?: 'count' | 'live';
-  /** Quando feature='count', número exibido (ex: '22'). */
   count?: number;
-  /** Quando feature='count', sufixo (ex: 'agentes'). */
   countSuffix?: string;
+  /** Apenas no INFRA wide cell — chip strip de integrações inline. */
+  integrations?: string[];
 }
 
-const ROW1_GRID = 'col-span-1 sm:col-span-4 lg:col-span-4';
-const SMALL_GRID = 'col-span-1 sm:col-span-2 lg:col-span-2';
-
 const CELL_CLASS_BY_SIZE: Record<BentoSkillsCell['size'], string> = {
-  large: ROW1_GRID,
-  small: SMALL_GRID,
+  xl: 'col-span-1 sm:col-span-6 lg:col-span-4 lg:row-span-3',
+  small: 'col-span-1 sm:col-span-3 lg:col-span-2',
+  wide: 'col-span-1 sm:col-span-6 lg:col-span-6',
+};
+
+const MIN_HEIGHT_BY_SIZE: Record<BentoSkillsCell['size'], string> = {
+  xl: 'min-h-[420px] lg:min-h-[640px]',
+  small: 'min-h-[14rem]',
+  wide: 'min-h-[340px]',
 };
 
 interface BentoSkillsGridProps {
@@ -66,7 +68,7 @@ export function BentoSkillsGrid({ cells }: BentoSkillsGridProps) {
         <m.li
           key={cell.heading}
           variants={itemVariants}
-          className={cn(CELL_CLASS_BY_SIZE[cell.size], 'min-h-[14rem]')}
+          className={cn(CELL_CLASS_BY_SIZE[cell.size], MIN_HEIGHT_BY_SIZE[cell.size])}
         >
           <BentoCell cell={cell} />
         </m.li>
@@ -78,6 +80,8 @@ export function BentoSkillsGrid({ cells }: BentoSkillsGridProps) {
 function BentoCell({ cell }: { cell: BentoSkillsCell }) {
   const [hover, setHover] = useState(false);
   const reduced = useReducedMotionSafe();
+  const isXL = cell.size === 'xl';
+  const isWide = cell.size === 'wide';
 
   return (
     <article
@@ -96,34 +100,50 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         'hover:border-(--color-accent)',
         'focus-within:border-(--color-accent)',
         'hover:shadow-(--shadow-glow-lime-sm)',
-        reduced ? 'hover:scale-[1.005]' : 'hover:scale-[1.015] hover:-translate-y-0.5'
+        reduced ? 'hover:scale-[1.003]' : 'hover:-translate-y-0.5',
+        isXL && 'lg:p-10',
+        isWide && 'lg:p-8'
       )}
     >
       {!reduced ? <PerimeterTrace active={hover} /> : null}
 
       <header className="flex items-baseline justify-between gap-3">
-        <h3 className="font-mono text-xs uppercase tracking-widest text-(--color-accent)">
+        <h3
+          className={cn(
+            'font-mono uppercase tracking-widest text-(--color-accent)',
+            isXL ? 'text-sm' : 'text-xs'
+          )}
+        >
           {cell.heading}
         </h3>
         <span
           aria-hidden="true"
           className="font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)"
         >
-          {cell.size === 'large' ? '◆◆' : '◆'}
+          {cell.size === 'xl' ? '◆◆◆' : cell.size === 'wide' ? '═══' : '◆'}
         </span>
       </header>
 
-      {/* Feature visual — number ou live indicators */}
+      {/* Feature visual XL — "22" GIGANTE */}
       {cell.feature === 'count' && cell.count !== undefined ? (
-        <div className="flex items-baseline gap-3 pb-1">
+        <div className="flex items-baseline gap-3 pb-1 pt-2">
           <span
             aria-hidden="true"
-            className="mono-stats text-6xl font-bold leading-none text-(--color-accent) tabular-nums sm:text-7xl"
+            className={cn(
+              'mono-stats font-bold leading-none text-(--color-accent) tabular-nums',
+              isXL ? 'text-[140px] sm:text-[180px] lg:text-[220px]' : 'text-6xl sm:text-7xl'
+            )}
+            style={{ letterSpacing: '-0.04em' }}
           >
             {cell.count}
           </span>
           {cell.countSuffix ? (
-            <span className="font-mono text-xs uppercase tracking-widest text-(--color-text-3)">
+            <span
+              className={cn(
+                'font-mono uppercase tracking-widest text-(--color-text-3)',
+                isXL ? 'text-sm max-w-[16ch]' : 'text-xs'
+              )}
+            >
               <span className="sr-only">{`${cell.count} `}</span>
               {cell.countSuffix}
             </span>
@@ -131,23 +151,18 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </div>
       ) : null}
 
-      {/* Tech logos row — ícones + nomes oficiais (estilizados) */}
+      {/* Tech logos */}
       {cell.techs.length > 0 ? (
         <ul className="flex flex-wrap gap-x-3 gap-y-2">
           {cell.techs.map((id) => (
             <li key={id}>
-              <TechLogo
-                id={id}
-                size={16}
-                showLabel
-                className="text-(--color-text-1) group-hover/cell:text-(--color-text-1)"
-              />
+              <TechLogo id={id} size={isXL ? 20 : 16} showLabel />
             </li>
           ))}
         </ul>
       ) : null}
 
-      {/* Extras chip list (versões / sub-features) */}
+      {/* Extras chip list */}
       {cell.extras && cell.extras.length > 0 ? (
         <ul className="flex flex-wrap gap-1.5">
           {cell.extras.map((tag) => (
@@ -168,46 +183,98 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </ul>
       ) : null}
 
+      {/* Status bars LIVE (wide INFRA cell) */}
       {cell.feature === 'live' ? (
-        <ul className="flex flex-col gap-2 pt-2">
+        <div className="grid gap-2 pt-2 sm:grid-cols-2 lg:grid-cols-4">
           {['Vercel deploy', 'Coolify VPS', 'Sentry errors', 'Langfuse traces'].map((service) => (
-            <li
-              key={service}
-              className="flex items-center gap-2 font-mono text-xs text-(--color-text-2)"
-            >
-              <LiveDot reduced={reduced ?? false} />
-              <span>{service}</span>
-              <span className="ml-auto text-[10px] uppercase tracking-widest text-(--color-success)">
-                ok
-              </span>
-            </li>
+            <StatusBar key={service} label={service} reduced={reduced ?? false} />
           ))}
-        </ul>
+        </div>
       ) : null}
 
       {cell.note ? (
-        <p className="mt-auto pt-2 text-sm leading-relaxed text-(--color-text-2)">{cell.note}</p>
+        <p
+          className={cn(
+            'pt-2 leading-relaxed text-(--color-text-2)',
+            isXL ? 'text-base mt-auto' : 'text-sm mt-auto'
+          )}
+        >
+          {cell.note}
+        </p>
+      ) : null}
+
+      {/* Integrações chip strip (wide INFRA cell only) — horizontal scroll-snap */}
+      {cell.integrations && cell.integrations.length > 0 ? (
+        <div className="mt-3 border-t border-(--color-hairline) pt-4">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-(--color-text-3) mb-2">
+            ↳ INTEGRAÇÕES
+          </p>
+          <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {cell.integrations.map((name) => (
+              <li
+                key={name}
+                className="shrink-0 rounded-md border border-(--color-hairline-strong) bg-(--color-base) px-3 py-1.5 font-mono text-[11px] text-(--color-text-2)"
+              >
+                {name}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
     </article>
   );
 }
 
-function LiveDot({ reduced }: { reduced: boolean }) {
+function StatusBar({ label, reduced }: { label: string; reduced: boolean }) {
   return (
-    <span className="relative flex size-2 items-center justify-center">
-      {!reduced ? (
+    <div className="flex items-center gap-3 rounded-md border border-(--color-hairline) bg-(--color-base) px-3 py-2.5">
+      <span className="relative flex size-2 shrink-0 items-center justify-center">
+        {!reduced ? (
+          <span
+            aria-hidden="true"
+            className="absolute inline-flex size-full animate-ping rounded-full opacity-50"
+            style={{ background: 'var(--color-success)' }}
+          />
+        ) : null}
         <span
           aria-hidden="true"
-          className="absolute inline-flex size-full animate-ping rounded-full opacity-50"
-          style={{ background: 'var(--color-success)' }}
+          className="relative inline-flex size-2 rounded-full"
+          style={{ background: 'var(--color-success)', boxShadow: '0 0 6px var(--color-success)' }}
         />
-      ) : null}
-      <span
-        aria-hidden="true"
-        className="relative inline-flex size-2 rounded-full"
-        style={{ background: 'var(--color-success)', boxShadow: '0 0 6px var(--color-success)' }}
-      />
-    </span>
+      </span>
+      <span className="flex-1 font-mono text-xs text-(--color-text-1)">{label}</span>
+      <ProgressBar reduced={reduced} />
+      <span className="font-mono text-[10px] uppercase tracking-widest text-(--color-success)">
+        ok
+      </span>
+    </div>
+  );
+}
+
+function ProgressBar({ reduced }: { reduced: boolean }) {
+  // Mini progress bar visual — 6 bars dancing. Reduced-motion: static at 80%.
+  return (
+    <div className="flex items-end gap-0.5 h-3">
+      {[3, 5, 7, 5, 8, 6].map((h, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          className="inline-block w-0.5 bg-(--color-success)"
+          style={{
+            height: `${h * 1.5}px`,
+            opacity: 0.65,
+            ...(reduced
+              ? {}
+              : {
+                  animation: `progressPulse ${1.5 + i * 0.15}s ease-in-out ${i * 0.1}s infinite alternate`,
+                }),
+          }}
+        />
+      ))}
+      <style>
+        {`@keyframes progressPulse { from { transform: scaleY(0.6); opacity: 0.35; } to { transform: scaleY(1); opacity: 0.85; } }`}
+      </style>
+    </div>
   );
 }
 

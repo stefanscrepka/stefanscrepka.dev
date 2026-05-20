@@ -53,13 +53,16 @@
   --color-success: oklch(75% 0.15 142);
   --color-warning: oklch(80% 0.18 100);
   --color-danger: oklch(65% 0.20 10);
-  --color-info: oklch(72% 0.14 250);
+  /* --color-info removido (não consumido em código). Re-adicionar se necessário. */
 
   /* === Fonts (chain through next/font Geist CSS vars set on <html>) === */
   --font-display: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-body: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, 'SF Mono', Menlo, monospace;
-  --font-editorial: 'PP Editorial New', 'GT Sectra', Georgia, 'Times New Roman', serif;
+  /* PP Editorial New italic carregada via next/font/local em app/layout.tsx — Pangram Pangram
+     "Free for personal use" cobre uso de portfolio pessoal. next/font seta a var em
+     html.className override; este valor é apenas fallback se next/font falhar. */
+  --font-editorial: ui-serif, Georgia, 'Times New Roman', serif;
 
   /* === Fluid type scale (ratio 1.333 perfect fourth, clamp 320→1920px) === */
   --text-xs: clamp(0.75rem, 0.7272rem + 0.1136vw, 0.875rem);
@@ -102,9 +105,7 @@
   --text-6xl--line-height: 0.92;
   --text-6xl--letter-spacing: -0.03em;
 
-  --text-7xl: clamp(9rem, 4.9545rem + 20.4545vw, 12rem);
-  --text-7xl--line-height: 0.9;
-  --text-7xl--letter-spacing: -0.035em;
+  /* --text-7xl removido (não consumido — text-6xl é o cap atual). */
 
   /* === Tracking === */
   --tracking-tighter: -0.04em;
@@ -186,12 +187,10 @@
   --motion-drift: 60s;
 
   /* === Custom animations (v4 namespace --animate-* → animate-* utilities).
-     Reusa --motion-* como single source of truth (DRY): mudar marquee
-     duration uma vez, todos os consumidores acompanham. === */
+     Apenas grain-drift está em uso (grain-overlay.tsx). marquee/fade-up/shimmer
+     foram removidos por dead code — marquees usam GSAP (code-marquee-track,
+     partner-marquee), reveals usam Motion 12 useInView, shimmer não era consumido. === */
   --animate-grain-drift: grain-drift var(--motion-drift) linear infinite;
-  --animate-marquee: marquee var(--motion-marquee) linear infinite;
-  --animate-fade-up: fade-up var(--motion-page) cubic-bezier(0.165, 0.84, 0.44, 1) both;
-  --animate-shimmer: shimmer 2400ms linear infinite;
 }
 
 /* ============================================================
@@ -231,35 +230,6 @@
   }
   100% {
     transform: translate(0, 0);
-  }
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes shimmer {
-  from {
-    background-position: -200% 0;
-  }
-  to {
-    background-position: 200% 0;
   }
 }
 
@@ -341,6 +311,34 @@
 
 @utility section-pad-y-lg {
   padding-block: clamp(6rem, 10vw, 12rem);
+}
+
+@utility glass-panel {
+  background-color: oklch(20% 0.010 130 / 0.55);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  border: 1px solid oklch(100% 0 0 / 0.06);
+}
+
+@utility scanline {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(94% 0.22 124 / 0.04) 2px,
+    oklch(94% 0.22 124 / 0.04) 3px
+  );
+}
+
+@utility vignette {
+  box-shadow: inset 0 0 200px oklch(0% 0 0 / 0.4);
+}
+
+@utility emissive-lime {
+  border: 1px solid var(--color-accent);
+  box-shadow:
+    var(--shadow-glow-lime-sm),
+    inset 0 1px 0 oklch(100% 0 0 / 0.10);
 }
 
 @utility skip-link {

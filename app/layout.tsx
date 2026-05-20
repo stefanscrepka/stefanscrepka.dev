@@ -3,6 +3,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
+import localFont from 'next/font/local';
 import { AboutThisSiteModal } from '@/components/contact/about-this-site-modal';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { MotionProvider } from '@/components/providers/motion-provider';
@@ -11,6 +12,27 @@ import { ContactIcon, ManifestoIcon, ProcessIcon, WorkIcon } from '@/components/
 import { FloatingDock, type FloatingDockItem } from '@/components/ui-effects/floating-dock';
 import { GrainOverlay } from '@/components/ui-effects/grain-overlay';
 import './globals.css';
+
+// PP Editorial New (Pangram Pangram, EULA "Free for personal use" — cobre portfolio
+// pessoal). Italic usado pelo <EditorialAccent /> na palavra "multi-agente" no hero
+// (único momento editorial serif do site). Regular reservado pra pull-quotes futuras.
+const ppEditorial = localFont({
+  src: [
+    {
+      path: '../public/fonts/PPEditorialNew-Italic.otf',
+      weight: '400',
+      style: 'italic',
+    },
+    {
+      path: '../public/fonts/PPEditorialNew-Regular.otf',
+      weight: '400',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-editorial',
+  display: 'swap',
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
+});
 
 const navItems: FloatingDockItem[] = [
   { label: 'Work', href: '#work', icon: <WorkIcon />, subtitle: 'Três produtos em produção' },
@@ -108,7 +130,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="pt-BR"
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      className={`${GeistSans.variable} ${GeistMono.variable} ${ppEditorial.variable}`}
       suppressHydrationWarning
     >
       <head>

@@ -21,7 +21,7 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "lhci": "lhci autorun",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "cross-env ANALYZE=true next build"
   },
   "dependencies": {
     "@calcom/embed-react": "^1.5.3",
@@ -32,7 +32,6 @@
     "@react-three/fiber": "^9.6.1",
     "@react-three/postprocessing": "^3.0.4",
     "@sentry/nextjs": "^10.53.1",
-    "@serwist/next": "^9.5.11",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
@@ -49,7 +48,6 @@
     "react-hook-form": "^7.76.0",
     "recharts": "^3.8.1",
     "resend": "^6.12.3",
-    "serwist": "^9.5.11",
     "shiki": "^4.0.2",
     "tailwind-merge": "^3.6.0",
     "three": "^0.184.0",
@@ -68,6 +66,7 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.184.1",
     "@vitest/ui": "^4.1.6",
+    "cross-env": "^10.1.0",
     "eslint": "^10.4.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "playwright": "^1.60.0",

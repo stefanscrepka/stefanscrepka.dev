@@ -13,12 +13,14 @@ export function ContactSection() {
       className="container-max section-pad-y border-t border-(--color-hairline)"
       data-slot="contact"
     >
-      <header className="mb-10 flex flex-col gap-3 sm:mb-14">
+      <header className="mb-12 flex flex-col gap-3 sm:mb-16">
         <p className="eyebrow">VAMOS CONVERSAR</p>
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Conta o problema. Respondo em &lt;12h.
+        <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl !leading-[0.95]">
+          Conta o problema.
+          <br />
+          Respondo em &lt;12h.
         </h2>
-        <p className="max-w-prose text-(--color-text-2) leading-relaxed">
+        <p className="mt-2 max-w-prose text-(--color-text-2) leading-relaxed">
           Form chega direto no meu email. Confirmação automática. Se prefere síncrono, WhatsApp ou
           Cal.com 15min embedded — sem ida-e-volta pra marcar horário.
         </p>

@@ -33,6 +33,7 @@ const MARKERS: TimelineMarker[] = [
     title: 'Agora · multi-agente em produção',
     body: '22 agentes Claude SDK orquestrados em 5 squads. Prompt cache 2 camadas, anti-slop validator com 14 regex PT-BR, aprovação humana via Telegram em ≤10 min/dia. Aqui é o presente.',
     institutions: ['content-engine'],
+    isCurrent: true,
   },
 ];
 
@@ -45,12 +46,14 @@ export function TimelineSection() {
       className="container-narrow section-pad-y border-t border-(--color-hairline)"
       data-slot="timeline"
     >
-      <header className="mb-12 flex flex-col gap-3 sm:mb-16">
+      <header className="mb-14 flex flex-col gap-3 sm:mb-20">
         <p className="eyebrow">JORNADA</p>
-        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Da automação industrial pra IA multi-agente
+        <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl !leading-[0.95]">
+          Da automação industrial
+          <br />
+          pra IA multi-agente.
         </h2>
-        <p className="max-w-prose text-(--color-text-2) leading-relaxed">
+        <p className="mt-2 max-w-prose text-(--color-text-2) leading-relaxed">
           Cinco anos. Quatro estágios. Um fio condutor: construir sistemas que funcionam quando
           ninguém está olhando.
         </p>

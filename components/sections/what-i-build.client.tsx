@@ -5,10 +5,10 @@ import { useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { CircuitVisual, SquadsVisual, StackVisual } from './what-i-build';
 
-// Cards "O que eu construo" — cada um tem um VISUAL BACKGROUND único
-// (squads diagram, tech logos cluster, ou circuit pattern). Quebra a
-// uniformidade do "ícone genérico no top".
-// Reveal stagger 120ms on view. Hover: scale + border emissive lime.
+// Cards "O que eu construo" — 3 blocos VERTICAIS 85dvh cada (não grid 3-col).
+// Number "01/02/03" GIGANTE 240px lime opacity 8% atrás do conteúdo (não top-right pequeno).
+// Diagrams sangram outline 60% do bloco (não thumbnail num card).
+// Layout próprio por bloco: 01 diagonal sweep, 02 grid invertido, 03 centralizado.
 
 export interface WhatIBuildCardData {
   eyebrow: string;
@@ -19,12 +19,11 @@ export interface WhatIBuildCardData {
 }
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  hidden: { opacity: 0, y: 32 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.165, 0.84, 0.44, 1] as const },
+    transition: { duration: 0.6, ease: [0.165, 0.84, 0.44, 1] as const },
   },
 };
 
@@ -40,76 +39,85 @@ interface WhatIBuildGridProps {
 }
 
 export function WhatIBuildGrid({ cards, className }: WhatIBuildGridProps) {
-  const ref = useRef<HTMLUListElement>(null);
-  const inView = useInView(ref, { once: true, margin: '0px 0px -120px 0px' });
-
   return (
-    <m.ul
-      ref={ref}
-      initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
-      variants={{
-        hidden: {},
-        visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
-      }}
-      className={cn('grid gap-5 sm:gap-6 md:grid-cols-3', className)}
-    >
-      {cards.map((card) => (
-        <m.li key={card.title} variants={itemVariants}>
-          <ModeCard card={card} />
-        </m.li>
+    <ol className={cn('flex flex-col', className)}>
+      {cards.map((card, idx) => (
+        <ModeBlock key={card.title} card={card} index={idx} />
       ))}
-    </m.ul>
+    </ol>
   );
 }
 
-function ModeCard({ card }: { card: WhatIBuildCardData }) {
+function ModeBlock({ card, index }: { card: WhatIBuildCardData; index: number }) {
+  const ref = useRef<HTMLLIElement>(null);
+  const inView = useInView(ref, { once: true, margin: '0px 0px -120px 0px' });
   const VisualComponent = VISUAL_MAP[card.visual];
+  const isReversed = index === 1; // bloco 02 grid invertido (text-LEFT visual-RIGHT)
 
   return (
-    <article
-      data-slot="mode-card"
+    <m.li
+      ref={ref}
+      initial="hidden"
+      animate={inView ? 'visible' : 'hidden'}
+      variants={itemVariants}
+      data-slot="mode-block"
       data-visual={card.visual}
+      data-index={index}
       className={cn(
-        'group/mode relative isolate flex h-full min-h-[28rem] flex-col overflow-hidden rounded-2xl',
-        'border border-(--color-hairline) bg-(--color-surface)',
-        'transition-[border-color,transform,box-shadow] duration-(--motion-fast) ease-(--ease-standard)',
-        'hover:-translate-y-1 hover:border-(--color-accent) hover:shadow-(--shadow-glow-lime-sm)',
-        'focus-within:border-(--color-accent)'
+        'group/block relative isolate flex min-h-[85dvh] flex-col justify-center overflow-hidden',
+        index > 0 && 'border-t border-(--color-hairline)'
       )}
     >
-      {/* Visual top — 50% altura, distinto por card */}
-      <div className="relative h-44 overflow-hidden border-b border-(--color-hairline) bg-(--color-base) p-3 sm:h-48">
-        <VisualComponent />
+      {/* Number GIGANTE 240px lime opacity 8% atrás de tudo */}
+      <span
+        aria-hidden="true"
+        className={cn(
+          'pointer-events-none absolute select-none font-mono font-bold leading-none tabular-nums',
+          'text-[160px] sm:text-[220px] lg:text-[280px]',
+          isReversed ? 'right-[-2vw]' : 'left-[-2vw]',
+          'top-1/2 -translate-y-1/2'
+        )}
+        style={{
+          color: 'var(--color-accent)',
+          opacity: 0.06,
+          letterSpacing: '-0.04em',
+        }}
+      >
+        {card.eyebrow}
+      </span>
 
-        {/* Number indicator — top-right large */}
-        <span
-          aria-hidden="true"
-          className="absolute right-4 top-3 font-mono text-4xl font-bold leading-none text-(--color-accent-subtle) tabular-nums"
-        >
-          {card.eyebrow}
-        </span>
+      <div className="container-max relative z-10 grid gap-12 lg:grid-cols-2 lg:gap-16 lg:items-center">
+        {/* Visual side */}
+        <div className={cn('relative h-64 sm:h-80 lg:h-[60vh]', isReversed && 'lg:order-2')}>
+          <VisualComponent />
+        </div>
+
+        {/* Text side */}
+        <div className={cn('flex flex-col gap-5', isReversed && 'lg:order-1')}>
+          <p className="font-mono text-xs uppercase tracking-widest text-(--color-accent)">
+            <span className="tabular-nums">{card.eyebrow}</span>
+            <span className="mx-2 text-(--color-text-3)">/</span>
+            <span className="text-(--color-text-3)">03</span>
+          </p>
+
+          <h3 className="text-3xl font-bold leading-[0.95] tracking-tight text-(--color-text-1) sm:text-4xl lg:text-5xl">
+            {card.title}
+          </h3>
+
+          <p className="text-base leading-relaxed text-(--color-text-2)">{card.body}</p>
+
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {card.pillars.map((pillar) => (
+              <li
+                key={pillar}
+                className="rounded-md border border-(--color-hairline-strong) bg-(--color-surface-elevated) px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-(--color-text-3)"
+              >
+                {pillar}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-
-      {/* Text content */}
-      <div className="flex flex-1 flex-col gap-4 p-6 sm:p-7">
-        <h3 className="text-lg font-semibold leading-tight tracking-tight text-(--color-text-1) sm:text-xl">
-          {card.title}
-        </h3>
-        <p className="text-sm leading-relaxed text-(--color-text-2)">{card.body}</p>
-
-        {/* Pillars chip list */}
-        <ul className="mt-auto flex flex-wrap gap-1.5 pt-2">
-          {card.pillars.map((pillar) => (
-            <li
-              key={pillar}
-              className="rounded-md border border-(--color-hairline-strong) bg-(--color-surface-elevated) px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-(--color-text-3)"
-            >
-              {pillar}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </article>
+    </m.li>
   );
 }

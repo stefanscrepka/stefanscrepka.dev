@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { PartnerMarquee } from '@/components/hero/partner-marquee';
 import { AnchorLink } from '@/components/shared/anchor-link';
 import { SHMonogram } from '@/components/shared/sh-monogram';
 import { cn } from '@/lib/utils';
@@ -26,7 +27,7 @@ const SOCIAL_LINKS = [
 const STACK_CREDITS = [
   'Next 16 · React 19',
   'Tailwind v4 · Geist',
-  'PP Editorial New',
+  'PP Editorial New (FFPU)',
   'r3f + drei · GSAP · Lenis',
   'Shiki SSR · Sentry · Vercel',
 ];
@@ -70,6 +71,11 @@ export function Footer() {
 
           {/* Mapa Ponta Grossa mini SVG — silhouette geográfica */}
           <PontaGrossaBadge />
+        </div>
+
+        {/* Partner marquee REUSE do Hero — fecha loop conceitual (Lando-style) */}
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8">
+          <PartnerMarquee />
         </div>
 
         {/* 3-col grid */}
@@ -171,6 +177,20 @@ export function Footer() {
             Sobre este site →
           </Link>
         </div>
+
+        {/* Sign-off — assinatura editorial echoing Hero headline (loop conceitual) */}
+        <p
+          className="mt-2 text-center text-base sm:text-lg"
+          style={{
+            fontFamily: 'var(--font-editorial)',
+            fontStyle: 'italic',
+            fontWeight: 400,
+            color: 'oklch(94% 0.22 124 / 0.6)',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          Construo IA multi-agente em produção.
+        </p>
       </div>
     </footer>
   );

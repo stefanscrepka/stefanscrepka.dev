@@ -9,6 +9,9 @@ import Lenis from 'lenis';
 gsap.registerPlugin(ScrollTrigger);
 
 let lenisInstance: Lenis | null = null;
+let scrollTriggerConfigured = false;
+let rafTickerCallback: ((time: number) => void) | null = null;
+let originalLagSmoothing: { lag: number; tolerance: number } | null = null;
 
 interface SmoothScrollOptions {
   duration?: number;
@@ -22,6 +25,14 @@ export function initSmoothScroll(options: SmoothScrollOptions = {}): Lenis {
   }
 
   if (lenisInstance) return lenisInstance;
+
+  // ScrollTrigger refresh em resize/orientation change (1× por session, browser-only).
+  if (!scrollTriggerConfigured) {
+    ScrollTrigger.config({
+      autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load,resize,orientationchange',
+    });
+    scrollTriggerConfigured = true;
+  }
 
   const {
     duration = 1.2,
@@ -41,17 +52,31 @@ export function initSmoothScroll(options: SmoothScrollOptions = {}): Lenis {
     ScrollTrigger.update();
   });
 
-  gsap.ticker.add((time: number) => {
+  // Salva ref do callback pra cleanup (gotcha: gsap.ticker.add sem remove vazava em StrictMode)
+  rafTickerCallback = (time: number) => {
     lenisInstance?.raf(time * 1000);
-  });
+  };
+  gsap.ticker.add(rafTickerCallback);
 
-  // Critical: lagSmoothing(0) evita desync com Lenis raf loop
+  // Critical: lagSmoothing(0) evita desync com Lenis raf loop.
+  // Backup do default antes pra restaurar no destroy.
+  if (originalLagSmoothing === null) {
+    originalLagSmoothing = { lag: 500, tolerance: 33 }; // GSAP defaults
+  }
   gsap.ticker.lagSmoothing(0);
 
   return lenisInstance;
 }
 
 export function destroySmoothScroll(): void {
+  if (rafTickerCallback) {
+    gsap.ticker.remove(rafTickerCallback);
+    rafTickerCallback = null;
+  }
+  if (originalLagSmoothing) {
+    gsap.ticker.lagSmoothing(originalLagSmoothing.lag, originalLagSmoothing.tolerance);
+    originalLagSmoothing = null;
+  }
   if (lenisInstance) {
     lenisInstance.destroy();
     lenisInstance = null;

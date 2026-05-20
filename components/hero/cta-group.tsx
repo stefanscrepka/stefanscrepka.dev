@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { MagneticCTA } from '@/components/ui-effects/magnetic-cta';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { useAnchorScroll } from '@/lib/scroll/anchor-scroll';
 import { cn } from '@/lib/utils';
@@ -53,16 +54,20 @@ export function CTAGroup({ className }: CTAGroupProps) {
         className
       )}
     >
-      <Button
-        size="lg"
-        onClick={(e) => {
-          e.preventDefault();
-          scroll('#work');
-        }}
-        asChild
-      >
-        <a href="#work">Ver os produtos →</a>
-      </Button>
+      {/* Primary CTA recebe magnetic hover — anti-Awwwards: APENAS 1 magnetic por viewport. */}
+      <MagneticCTA strength={6} range={80}>
+        <Button
+          size="lg"
+          onClick={(e) => {
+            e.preventDefault();
+            scroll('#work');
+          }}
+          asChild
+        >
+          <a href="#work">Ver os produtos →</a>
+        </Button>
+      </MagneticCTA>
+
       <Button
         size="lg"
         variant="outline"

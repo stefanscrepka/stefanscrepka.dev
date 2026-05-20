@@ -31,5 +31,22 @@ export function LenisProvider({ children }: LenisProviderProps) {
     };
   }, [reduced]);
 
+  // Pause Lenis quando Radix Dialog abre (seta body[data-scroll-locked]).
+  // Sem isso, scroll vaza atrás do modal em mobile (syncTouch:true especialmente).
+  useEffect(() => {
+    if (!lenis || typeof window === 'undefined') return;
+    const body = document.body;
+    const checkAndApply = () => {
+      const locked = body.hasAttribute('data-scroll-locked');
+      if (locked) lenis.stop();
+      else lenis.start();
+    };
+    // Verifica estado atual on mount (caso modal já esteja aberto)
+    checkAndApply();
+    const observer = new MutationObserver(checkAndApply);
+    observer.observe(body, { attributes: true, attributeFilter: ['data-scroll-locked'] });
+    return () => observer.disconnect();
+  }, [lenis]);
+
   return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>;
 }

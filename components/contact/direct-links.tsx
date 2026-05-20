@@ -52,23 +52,25 @@ export function DirectLinks() {
         'bg-(--color-surface) p-6 sm:p-7'
       )}
     >
-      <header className="flex items-start gap-4">
-        {/* Avatar fallback SVG — quando Stefan entregar foto, troca por <Image> */}
+      <header className="flex flex-col items-start gap-4">
+        {/* Avatar grande 96px — vira protagonista do perfil (era 56px inline) */}
         <div
           aria-hidden="true"
           className={cn(
-            'relative grid size-14 shrink-0 place-items-center overflow-hidden rounded-full',
-            'border border-(--color-accent) bg-(--color-surface-elevated)'
+            'relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-full',
+            'border-2 border-(--color-accent) bg-(--color-surface-elevated)'
           )}
-          style={{ boxShadow: '0 0 24px var(--color-accent-glow)' }}
+          style={{
+            boxShadow: '0 0 32px var(--color-accent-glow), inset 0 1px 0 oklch(100% 0 0 / 0.10)',
+          }}
         >
-          <svg viewBox="0 0 48 48" className="size-9 text-(--color-accent)" aria-hidden="true">
+          <svg viewBox="0 0 64 64" className="size-14 text-(--color-accent)" aria-hidden="true">
             <title>Stefan Heinz Screpka</title>
             <text
-              x="24"
-              y="30"
+              x="32"
+              y="40"
               textAnchor="middle"
-              fontSize="20"
+              fontSize="26"
               fontFamily="var(--font-display)"
               fontWeight="700"
               letterSpacing="-0.04em"
@@ -80,20 +82,28 @@ export function DirectLinks() {
           {/* Live dot */}
           <span
             aria-hidden="true"
-            className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-(--color-surface)"
+            className="absolute bottom-1 right-1 size-4 rounded-full border-2 border-(--color-surface)"
             style={{
               background: 'var(--color-success)',
-              boxShadow: '0 0 8px var(--color-success)',
+              boxShadow: '0 0 10px var(--color-success)',
             }}
           />
         </div>
 
         <div className="flex flex-col gap-1">
           <p className="eyebrow">CANAIS DIRETOS</p>
-          <h3 className="text-lg font-semibold tracking-tight text-(--color-text-1)">
-            Prefere falar agora?
+          <h3 className="text-2xl font-bold tracking-tight text-(--color-text-1)">
+            Stefan Heinz Screpka
           </h3>
-          <p className="font-mono text-[11px] text-(--color-text-3)">Online · Ponta Grossa, PR</p>
+          <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+            AI Product Engineer · Ponta Grossa, PR
+          </p>
+          <p
+            className="mt-2 text-sm leading-relaxed text-(--color-text-2)"
+            style={{ fontFamily: 'var(--font-editorial)', fontStyle: 'italic' }}
+          >
+            Respondo manual. Não auto-reply IA.
+          </p>
         </div>
       </header>
 

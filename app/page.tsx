@@ -4,6 +4,7 @@ import { FeaturedWorkSection } from '@/components/sections/featured-work';
 import { HeroSection } from '@/components/sections/hero';
 import { ManifestoSection } from '@/components/sections/manifesto';
 import { OtherWorkSection } from '@/components/sections/other-work';
+import { SilentFrame } from '@/components/sections/silent-frame';
 import { SocialProofLine } from '@/components/sections/social-proof-line';
 import { TimelineSection } from '@/components/sections/timeline';
 import { WhatIBuildSection } from '@/components/sections/what-i-build';
@@ -19,6 +20,7 @@ export default function HomePage() {
     <>
       <HeroSection />
       <SocialProofLine />
+      <SilentFrame />
       <FeaturedWorkSection />
       <WhatIBuildSection />
       <OtherWorkSection />
