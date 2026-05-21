@@ -124,7 +124,7 @@ export function DirectLinksRow() {
               </span>
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-semibold text-(--color-text-1)">{item.label}</span>
-                <span className="font-mono text-[11px] tracking-tight text-(--color-text-3) leading-relaxed break-all">
+                <span className="font-mono text-2xs tracking-tight text-(--color-text-3) leading-relaxed break-all">
                   {item.detail}
                 </span>
               </div>
@@ -137,7 +137,7 @@ export function DirectLinksRow() {
           NUNCA link externo per HANDOFF §97: modal embedded always. */}
       <div className="flex flex-col gap-3 border-t border-(--color-hairline) pt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <div className="flex flex-col gap-1">
-          <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+          <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
             Prefere agendar direto?
           </p>
           <p className="text-sm leading-relaxed text-(--color-text-2)">

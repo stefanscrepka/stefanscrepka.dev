@@ -166,7 +166,7 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
             className="block h-px w-12 bg-(--color-accent)"
             style={{ opacity: 0.6 }}
           />
-          <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3) leading-relaxed">
+          <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) leading-relaxed">
             Stefan Heinz Screpka{' '}
             <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
               ·

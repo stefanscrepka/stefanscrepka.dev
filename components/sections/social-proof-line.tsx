@@ -99,7 +99,7 @@ export function SocialProofLine() {
             <Link
               href={line.href}
               className={cn(
-                'group/proof inline-flex items-baseline gap-2 font-mono text-[11px] uppercase',
+                'group/proof inline-flex items-baseline gap-2 font-mono text-2xs uppercase',
                 'tracking-widest text-(--color-text-3) leading-relaxed',
                 'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
                 'hover:text-(--color-text-1) focus-visible:text-(--color-text-1) outline-none'

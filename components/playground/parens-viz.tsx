@@ -3,6 +3,7 @@
 import { AnimatePresence, m } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 
 // Balanceamento de parênteses com pilha — input PT-BR, SVG stack push/pop animado.
@@ -129,7 +130,7 @@ export function ParensViz() {
         />
 
         <div className="flex flex-col gap-2">
-          <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+          <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
             Exemplos
           </p>
           <div className="flex flex-wrap gap-2">
@@ -214,7 +215,7 @@ function StackViz({ stack, balanced, reduced }: StackVizProps) {
               exit={reduced ? { opacity: 0 } : { opacity: 0, x: 40, scale: 0.9 }}
               transition={{
                 duration: reduced ? 0 : 0.28,
-                ease: [0.34, 1.56, 0.64, 1],
+                ease: EASES.snappy,
               }}
               className={cn(
                 'flex h-9 items-center justify-between rounded-md border px-3',
@@ -227,7 +228,7 @@ function StackViz({ stack, balanced, reduced }: StackVizProps) {
               <span aria-hidden="true" className="font-semibold">
                 {bracket}
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-(--color-text-3)">
+              <span className="text-2xs uppercase tracking-widest text-(--color-text-3)">
                 {idx === 0 ? 'top' : `+${idx}`}
               </span>
             </m.div>

@@ -87,7 +87,7 @@ export function ContentEnginePanel({
       className={cn('flex h-full w-full flex-col items-start justify-center gap-6', 'max-w-3xl')}
       aria-labelledby={`ce-panel-${panel.id}`}
     >
-      <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-accent)">
+      <p className="font-mono text-2xs uppercase tracking-widest text-(--color-accent)">
         {panel.badge}
       </p>
       <h3
@@ -101,7 +101,7 @@ export function ContentEnginePanel({
 
       <div className="mt-4 flex w-full items-center justify-center">{panel.diagram}</div>
 
-      <p className="mt-auto font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)">
+      <p className="mt-auto font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
         {String(index + 1).padStart(2, '0')} / {String(total).padStart(2, '0')}
       </p>
     </article>

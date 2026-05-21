@@ -4,6 +4,7 @@ import { m, useInView } from 'motion/react';
 import { useRef, useState } from 'react';
 import { type TechId, TechLogo } from '@/components/shared/tech-logo';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 
 // Bento Grid 6-col com hierarquia declarada:
@@ -47,7 +48,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: [0.165, 0.84, 0.44, 1] as const },
+    transition: { duration: 0.5, ease: EASES.dramatic },
   },
 };
 
@@ -126,7 +127,7 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </h3>
         <span
           aria-hidden="true"
-          className="font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)"
+          className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)"
         >
           {cell.size === 'xl' ? '◆◆◆' : cell.size === 'wide' ? '═══' : '◆'}
         </span>
@@ -144,7 +145,7 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
             {cell.count}
           </span>
           {cell.countSuffix ? (
-            <p className="text-center font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+            <p className="text-center font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               {cell.countSuffix}
             </p>
           ) : null}
@@ -171,7 +172,7 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
               className={cn(
                 'rounded-md border border-(--color-hairline-strong)',
                 'bg-transparent px-2 py-0.5',
-                'font-mono text-[10px] text-(--color-text-3)',
+                'font-mono text-2xs text-(--color-text-3)',
                 'transition-colors duration-(--motion-fast)',
                 'group-hover/cell:border-(--color-accent-emissive)',
                 'group-hover/cell:text-(--color-text-2)'
@@ -207,14 +208,14 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
       {/* Integrações chip strip (wide INFRA cell only) — horizontal scroll-snap */}
       {cell.integrations && cell.integrations.length > 0 ? (
         <div className="mt-3 border-t border-(--color-hairline) pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-(--color-text-3) mb-2">
+          <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) mb-2">
             ↳ INTEGRAÇÕES
           </p>
           <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {cell.integrations.map((name) => (
               <li
                 key={name}
-                className="shrink-0 rounded-md border border-(--color-hairline-strong) bg-(--color-base) px-3 py-1.5 font-mono text-[11px] text-(--color-text-2)"
+                className="shrink-0 rounded-md border border-(--color-hairline-strong) bg-(--color-base) px-3 py-1.5 font-mono text-2xs text-(--color-text-2)"
               >
                 {name}
               </li>
@@ -263,7 +264,7 @@ function StatusBar({ label, reduced }: { label: string; reduced: boolean }) {
       </span>
       <span className="flex-1 font-mono text-xs text-(--color-text-1)">{label}</span>
       <ProgressBar reduced={reduced} />
-      <span className="font-mono text-[10px] uppercase tracking-widest text-(--color-success)">
+      <span className="font-mono text-2xs uppercase tracking-widest text-(--color-success)">
         ok
       </span>
     </div>
@@ -324,8 +325,8 @@ function PerimeterTrace({ active }: { active: boolean }) {
         initial={{ strokeDashoffset: 1, opacity: 0 }}
         animate={active ? { strokeDashoffset: 0, opacity: 1 } : { strokeDashoffset: 1, opacity: 0 }}
         transition={{
-          strokeDashoffset: { duration: 0.6, ease: [0.165, 0.84, 0.44, 1] },
-          opacity: { duration: 0.18, ease: [0.2, 0, 0, 1] },
+          strokeDashoffset: { duration: 0.6, ease: EASES.dramatic },
+          opacity: { duration: 0.18, ease: EASES.standard },
         }}
       />
     </svg>

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { EASES } from '@/lib/animation/eases';
 import { type ContactState, submitContact } from '@/lib/server-actions/contact';
 import { jsonToFormData } from '@/lib/server-actions/form-data-bridge';
 import { cn } from '@/lib/utils';
@@ -159,7 +160,7 @@ export function ContactForm() {
                       transition={{
                         duration: 0.5,
                         delay: 0.15 + idx * 0.05,
-                        ease: [0.22, 1, 0.36, 1],
+                        ease: EASES.outQuint,
                       }}
                       className="inline-block"
                     >
@@ -360,7 +361,7 @@ export function ContactForm() {
           role="status"
           aria-live="polite"
           className={cn(
-            'font-mono text-[11px] uppercase tracking-widest leading-relaxed',
+            'font-mono text-2xs uppercase tracking-widest leading-relaxed',
             state.status === 'error' ? 'text-(--color-danger)' : 'text-(--color-text-3)'
           )}
         >
@@ -384,7 +385,7 @@ function Field({ label, error, input, errorId, fieldId }: FieldProps) {
     <div className="group/field flex flex-col gap-2.5" data-disabled="false">
       <Label
         htmlFor={fieldId}
-        className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)"
+        className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)"
       >
         {label}
       </Label>

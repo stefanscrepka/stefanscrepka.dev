@@ -2,6 +2,7 @@
 
 import { m, useInView } from 'motion/react';
 import { type ReactNode, useRef } from 'react';
+import { EASES } from '@/lib/animation/eases';
 
 // Reveal stagger client wrapper pro FeaturedWorkSection.
 // Pattern parecido com WhatIBuildGrid mas sem aninhar lista (preserva semantics).
@@ -19,7 +20,7 @@ export function FeaturedWorkReveal({ children }: FeaturedWorkRevealProps) {
       ref={ref}
       initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-      transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
+      transition={{ duration: 0.5, ease: EASES.standard }}
     >
       {children}
     </m.div>

@@ -71,7 +71,7 @@ export function CaseStudyCover({
       className={cn(ASPECT_CLASS[aspectRatio], className)}
     >
       <div aria-hidden="true" className="absolute inset-0 flex items-end justify-start p-6">
-        <span className="font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)">
+        <span className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
           {caseStudy.title} — asset em produção
         </span>
       </div>

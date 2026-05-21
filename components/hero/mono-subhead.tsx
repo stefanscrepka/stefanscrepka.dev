@@ -4,6 +4,7 @@ import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { type ReactNode, useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { EASES, toCss } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 
 // Layer 3 do 8-layer choreography: subhead mono fade-up 300ms ease-standard,
@@ -27,7 +28,7 @@ export function MonoSubhead({ children, className }: MonoSubheadProps) {
         opacity: 0,
         duration: 0.3,
         delay: 0.4,
-        ease: 'cubic-bezier(0.2, 0, 0, 1)',
+        ease: toCss(EASES.standard),
       });
 
       return () => {

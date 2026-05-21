@@ -4,6 +4,7 @@ import { m, useInView } from 'motion/react';
 import { useRef } from 'react';
 import { type InstitutionId, InstitutionLogo } from '@/components/shared/institution-logo';
 import { TracingBeam } from '@/components/ui-effects/tracing-beam';
+import { EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 
 // Timeline editorial polish:
@@ -30,7 +31,7 @@ const itemVariants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, ease: [0.165, 0.84, 0.44, 1] as const },
+    transition: { duration: 0.6, ease: EASES.dramatic },
   },
 };
 
@@ -76,7 +77,7 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
                   className={cn(
                     'inline-flex items-center gap-1.5 rounded-md',
                     'border border-(--color-accent) bg-(--color-accent-subtle)',
-                    'px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-widest',
+                    'px-2.5 py-1.5 font-mono text-2xs uppercase tracking-widest',
                     'text-(--color-accent)'
                   )}
                   style={{ boxShadow: 'inset 0 1px 0 oklch(100% 0 0 / 0.10)' }}
@@ -105,7 +106,7 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
                 className="block h-px w-16 bg-(--color-accent)"
                 style={{ opacity: 0.6 }}
               />
-              <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+              <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
                 {marker.place}
               </p>
             </div>

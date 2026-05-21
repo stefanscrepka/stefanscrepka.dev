@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { EASES, toCss } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 
 // Defensive registerPlugin (não depender de side-effect transitivo).
@@ -95,7 +96,7 @@ function CountUp({ target }: { target: number }) {
       const tween = gsap.to(obj, {
         n: target,
         duration: 1.5,
-        ease: 'cubic-bezier(0.165, 0.84, 0.44, 1)',
+        ease: toCss(EASES.dramatic),
         scrollTrigger: {
           trigger: node,
           // 'top bottom' = dispara quando topo do stat chega no bottom do viewport

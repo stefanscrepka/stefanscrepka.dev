@@ -4,6 +4,7 @@ import { AnimatePresence, m } from 'motion/react';
 import dynamic from 'next/dynamic';
 import { type KeyboardEvent, useCallback, useRef, useState } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 import { FibonacciViz } from './fibonacci-viz';
 import { ParensViz } from './parens-viz';
@@ -103,7 +104,7 @@ export function PlaygroundPage() {
             initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduced ? { opacity: 1 } : { opacity: 0, y: -8 }}
-            transition={{ duration: reduced ? 0 : 0.2, ease: [0.2, 0, 0, 1] }}
+            transition={{ duration: reduced ? 0 : 0.2, ease: EASES.standard }}
           >
             {TABS.map((tab) => (
               <div
@@ -154,7 +155,7 @@ function TabButton({ ref, tab, active, onSelect }: TabButtonProps) {
       )}
     >
       <span className="font-semibold">{tab.label}</span>
-      <span className="text-[11px] tracking-wide text-(--color-text-3)">{tab.subtitle}</span>
+      <span className="text-2xs tracking-wide text-(--color-text-3)">{tab.subtitle}</span>
     </button>
   );
 }

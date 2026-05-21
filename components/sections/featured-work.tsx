@@ -85,7 +85,7 @@ export function FeaturedWorkSection() {
 
 function SequenceLabel({ index, total, label }: { index: number; total: number; label: string }) {
   return (
-    <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-accent)">
+    <p className="font-mono text-2xs uppercase tracking-widest text-(--color-accent)">
       <span className="tabular-nums">{String(index).padStart(2, '0')}</span>
       <span className="mx-1.5 text-(--color-text-3)">/</span>
       <span className="tabular-nums text-(--color-text-3)">{String(total).padStart(2, '0')}</span>

@@ -43,12 +43,12 @@ export function Footer() {
     <footer
       data-slot="footer"
       className={cn(
-        'relative isolate',
-        // Background deeper que body — oklch -3% L pra criar shelf sutil sob Contact.
+        'relative isolate bg-(--color-surface-deep)',
+        // Background deeper que body — token --color-surface-deep cria shelf sutil
+        // sob Contact (-3% L vs --color-base).
         'border-t border-(--color-hairline)',
         'pt-16 pb-20 sm:pt-20 sm:pb-24'
       )}
-      style={{ backgroundColor: 'oklch(10% 0.005 130)' }}
     >
       {/* Lime hairline divisor — sinaliza fim do conteúdo (gradient fade nas pontas) */}
       <div
@@ -77,7 +77,7 @@ export function Footer() {
             <p className="max-w-xs text-sm leading-relaxed text-(--color-text-2)">
               Construo IA multi-agente em produção — e o produto inteiro ao redor dela.
             </p>
-            <p className="mt-1 font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+            <p className="mt-1 font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               Ponta Grossa, Paraná{' '}
               <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
                 ·
@@ -135,7 +135,7 @@ export function Footer() {
 
         {/* ROW 2 — Copyright row (hairline top, font-mono small) */}
         <div className="flex flex-col gap-4 border-t border-(--color-hairline) pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-          <p className="font-mono text-[11px] tracking-wide text-(--color-text-3)">
+          <p className="font-mono text-2xs tracking-wide text-(--color-text-3)">
             © 2026 Stefan Heinz Screpka{' '}
             <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
               ·
@@ -143,7 +143,7 @@ export function Footer() {
             Construído em Ponta Grossa, PR
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[11px] tracking-wide text-(--color-text-3)">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-2xs tracking-wide text-(--color-text-3)">
             <Link
               href="#about-this-site"
               className={cn(
@@ -176,9 +176,7 @@ export function Footer() {
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-4">
-      <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
-        {title}
-      </p>
+      <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">{title}</p>
       {children}
     </div>
   );

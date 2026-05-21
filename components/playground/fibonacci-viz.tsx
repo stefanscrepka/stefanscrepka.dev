@@ -107,7 +107,7 @@ export function FibonacciViz() {
             '[&::-moz-range-thumb]:cursor-pointer'
           )}
         />
-        <p className="font-mono text-[11px] text-(--color-text-3)">1—{MAX_N}</p>
+        <p className="font-mono text-2xs text-(--color-text-3)">1—{MAX_N}</p>
       </div>
 
       {/* Chart */}
@@ -221,7 +221,7 @@ function Stat({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <dt className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+      <dt className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
         {label}
       </dt>
       <dd

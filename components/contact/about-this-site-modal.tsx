@@ -158,7 +158,7 @@ export function AboutThisSiteModal() {
               <ul className="flex flex-col gap-2">
                 {STACK_CREDITS.map((item) => (
                   <li key={item.label} className="flex flex-col gap-0.5">
-                    <span className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+                    <span className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
                       {item.label}
                     </span>
                     <span className="text-sm text-(--color-text-2)">{item.value}</span>
@@ -174,7 +174,7 @@ export function AboutThisSiteModal() {
               <ul className="flex flex-col gap-3">
                 {MOTION_NARRATIVE.map((item) => (
                   <li key={item.section} className="flex flex-col gap-1">
-                    <span className="font-mono text-[11px] uppercase tracking-widest text-(--color-accent)">
+                    <span className="font-mono text-2xs uppercase tracking-widest text-(--color-accent)">
                       {item.section}
                     </span>
                     <span className="text-sm leading-relaxed text-(--color-text-2)">

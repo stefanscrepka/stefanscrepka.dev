@@ -38,7 +38,7 @@ export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
       <Link
         href="/work"
         className={cn(
-          'group/back inline-flex w-fit items-center gap-2 font-mono text-[11px] uppercase tracking-widest',
+          'group/back inline-flex w-fit items-center gap-2 font-mono text-2xs uppercase tracking-widest',
           'text-(--color-text-3) outline-none',
           'transition-[gap,color] duration-(--motion-transition) ease-(--ease-smooth)',
           'hover:gap-3 focus-visible:gap-3'
@@ -76,7 +76,7 @@ export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
           />
         </span>
         <p
-          className="font-mono text-[11px] uppercase tracking-widest"
+          className="font-mono text-2xs uppercase tracking-widest"
           style={{ color: 'var(--color-text-3)' }}
         >
           {cs.status}

@@ -13,6 +13,7 @@ import { type ReactNode, useRef, useState } from 'react';
 import { SHMonogram } from '@/components/shared/sh-monogram';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { EASES } from '@/lib/animation/eases';
 import { useAnchorScroll } from '@/lib/scroll/anchor-scroll';
 import { cn } from '@/lib/utils';
 
@@ -169,11 +170,11 @@ function DockItemMagnify({
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 2 }}
             exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.15, ease: [0.2, 0, 0, 1] }}
+            transition={{ duration: 0.15, ease: EASES.standard }}
             className={cn(
               'pointer-events-none absolute left-1/2 top-full -translate-x-1/2',
               'mt-3 whitespace-nowrap rounded-md border border-(--color-hairline-strong)',
-              'bg-(--color-surface-overlay) px-2 py-1 font-mono text-[11px] tracking-wide',
+              'bg-(--color-surface-overlay) px-2 py-1 font-mono text-2xs tracking-wide',
               'text-(--color-text-3) shadow-(--shadow-md)'
             )}
             role="tooltip"
@@ -261,7 +262,7 @@ function FloatingDockMobile({ items }: { items: FloatingDockItem[] }) {
                 <span className="flex flex-col">
                   <span>{item.label}</span>
                   {item.subtitle ? (
-                    <span className="font-mono text-[11px] text-(--color-text-3)">
+                    <span className="font-mono text-2xs text-(--color-text-3)">
                       {item.subtitle}
                     </span>
                   ) : null}

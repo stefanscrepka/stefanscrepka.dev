@@ -50,7 +50,7 @@ export function SquadsStatusLine({ className }: SquadsStatusLineProps) {
     <div
       className={cn(
         'flex flex-wrap items-center gap-x-2 gap-y-1',
-        'font-mono text-[10px] uppercase tracking-widest text-(--color-text-3)',
+        'font-mono text-2xs uppercase tracking-widest text-(--color-text-3)',
         className
       )}
       data-slot="squads-status-line"

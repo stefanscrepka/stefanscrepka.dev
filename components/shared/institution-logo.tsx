@@ -35,7 +35,7 @@ export function InstitutionLogo({ ids, size = 18, className }: InstitutionLogoPr
       {ids.map((id) => (
         <li key={id} className="inline-flex items-center gap-2">
           <InstitutionGlyph id={id} size={size} />
-          <span className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-2)">
+          <span className="font-mono text-2xs uppercase tracking-widest text-(--color-text-2)">
             {LABELS[id]}
           </span>
         </li>

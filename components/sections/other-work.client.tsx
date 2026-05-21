@@ -4,6 +4,7 @@ import { m, useInView } from 'motion/react';
 import { type ReactNode, useRef } from 'react';
 import { FlipCard } from '@/components/ui-effects/flip-card';
 import { ProductCover } from '@/components/work/product-cover';
+import { EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 
 // Client islands para OtherWorkSection — FlipCard amber + reveal stagger.
@@ -23,7 +24,7 @@ export function OtherWorkReveal({ children }: OtherWorkRevealProps) {
       ref={ref}
       initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-      transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
+      transition={{ duration: 0.5, ease: EASES.standard }}
     >
       {children}
     </m.div>
@@ -52,7 +53,7 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
             aspectRatio="16/10"
           />
           <div className="flex flex-1 flex-col gap-3">
-            <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+            <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               Em produção desde Dez/2024
             </p>
             <h3 className="text-xl font-semibold leading-tight text-(--color-text-1)">
@@ -68,7 +69,7 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
               Site institucional + conversão para Dra. Martina Dona (ozonioterapia, criolipólise,
               drenagem, RF, depilação laser, peeling). Vanilla JS antes do React.
             </p>
-            <p className="mt-auto font-mono text-[11px] text-(--color-text-3)">
+            <p className="mt-auto font-mono text-2xs text-(--color-text-3)">
               Passe o mouse / toque pra ver detalhes →
             </p>
           </div>
@@ -76,7 +77,7 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
       }
       back={
         <div className="flex h-full flex-col gap-4 p-6 sm:p-7" data-clinic-scope>
-          <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
+          <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
             Stack & detalhes
           </p>
           <ul className="flex flex-col gap-2 text-xs leading-relaxed text-(--color-text-2)">

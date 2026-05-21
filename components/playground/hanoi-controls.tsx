@@ -75,7 +75,7 @@ export function HanoiControls({
             '[&::-moz-range-thumb]:cursor-pointer'
           )}
         />
-        <p className="font-mono text-[11px] text-(--color-text-3)">
+        <p className="font-mono text-2xs text-(--color-text-3)">
           1—{maxN} {maxN < 8 ? '(mobile cap)' : ''}
         </p>
       </div>
