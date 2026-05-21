@@ -1,5 +1,6 @@
 'use client';
 
+import { SiGithub, SiWhatsapp } from '@icons-pack/react-simple-icons';
 import { useCalModal } from '@/lib/contact/cal-modal-context';
 import { cn } from '@/lib/utils';
 
@@ -7,6 +8,8 @@ import { cn } from '@/lib/utils';
 // horizontal e enxuta pra usar abaixo do form na seção Contact cinematic.
 // Cada card: ícone mono + label + dado em mono, hover lift + lime border.
 // Cal.com trigger fica em row separada abaixo (ghost button + microcopy).
+// Brand icons via @icons-pack/react-simple-icons; LinkedIn segue custom porque
+// foi removido do Simple Icons (brand request) — e Email não é "brand".
 
 interface DirectLinkItem {
   label: string;
@@ -16,28 +19,13 @@ interface DirectLinkItem {
   icon: React.ReactNode;
 }
 
-const ICON_STROKE = 'currentColor';
-
 const LINKS: DirectLinkItem[] = [
   {
     label: 'WhatsApp',
     detail: '(42) 99859-2522',
     href: 'https://wa.me/5542998592522',
     external: true,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true" focusable="false">
-        <path
-          d="M20.5 3.5A11 11 0 0 0 3.6 17.4L2.5 21.5l4.2-1.1A11 11 0 1 0 20.5 3.5Z"
-          stroke={ICON_STROKE}
-          strokeWidth="1.4"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M8.5 8.2c.2-.5.5-.5.7-.5h.5c.2 0 .4 0 .6.5l.7 1.7c.1.3.1.6-.1.8l-.4.5c-.2.2-.3.5 0 .8.5.9 1.4 2 2.4 2.4.3.2.6.1.8 0l.5-.4c.2-.2.5-.2.8-.1l1.7.7c.5.2.5.4.5.6v.5c0 .2 0 .5-.5.7-.6.2-1.7.4-2.7-.2-1.4-.7-2.9-2-3.9-3-.9-1-2.3-2.5-3-3.9-.6-1-.4-2.1-.2-2.7Z"
-          fill={ICON_STROKE}
-        />
-      </svg>
-    ),
+    icon: <SiWhatsapp className="size-5" color="currentColor" aria-hidden="true" />,
   },
   {
     label: 'Email',
@@ -45,8 +33,8 @@ const LINKS: DirectLinkItem[] = [
     href: 'mailto:stefanheinz2006@gmail.com',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true" focusable="false">
-        <rect x="3" y="5" width="18" height="14" rx="2" stroke={ICON_STROKE} strokeWidth="1.4" />
-        <path d="m3 7 9 6 9-6" stroke={ICON_STROKE} strokeWidth="1.4" strokeLinejoin="round" />
+        <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.4" />
+        <path d="m3 7 9 6 9-6" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -57,11 +45,11 @@ const LINKS: DirectLinkItem[] = [
     external: true,
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true" focusable="false">
-        <rect x="3" y="3" width="18" height="18" rx="2" stroke={ICON_STROKE} strokeWidth="1.4" />
-        <circle cx="8" cy="8.5" r="1.1" fill={ICON_STROKE} />
+        <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.4" />
+        <circle cx="8" cy="8.5" r="1.1" fill="currentColor" />
         <path
           d="M7.5 10.5h1.2v7H7.5zM11 10.5h1.2v1c.3-.5 1-1.2 2.2-1.2 2 0 2.3 1.4 2.3 3v4.2H15.5v-3.8c0-.9-.2-1.6-1.1-1.6s-1.2.7-1.2 1.6v3.8H11v-7Z"
-          fill={ICON_STROKE}
+          fill="currentColor"
         />
       </svg>
     ),
@@ -71,16 +59,7 @@ const LINKS: DirectLinkItem[] = [
     detail: '/stefanscrepka',
     href: 'https://github.com/stefanscrepka',
     external: true,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true" focusable="false">
-        <path
-          d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.3-3.4-1.3-.4-1-1.1-1.3-1.1-1.3-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.4 1.1 3 .8.1-.7.4-1.1.6-1.4-2.2-.2-4.6-1.1-4.6-5a4 4 0 0 1 1-2.7c-.1-.3-.5-1.3.1-2.8 0 0 .8-.3 2.7 1a9.5 9.5 0 0 1 5 0c1.9-1.3 2.7-1 2.7-1 .6 1.5.2 2.5.1 2.8a4 4 0 0 1 1 2.7c0 3.9-2.4 4.8-4.6 5 .4.3.7.9.7 1.8v2.7c0 .3.2.6.7.5A10 10 0 0 0 12 2Z"
-          stroke={ICON_STROKE}
-          strokeWidth="1.2"
-          fill="none"
-        />
-      </svg>
-    ),
+    icon: <SiGithub className="size-5" color="currentColor" aria-hidden="true" />,
   },
 ];
 
