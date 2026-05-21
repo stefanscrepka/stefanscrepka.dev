@@ -6,21 +6,16 @@ import { SplitTextHeadline } from '@/components/hero/split-text-headline';
 import { StatsRow } from '@/components/hero/stats-row';
 
 // ============================================================
-// Section 1 — Hero (Wave 1: stripped, Wave 2: HeroVideo entra)
+// Section 1 — Hero
 //
-// Removido em Wave 1:
-//   - HeroSceneClient + scene-3d r3f + hero-poster (visual "3 retângulos
-//     flutuantes" rejeitado pelo Stefan + bug Canvas null/alpha)
-//   - CodeMarquee (R-15 anti-slop validator regex strip — Stefan: "nada a ver")
+// Layout: single-column centered-left editorial (midu + landonorris fusion).
+// Tipografia massiva primeira dobra (text-5xl 80-108px clamp), italic editorial
+// pontual em "multi-agente" sem underline, mono subhead, CTAs com magnetic primary.
 //
-// Mantém:
-//   - Atmosphere radial lime beam CSS (continua útil mesmo sem canvas)
-//   - Top vignette
-//   - Headline travada com "multi-agente" italic
-//   - MonoSubhead, CTAGroup, StatsRow, PartnerMarquee
-//
-// Wave 2 vai adicionar <HeroVideo /> no slot direito (vídeo loop Veo 3.1
-// atmospheric beam pure, conforme plano §B).
+// Right-side visual portal (Polo + Huly fusion) entra em Wave futura quando
+// screenshot real do Content Engine for entregue por Stefan + ProductMockup
+// chrome wrapped com rotate 6° + shadow-cinema. Por ora o hero fica single-col
+// pra evitar slot vazio + headline ganha 100% da largura.
 // ============================================================
 
 export async function HeroSection() {
@@ -53,18 +48,21 @@ export async function HeroSection() {
         }}
       />
 
-      {/* Main grid — headline left + hero visual slot right (Wave 2 preenche com <HeroVideo />) */}
+      {/* Main column — single-col editorial. max-w-5xl pra evitar headline esticar
+          full container-max em telas >=xl (mantém ritmo de leitura humano).
+          Sem min-h forçado — altura natural deixa headline + subhead + CTAs todos
+          visíveis acima da dobra. */}
       <div
         className={[
-          'container-max relative z-10 grid items-center gap-10',
-          'pt-32 pb-12 sm:pt-36 sm:pb-16',
-          'lg:min-h-[78dvh] lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-20 lg:pt-40',
+          'container-max relative z-10 flex flex-col',
+          'pt-28 pb-12 sm:pt-32 sm:pb-16',
+          'lg:pb-20 lg:pt-32',
         ].join(' ')}
       >
-        <div className="flex flex-col gap-7 lg:gap-9">
-          <SplitTextHeadline className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl !leading-[0.92] !tracking-[-0.035em] font-bold">
-            Construo IA <EditorialAccent delay={1.25}>multi-agente</EditorialAccent> em produção — e
-            o produto inteiro ao redor dela.
+        <div className="flex max-w-5xl flex-col gap-6 lg:gap-7">
+          <SplitTextHeadline className="text-4xl sm:text-5xl !leading-[0.92] !tracking-[-0.035em] font-semibold">
+            Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto
+            inteiro ao redor dela.
           </SplitTextHeadline>
 
           <MonoSubhead>
@@ -73,20 +71,6 @@ export async function HeroSection() {
 
           <CTAGroup />
         </div>
-
-        {/* Hero visual slot — Wave 1: stub vazio (sem r3f). Wave 2: <HeroVideo /> entra aqui
-            com vídeo loop atmospheric Veo 3.1. */}
-        <div
-          aria-hidden="true"
-          className={[
-            'relative aspect-square w-full max-w-[560px] overflow-hidden',
-            'place-self-center',
-            'lg:aspect-auto lg:min-h-[600px] lg:max-w-none lg:place-self-stretch',
-            // Slot stub: reforça atmosphere com gradient interno até Wave 2 chegar
-            'rounded-2xl',
-          ].join(' ')}
-          data-slot="hero-visual-placeholder"
-        />
       </div>
 
       {/* Stats row strip */}

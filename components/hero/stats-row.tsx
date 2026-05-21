@@ -98,7 +98,10 @@ function CountUp({ target }: { target: number }) {
         ease: 'cubic-bezier(0.165, 0.84, 0.44, 1)',
         scrollTrigger: {
           trigger: node,
-          start: 'top 90%',
+          // 'top bottom' = dispara quando topo do stat chega no bottom do viewport
+          // (i.e., elemento entra no viewport pela primeira vez). Substitui 'top 90%'
+          // que falhava quando hero tinha altura > viewport (stats no fim da section).
+          start: 'top bottom',
           once: true,
         },
         // Imperative DOM update — evita ~90 React commits/s × 3 stats em paralelo.

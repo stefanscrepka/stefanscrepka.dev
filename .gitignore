@@ -51,4 +51,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+.vercelscreenshots-2026-05-21/
