@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { CaseStudyCover } from '@/components/work/case-study-cover';
+import { SquadsStatusLine } from '@/components/work/squads-status-line';
 import { cn } from '@/lib/utils';
 import { CASE_STUDIES, type CaseStudy } from '@/lib/work/data';
 import { FeaturedWorkReveal } from './featured-work.client';
@@ -216,6 +217,10 @@ function HeroTile({
             <span>Anti-slop validator · 100 tests runtime · pgvector RAG</span>
           </li>
         </ul>
+
+        {/* Squads status line — pulse loop S0 → S1 → ... → E-0 HITL.
+            Camada de "produto vivo" sem aumentar peso visual. */}
+        <SquadsStatusLine className="mt-3" />
 
         <CaseCTA className="mt-auto pt-6" />
       </div>
