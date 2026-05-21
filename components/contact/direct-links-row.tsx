@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useCalModal } from '@/lib/contact/cal-modal-context';
 import { cn } from '@/lib/utils';
-import { CalcomModal } from './calcom-modal';
 
 // 4 cards minimal em linha (WhatsApp · Email · LinkedIn · GitHub) — versão
 // horizontal e enxuta pra usar abaixo do form na seção Contact cinematic.
@@ -86,7 +85,7 @@ const LINKS: DirectLinkItem[] = [
 ];
 
 export function DirectLinksRow() {
-  const [calOpen, setCalOpen] = useState(false);
+  const { open: calOpen, openModal } = useCalModal();
 
   return (
     <div data-slot="direct-links-row" className="flex flex-col gap-8 sm:gap-10">
@@ -147,7 +146,7 @@ export function DirectLinksRow() {
         </div>
         <button
           type="button"
-          onClick={() => setCalOpen(true)}
+          onClick={openModal}
           className={cn(
             'group/cal inline-flex shrink-0 items-center justify-center gap-2 rounded-pill',
             'border border-(--color-accent) bg-transparent px-6 py-3',
@@ -179,8 +178,6 @@ export function DirectLinksRow() {
           </svg>
         </button>
       </div>
-
-      <CalcomModal open={calOpen} onOpenChange={setCalOpen} />
     </div>
   );
 }

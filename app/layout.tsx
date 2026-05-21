@@ -11,6 +11,7 @@ import { Footer } from '@/components/sections/footer';
 import { ContactIcon, ManifestoIcon, ProcessIcon, WorkIcon } from '@/components/shared/nav-icons';
 import { FloatingDock, type FloatingDockItem } from '@/components/ui-effects/floating-dock';
 import { GrainOverlay } from '@/components/ui-effects/grain-overlay';
+import { CalModalProvider } from '@/lib/contact/cal-modal-context';
 import './globals.css';
 
 // PP Editorial New (Pangram Pangram, EULA "Free for personal use" — cobre portfolio
@@ -156,11 +157,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </a>
         <MotionProvider>
           <LenisProvider>
-            <FloatingDock items={navItems} />
-            <main id="main" className="relative">
-              {children}
-            </main>
-            <Footer />
+            <CalModalProvider>
+              <FloatingDock items={navItems} />
+              <main id="main" className="relative">
+                {children}
+              </main>
+              <Footer />
+            </CalModalProvider>
           </LenisProvider>
         </MotionProvider>
         <AboutThisSiteModal />

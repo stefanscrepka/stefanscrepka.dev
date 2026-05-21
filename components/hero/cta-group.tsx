@@ -6,13 +6,13 @@ import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { MagneticCTA } from '@/components/ui-effects/magnetic-cta';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { useCalModal } from '@/lib/contact/cal-modal-context';
 import { useAnchorScroll } from '@/lib/scroll/anchor-scroll';
 import { cn } from '@/lib/utils';
 
-// Layer 4 do 8-layer choreography: CTA group reveal scale 0.95→1 + opacity 0→1,
-// stagger 80ms, 350ms spring tight (stiffness 300 damping 10 equiv).
-// delay 0.6s (após subhead Layer 3). Reduced-motion: snap final.
-// Secondary CTA "Conversar 15min →" leva pra #contato (Cal.com modal embed = FASE 6).
+// CTA group reveal — primary scroll pra #work, secondary abre Cal.com modal
+// embedded (HANDOFF §97: nunca link externo). Animação stagger 50ms, 350ms
+// spring tight back.out(1.6), delay 0.6s. Reduced-motion: snap final.
 
 interface CTAGroupProps {
   className?: string;
@@ -22,6 +22,7 @@ export function CTAGroup({ className }: CTAGroupProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionSafe();
   const scroll = useAnchorScroll();
+  const { openModal } = useCalModal();
 
   useGSAP(
     () => {
@@ -72,16 +73,8 @@ export function CTAGroup({ className }: CTAGroupProps) {
         </Button>
       </MagneticCTA>
 
-      <Button
-        size="lg"
-        variant="outline"
-        onClick={(e) => {
-          e.preventDefault();
-          scroll('#contato');
-        }}
-        asChild
-      >
-        <a href="#contato">Conversar 15min →</a>
+      <Button size="lg" variant="outline" type="button" onClick={openModal} aria-haspopup="dialog">
+        Conversar 15min →
       </Button>
     </div>
   );
