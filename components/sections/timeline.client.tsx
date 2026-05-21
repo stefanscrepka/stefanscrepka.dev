@@ -162,9 +162,12 @@ function MarkerDot({ index, isCurrent }: { index: number; isCurrent?: boolean | 
         // Negative offsets from the .pl-10/.pl-12/.pl-14 wrapper.
         'pointer-events-none absolute top-3 grid size-7 place-items-center',
         '-left-[1.875rem] sm:-left-[2rem] md:-left-[2.125rem]',
-        'rounded-full border border-(--color-hairline-strong) bg-(--color-base)',
-        'transition-all duration-(--motion-transition)',
-        isCurrent && 'border-(--color-accent)'
+        'rounded-full border bg-(--color-base)',
+        'transition-[border-color,box-shadow,transform] duration-(--motion-transition)',
+        // Ring vira lime emissive quando marker entra no viewport (sinaliza
+        // progresso ao longo do scroll, nao "está sempre off").
+        inView ? 'border-(--color-accent)' : 'border-(--color-hairline-strong)',
+        isCurrent && 'border-(--color-accent) shadow-(--shadow-glow-lime-sm)'
       )}
       data-active={inView ? '' : undefined}
       data-marker-index={index}
