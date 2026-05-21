@@ -85,20 +85,16 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       <div className="container-prose flex flex-col gap-12 sm:gap-14">
         <p className="eyebrow">Manifesto</p>
 
-        {/* ATO 1 — Pull-quote serif italic editorial.
-            Tracking -0.02em + leading 1.05 = pull-quote display tightness. */}
-        <blockquote className="border-l-2 border-(--color-accent) pl-6 sm:pl-8 py-2">
+        {/* ATO 1 — Pull-quote display tight. Sem italic editorial (regra "PP Editorial
+            italic APENAS em multi-agente"): peso editorial vem via Geist semibold
+            comprimido + tracking-tighter + leading 1.05 + border-l-2 lime. */}
+        <blockquote className="border-l-2 border-(--color-accent) py-2 pl-6 sm:pl-8">
           <p
             className={cn(
-              'leading-[1.05] tracking-[-0.02em]',
+              'font-semibold leading-[1.05] tracking-[-0.025em]',
               'text-[1.875rem] sm:text-[2.25rem] lg:text-[2.625rem]',
               'text-(--color-text-1)'
             )}
-            style={{
-              fontFamily: 'var(--font-editorial)',
-              fontStyle: 'italic',
-              fontWeight: 500,
-            }}
           >
             “{MANIFESTO_PULL_QUOTE}”
           </p>
@@ -148,19 +144,15 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
           })}
         </div>
 
-        {/* ATO 4 — Assinatura emocional serif italic peso heavy lime.
-            tracking -0.025em + leading 1.1 = signature display tightness. */}
+        {/* ATO 4 — Assinatura emocional Geist semibold lime. Sem italic
+            (regra "PP Editorial italic APENAS em multi-agente"): peso editorial
+            vem via Geist semibold + tracking-tighter + lime accent. */}
         <p
           className={cn(
-            'leading-[1.1] tracking-[-0.025em]',
+            'font-semibold leading-[1.1] tracking-[-0.025em]',
             'text-[1.75rem] sm:text-[2rem] lg:text-[2.25rem]',
             'text-(--color-accent)'
           )}
-          style={{
-            fontFamily: 'var(--font-editorial)',
-            fontStyle: 'italic',
-            fontWeight: 600,
-          }}
         >
           {MANIFESTO_SIGNATURE}
         </p>
