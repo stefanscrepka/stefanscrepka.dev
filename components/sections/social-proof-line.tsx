@@ -81,11 +81,11 @@ export function SocialProofLine() {
       className={cn(
         'container-max relative z-10',
         'border-t border-b border-(--color-hairline)',
-        'py-4 sm:py-5'
+        'py-5 sm:py-6'
       )}
       data-slot="social-proof-line"
     >
-      <ul className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6 lg:gap-10">
         {PROOF_LINES.map((line, idx) => (
           <li
             // biome-ignore lint/correctness/useUniqueElementIds: stagger key is the href which is unique
@@ -99,31 +99,32 @@ export function SocialProofLine() {
             <Link
               href={line.href}
               className={cn(
-                'group/proof inline-flex items-baseline gap-2 font-mono text-2xs uppercase',
-                'tracking-widest text-(--color-text-3) leading-relaxed',
-                'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
-                'hover:text-(--color-text-1) focus-visible:text-(--color-text-1) outline-none'
+                'group/proof flex h-full flex-col gap-1.5 rounded-md outline-none',
+                'transition-colors duration-(--motion-fast) ease-(--ease-standard)'
               )}
             >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'inline-block translate-y-px text-(--color-accent)',
-                  'transition-transform duration-(--motion-fast)',
-                  'group-hover/proof:translate-x-0.5 group-focus-visible/proof:translate-x-0.5'
-                )}
-              >
-                →
+              {/* Headline = highlight number/claim em sans semibold lime */}
+              <span className="inline-flex items-baseline gap-2 text-sm font-semibold text-(--color-text-1) sm:text-base">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'inline-block text-(--color-accent)',
+                    'transition-transform duration-(--motion-fast)',
+                    'group-hover/proof:translate-x-0.5 group-focus-visible/proof:translate-x-0.5'
+                  )}
+                >
+                  →
+                </span>
+                <span>{line.highlight}</span>
               </span>
-              <span className="text-(--color-text-1)">{line.highlight}</span>
-              <span aria-hidden="true" className="text-(--color-hairline-strong)">
-                ·
+              {/* Body em mono lowercase, ja sem tracking-widest que quebrava em palavra */}
+              <span className="font-mono text-xs leading-snug text-(--color-text-3) group-hover/proof:text-(--color-text-2)">
+                {line.body}
               </span>
-              <span>{line.body}</span>
-              <span aria-hidden="true" className="text-(--color-hairline-strong)">
-                ·
+              {/* Product = etiqueta lime mono uppercase pequena */}
+              <span className="mt-auto pt-1 font-mono text-2xs uppercase tracking-wider text-(--color-accent)">
+                {line.product}
               </span>
-              <span className="text-(--color-accent)">{line.product}</span>
             </Link>
           </li>
         ))}

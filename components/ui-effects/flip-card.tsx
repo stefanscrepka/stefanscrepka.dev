@@ -98,7 +98,7 @@ export function FlipCard({
     >
       <m.div
         animate={rotateAxis}
-        transition={{ type: 'spring', stiffness: 280, damping: 22, mass: 0.9 }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         className="relative h-full w-full"
         style={{ transformStyle: 'preserve-3d' }}
       >
