@@ -1,5 +1,6 @@
 import { CTAGroup } from '@/components/hero/cta-group';
 import { EditorialAccent } from '@/components/hero/editorial-accent';
+import { HeroGlassCard } from '@/components/hero/hero-glass-card';
 import { MonoSubhead } from '@/components/hero/mono-subhead';
 import { PartnerMarquee } from '@/components/hero/partner-marquee';
 import { SplitTextHeadline } from '@/components/hero/split-text-headline';
@@ -8,14 +9,12 @@ import { StatsRow } from '@/components/hero/stats-row';
 // ============================================================
 // Section 1 — Hero
 //
-// Layout: single-column centered-left editorial (midu + landonorris fusion).
-// Tipografia massiva primeira dobra (text-5xl 80-108px clamp), italic editorial
-// pontual em "multi-agente" sem underline, mono subhead, CTAs com magnetic primary.
+// Layout: dual-column editorial. Coluna esquerda (1.2fr) carrega tipografia
+// massiva + subhead + CTAs. Coluna direita (0.8fr) hospeda HeroGlassCard
+// refractive — vibe Polo/Johan Beker + Rive Translucent Window + Huly portal.
 //
-// Right-side visual portal (Polo + Huly fusion) entra em Wave futura quando
-// screenshot real do Content Engine for entregue por Stefan + ProductMockup
-// chrome wrapped com rotate 6° + shadow-cinema. Por ora o hero fica single-col
-// pra evitar slot vazio + headline ganha 100% da largura.
+// Mobile (<lg): single-col stack natural — card desce abaixo dos CTAs em
+// largura cheia. Desktop (>=lg): grid 1.2fr/0.8fr com gap-12 + items-center.
 // ============================================================
 
 export async function HeroSection() {
@@ -48,18 +47,18 @@ export async function HeroSection() {
         }}
       />
 
-      {/* Main column — single-col editorial. max-w-5xl pra evitar headline esticar
-          full container-max em telas >=xl (mantém ritmo de leitura humano).
-          Sem min-h forçado — altura natural deixa headline + subhead + CTAs todos
-          visíveis acima da dobra. */}
+      {/* Main grid — dual-column desktop, single stack mobile.
+          1.2fr/0.8fr distribui peso pro texto; items-center alinha card
+          vertical no centro do bloco editorial. */}
       <div
         className={[
-          'container-max relative z-10 flex flex-col',
+          'container-max relative z-10',
           'pt-28 pb-12 sm:pt-32 sm:pb-16',
           'lg:pb-20 lg:pt-32',
+          'grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:gap-12',
         ].join(' ')}
       >
-        <div className="flex max-w-5xl flex-col gap-6 lg:gap-7">
+        <div className="flex flex-col gap-6 lg:gap-7">
           <SplitTextHeadline className="text-4xl sm:text-5xl !leading-[0.92] !tracking-[-0.035em] font-semibold">
             Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto
             inteiro ao redor dela.
@@ -70,6 +69,12 @@ export async function HeroSection() {
           </MonoSubhead>
 
           <CTAGroup />
+        </div>
+
+        {/* Right column — HeroGlassCard refractive. Full-width mobile,
+            justify-self center pra nao colar na borda do container. */}
+        <div className="flex justify-center lg:justify-end">
+          <HeroGlassCard />
         </div>
       </div>
 
