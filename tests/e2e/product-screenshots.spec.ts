@@ -39,18 +39,23 @@ test.describe('Product screenshots — DPR 2x', () => {
   });
 });
 
-// STJ App + NexaCore + Content Engine dashboard precisam de servers locais.
-// Pra cada um: rodar `PORT=X pnpm dev` em terminal separado, depois rodar este spec
-// com env var `STJ_URL=http://localhost:3001` etc apontando pra ele.
-test.describe('STJ App — se servidor ativo', () => {
-  test.skip(!process.env.STJ_URL, 'STJ_URL nao fornecida, skip');
-
-  test('stj-app dashboard', async ({ page }) => {
+test.describe('STJ App — Vercel deploy', () => {
+  test('stj-app desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(process.env.STJ_URL || 'http://localhost:3001', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(2500);
+    await page.goto('https://stj-app.vercel.app/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(3500);
     await page.screenshot({
-      path: path.join(OUT, 'stj-app-dashboard.png'),
+      path: path.join(OUT, 'stj-app-desktop.png'),
+      fullPage: false,
+    });
+  });
+
+  test('stj-app mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('https://stj-app.vercel.app/', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(3500);
+    await page.screenshot({
+      path: path.join(OUT, 'stj-app-mobile.png'),
       fullPage: false,
     });
   });

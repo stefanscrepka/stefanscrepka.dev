@@ -43,10 +43,9 @@ export function TopBarNav({ items, className }: TopBarNavProps) {
       <div className="container-max flex h-full items-center justify-between gap-4">
         <NavLogo />
         <NavLinks items={items} />
-        <div className="flex items-center gap-2">
-          <NavStatusRow />
-          <NavMobileSheet items={items} />
-        </div>
+        <NavMobileSheet items={items} />
+        {/* Right side spacer pra centralizar links visualmente quando nav existe */}
+        <span aria-hidden="true" className="hidden w-[28px] md:block lg:w-[80px]" />
       </div>
     </header>
   );
@@ -142,71 +141,8 @@ function NavLinks({ items }: { items: TopBarNavItem[] }) {
 }
 
 /* ============================================================
-   <NavStatusRow /> — dot lime pulsante + label + clock BRT
-   Mono tabular-nums, 2xs uppercase tracking-widest.
-   ============================================================ */
-
-function NavStatusRow() {
-  return (
-    <div className="hidden items-center gap-3 lg:flex">
-      <div className="inline-flex items-center gap-2">
-        <span
-          aria-hidden="true"
-          className={cn(
-            'relative inline-flex size-1.5 rounded-full bg-(--color-accent)',
-            'motion-safe:animate-[nav-status-pulse_2s_ease-in-out_infinite]'
-          )}
-        />
-        <span className="font-mono text-2xs uppercase tracking-widest text-(--color-text-2)">
-          Disponível pra projetos
-        </span>
-      </div>
-      <span aria-hidden="true" className="h-3 w-px bg-(--color-hairline-strong)" />
-      <NavClock />
-      <style>{`
-        @keyframes nav-status-pulse {
-          0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--color-accent-emissive); }
-          50% { opacity: 0.6; box-shadow: 0 0 0 4px transparent; }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-function NavClock() {
-  const mounted = useMounted();
-  const [time, setTime] = useState<string>('');
-
-  useEffect(() => {
-    if (!mounted) return;
-    const tick = () => {
-      const now = new Date();
-      const formatted = new Intl.DateTimeFormat('pt-BR', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: 'America/Sao_Paulo',
-      }).format(now);
-      setTime(formatted);
-    };
-    tick();
-    const id = window.setInterval(tick, 30_000);
-    return () => window.clearInterval(id);
-  }, [mounted]);
-
-  // SSR-safe: renderiza placeholder fixo até montar → evita hydration mismatch.
-  return (
-    <span
-      className="font-mono text-2xs tabular-nums uppercase tracking-widest text-(--color-text-3)"
-      suppressHydrationWarning
-    >
-      {time ? `${time} · BRT` : '--:-- · BRT'}
-    </span>
-  );
-}
-
-/* ============================================================
    <NavMobileSheet /> — hamburger 44px + Radix Dialog drawer
+   Status row removido (Stefan: "nao faz sentido na navbar").
    ============================================================ */
 
 function NavMobileSheet({ items }: { items: TopBarNavItem[] }) {
@@ -281,19 +217,6 @@ function NavMobileSheet({ items }: { items: TopBarNavItem[] }) {
               </SheetClose>
             ))}
           </nav>
-
-          <div className="mt-auto flex flex-col gap-3 border-t border-(--color-hairline) pt-6">
-            <div className="inline-flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className="relative inline-flex size-1.5 rounded-full bg-(--color-accent) motion-safe:animate-[nav-status-pulse_2s_ease-in-out_infinite]"
-              />
-              <span className="font-mono text-2xs uppercase tracking-widest text-(--color-text-2)">
-                Disponível pra projetos
-              </span>
-            </div>
-            <NavClock />
-          </div>
         </SheetContent>
       </Sheet>
     </div>

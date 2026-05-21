@@ -161,15 +161,19 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     ],
     ctas: [
       {
-        label: 'Ver no GitHub →',
-        href: 'https://github.com/stefanscrepka/stj-app',
+        label: 'Acessar produção →',
+        href: 'https://stj-app.vercel.app/',
         external: true,
         variant: 'default',
       },
       { label: 'Post-mortem técnico →', href: '#post-mortem', variant: 'outline' },
     ],
-    screenshot: null,
-    heroAsset: null,
+    screenshot: '/work-screenshots/stj-app-desktop.png',
+    heroAsset: {
+      src: '/work-screenshots/stj-app-desktop.png',
+      type: 'image',
+      aspect: '16/10',
+    },
     diagram: 'stj',
     accent: 'lime',
     shortLine: 'PWA cockpit · Claude Haiku 4.5 streaming · prompt cache 2 camadas · 162 testes.',

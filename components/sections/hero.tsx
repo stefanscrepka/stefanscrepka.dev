@@ -1,8 +1,8 @@
 import { CTAGroup } from '@/components/hero/cta-group';
 import { EditorialAccent } from '@/components/hero/editorial-accent';
-import { HeroGlassCard } from '@/components/hero/hero-glass-card';
 import { MonoSubhead } from '@/components/hero/mono-subhead';
 import { PartnerMarquee } from '@/components/hero/partner-marquee';
+import { SplineHero } from '@/components/hero/spline-hero';
 import { SplitTextHeadline } from '@/components/hero/split-text-headline';
 import { StatsRow } from '@/components/hero/stats-row';
 
@@ -71,10 +71,11 @@ export async function HeroSection() {
           <CTAGroup />
         </div>
 
-        {/* Right column — HeroGlassCard refractive. Full-width mobile,
-            justify-self center pra nao colar na borda do container. */}
+        {/* Right column — SplineHero (asset 3D CC0 community).
+            Background transparent — Spline scene flutua sobre atmosfera CSS lime.
+            Reduced-motion / sem WebGL: placeholder atmospheric discreto. */}
         <div className="flex justify-center lg:justify-end">
-          <HeroGlassCard />
+          <SplineHero />
         </div>
       </div>
 
