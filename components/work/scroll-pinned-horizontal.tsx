@@ -60,7 +60,9 @@ export function ScrollPinnedHorizontal({
             ease: 'none',
             scrollTrigger: {
               trigger,
-              start: 'top top',
+              // Offset 80px pro FloatingDock/TopBarNav (top:4 z-50, ~80px altura
+              // total) não cobrir o conteúdo dos panels quando a section pina.
+              start: 'top top+=80',
               end: () => `+=${(panelCount - 1) * window.innerHeight}`,
               pin: true,
               scrub: 1,
@@ -115,7 +117,19 @@ export function ScrollPinnedHorizontal({
       </a>
 
       {/* Desktop: viewport pinned, track translates */}
-      <div className="hidden h-screen overflow-hidden md:block motion-reduce:hidden">
+      <div className="relative hidden h-screen overflow-hidden md:block motion-reduce:hidden">
+        {/* Fade-mask top — entrada cinematográfica. Alpha 0 → 100% nos primeiros
+            80px pra evitar o efeito "panel cortado pelo nav" e dar respiração
+            editorial quando a section pina. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-20"
+          style={{
+            background:
+              'linear-gradient(to bottom, var(--color-base) 0%, color-mix(in oklch, var(--color-base) 60%, transparent) 60%, transparent 100%)',
+          }}
+        />
+
         <div
           ref={trackRef}
           className="flex h-full will-change-transform"
@@ -125,7 +139,7 @@ export function ScrollPinnedHorizontal({
             <section
               // biome-ignore lint/suspicious/noArrayIndexKey: panels prop é static (case study slug-keyed), nunca reordena
               key={`pinned-${idx}`}
-              className="flex h-screen w-screen shrink-0 items-center justify-center px-6 md:px-12"
+              className="flex h-screen w-screen shrink-0 items-center justify-center px-6 pt-24 md:px-12 lg:pt-28"
               aria-roledescription="slide"
               aria-label={`Painel ${idx + 1} de ${panelCount}`}
             >
