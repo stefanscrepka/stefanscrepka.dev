@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import type { CaseStudy } from '@/lib/work/data';
+import { ProductCover } from './product-cover';
 import { MockupFrame } from './product-mockup';
 
 // CaseStudyCover — dispatcher inteligente entre dois renderers:
@@ -62,19 +63,21 @@ export function CaseStudyCover({
   }
 
   // ─────────────────────────────────────────────────────────────────────
-  // PATH 2 (Wave 1 stub): Sem screenshot → MockupFrame vazio com micro-label
+  // PATH 2: Sem screenshot → diagrama SVG custom por produto.
+  // Cada case study tem seu proprio diagrama em components/work/diagrams.tsx
+  // (SquadsDiagram pipeline horizontal, NexaCoreDiagram stack vertical,
+  // StjAppDiagram, EsteticaDiagram, etc) — substitui o frame vazio invisivel
+  // que antes deixava o HeroTile do Content Engine como um buraco.
   // ─────────────────────────────────────────────────────────────────────
   return (
-    <MockupFrame
-      glow={caseStudy.accent}
-      tilted={tilt !== 'none'}
-      className={cn(ASPECT_CLASS[aspectRatio], className)}
-    >
-      <div aria-hidden="true" className="absolute inset-0 flex items-end justify-start p-6">
-        <span className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
-          {caseStudy.title} — asset em produção
-        </span>
-      </div>
-    </MockupFrame>
+    <ProductCover
+      mode="diagram"
+      diagram={caseStudy.diagram}
+      tone={caseStudy.accent}
+      tilt={tilt}
+      aspectRatio={aspectRatio}
+      label={`${caseStudy.title} — arquitetura visual`}
+      className={className}
+    />
   );
 }
