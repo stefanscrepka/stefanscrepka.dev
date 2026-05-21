@@ -4,6 +4,7 @@ import { FeaturedWorkSection } from '@/components/sections/featured-work';
 import { HeroSection } from '@/components/sections/hero';
 import { ManifestoSection } from '@/components/sections/manifesto';
 import { OtherWorkSection } from '@/components/sections/other-work';
+import { PlaygroundTeaser } from '@/components/sections/playground-teaser';
 import { SocialProofLine } from '@/components/sections/social-proof-line';
 import { TimelineSection } from '@/components/sections/timeline';
 
@@ -22,6 +23,7 @@ export default function HomePage() {
       <OtherWorkSection />
       <BentoSkillsSection />
       <TimelineSection />
+      <PlaygroundTeaser />
       <ManifestoSection />
       <ContactSection />
     </>
