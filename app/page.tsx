@@ -4,18 +4,20 @@ import { FeaturedWorkSection } from '@/components/sections/featured-work';
 import { HeroSection } from '@/components/sections/hero';
 import { ManifestoSection } from '@/components/sections/manifesto';
 import { OtherWorkSection } from '@/components/sections/other-work';
+import { SocialProofLine } from '@/components/sections/social-proof-line';
 import { TimelineSection } from '@/components/sections/timeline';
 
 // Home — single-page scroll storytelling.
-// Wave 1 (demolição): removidos SilentFrame, SocialProofLine, WhatIBuildSection
-// (estavam visualmente perdidos / redundantes com FeaturedWork).
-// Wave 3 vai adicionar BentoProcessos (gifs de processos reais) entre HeroSection
-// e FeaturedWorkSection, substituindo o WhatIBuild.
+// SocialProofLine entre Hero e FeaturedWork = ponte narrativa de 3 linhas que
+// sinaliza "três produtos em produção" antes do mergulho nos cases. Substitui
+// o trio "What I Build" removido (era redundante com FeaturedWork) sem deixar
+// salto vazio entre Hero e Featured.
 
 export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <SocialProofLine />
       <FeaturedWorkSection />
       <OtherWorkSection />
       <BentoSkillsSection />
