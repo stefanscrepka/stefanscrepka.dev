@@ -12,26 +12,37 @@ interface DiagramProps {
 }
 
 // =================================================================
-// CONTENT ENGINE — 5 squads + E-0 HITL central network graph
+// CONTENT ENGINE — pipeline horizontal real
+// Whisper (input audio) -> S0 Onboarding -> S1 Inteligência -> S2 Estratégia
+// -> S3 Criação -> S4 Revisão -> E-0 HITL Telegram (output approval)
+//
+// Substituiu uma "rede de pontos lime conectados" generica (anti-AI slop).
+// Agora mostra o pipeline DIRECIONAL real do produto: data flow esquerda
+// pra direita, glass-panel cards + setas estilo Apple iPhone spec sheet.
 // =================================================================
 
-interface SquadNode {
+interface PipelineStage {
   id: string;
-  label: string;
-  count: number;
-  x: number;
-  y: number;
+  count?: string;
+  title: string;
+  emissive?: boolean;
 }
 
-const SQUADS: SquadNode[] = [
-  { id: 'O', label: 'Onboarding', count: 6, x: 50, y: 14 },
-  { id: 'I', label: 'Inteligência', count: 4, x: 82, y: 25 },
-  { id: 'S', label: 'Estratégia', count: 2, x: 72, y: 48 },
-  { id: 'C', label: 'Criação', count: 8, x: 28, y: 48 },
-  { id: 'R', label: 'Revisão', count: 4, x: 18, y: 25 },
+const PIPELINE_STAGES: PipelineStage[] = [
+  { id: 'IN', title: 'Whisper local · audio' },
+  { id: 'S0', count: '6', title: 'Onboarding' },
+  { id: 'S1', count: '4', title: 'Inteligência' },
+  { id: 'S2', count: '2', title: 'Estratégia' },
+  { id: 'S3', count: '8', title: 'Criação' },
+  { id: 'S4', count: '4', title: 'Revisão' },
+  { id: 'E-0', title: 'HITL Telegram', emissive: true },
 ];
 
-const CENTER = { x: 50, y: 32 } as const;
+const STAGE_W = 12;
+const STAGE_H = 22;
+const GAP = 1.4;
+const ROW_Y = 16; // top of stage row
+const X_START = (100 - (PIPELINE_STAGES.length * STAGE_W + (PIPELINE_STAGES.length - 1) * GAP)) / 2;
 
 export function SquadsDiagram({ className, label }: DiagramProps) {
   return (
@@ -45,7 +56,6 @@ export function SquadsDiagram({ className, label }: DiagramProps) {
     >
       {label ? <title>{label}</title> : null}
 
-      {/* Grid backdrop sutil */}
       <defs>
         <pattern id="grid-ce" width="4" height="4" patternUnits="userSpaceOnUse">
           <path
@@ -53,127 +63,129 @@ export function SquadsDiagram({ className, label }: DiagramProps) {
             fill="none"
             stroke="var(--color-hairline)"
             strokeWidth="0.15"
-            opacity="0.4"
+            opacity="0.35"
           />
         </pattern>
-        <radialGradient id="glow-ce" cx="50%" cy="53%" r="40%">
-          <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0" />
-        </radialGradient>
+        {/* Arrow marker reutilizado por todos os connectors */}
+        <marker
+          id="arrow-ce"
+          viewBox="0 0 10 10"
+          refX="9"
+          refY="5"
+          markerWidth="3.4"
+          markerHeight="3.4"
+          orient="auto"
+        >
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--color-accent)" />
+        </marker>
       </defs>
 
       <rect width="100" height="60" fill="url(#grid-ce)" />
-      <rect width="100" height="60" fill="url(#glow-ce)" />
 
-      {/* Edges — linhas tracejadas de cada squad ao centro */}
-      {SQUADS.map((squad) => (
-        <line
-          key={`edge-${squad.id}`}
-          x1={squad.x}
-          y1={squad.y}
-          x2={CENTER.x}
-          y2={CENTER.y}
-          stroke="var(--color-accent)"
-          strokeWidth="0.4"
-          strokeDasharray="1.5 1"
-          opacity="0.55"
-        />
-      ))}
-
-      {/* Squad nodes */}
-      {SQUADS.map((squad) => (
-        <g key={`node-${squad.id}`}>
-          <circle
-            cx={squad.x}
-            cy={squad.y}
-            r="3.6"
-            fill="var(--color-surface-elevated)"
+      {/* Connector lines + arrowheads ENTRE stages */}
+      {PIPELINE_STAGES.slice(0, -1).map((stage, idx) => {
+        const x1 = X_START + (idx + 1) * STAGE_W + idx * GAP;
+        const x2 = X_START + (idx + 1) * (STAGE_W + GAP);
+        const y = ROW_Y + STAGE_H / 2;
+        return (
+          <line
+            key={`arrow-${stage.id}`}
+            x1={x1}
+            y1={y}
+            x2={x2 - 0.5}
+            y2={y}
             stroke="var(--color-accent)"
             strokeWidth="0.5"
+            opacity="0.6"
+            markerEnd="url(#arrow-ce)"
           />
-          <text
-            x={squad.x}
-            y={squad.y + 0.7}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fontSize="2.4"
-            fontFamily="var(--font-mono)"
-            fontWeight="600"
-            fill="var(--color-accent)"
-          >
-            {squad.id}-{squad.count}
-          </text>
-        </g>
-      ))}
+        );
+      })}
 
-      {/* E-0 HITL central — hexagon lime emissive */}
-      <g>
-        {/* outer glow ring */}
-        <circle
-          cx={CENTER.x}
-          cy={CENTER.y}
-          r="7"
-          fill="var(--color-accent-subtle)"
-          stroke="var(--color-accent)"
-          strokeWidth="0.4"
-          opacity="0.6"
-        />
-        {/* hexagon */}
-        <polygon
-          points={hexPoints(CENTER.x, CENTER.y, 4.5)}
-          fill="var(--color-accent)"
-          stroke="var(--color-accent)"
-          strokeWidth="0.4"
-        />
-        <text
-          x={CENTER.x}
-          y={CENTER.y - 0.3}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fontSize="2.2"
-          fontFamily="var(--font-mono)"
-          fontWeight="700"
-          fill="var(--color-text-on-accent)"
-        >
-          E-0
-        </text>
-        <text
-          x={CENTER.x}
-          y={CENTER.y + 2.4}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          fontSize="1.4"
-          fontFamily="var(--font-mono)"
-          fill="var(--color-text-on-accent)"
-          opacity="0.7"
-        >
-          HITL
-        </text>
-      </g>
+      {/* Stages */}
+      {PIPELINE_STAGES.map((stage, idx) => {
+        const x = X_START + idx * (STAGE_W + GAP);
+        const emissive = stage.emissive;
+        return (
+          <g key={`stage-${stage.id}`}>
+            <rect
+              x={x}
+              y={ROW_Y}
+              width={STAGE_W}
+              height={STAGE_H}
+              rx="1.6"
+              ry="1.6"
+              fill={emissive ? 'var(--color-accent-subtle)' : 'var(--color-surface-elevated)'}
+              stroke={emissive ? 'var(--color-accent)' : 'var(--color-hairline-strong)'}
+              strokeWidth={emissive ? '0.6' : '0.3'}
+            />
+            {/* Inset highlight top — bisel effect */}
+            <line
+              x1={x + 1}
+              y1={ROW_Y + 0.5}
+              x2={x + STAGE_W - 1}
+              y2={ROW_Y + 0.5}
+              stroke="var(--color-accent)"
+              strokeWidth="0.15"
+              opacity={emissive ? '0.45' : '0.15'}
+            />
+            {/* Stage id (S0, S1, ..., E-0) */}
+            <text
+              x={x + STAGE_W / 2}
+              y={ROW_Y + 7.5}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="3.8"
+              fontFamily="var(--font-mono)"
+              fontWeight="600"
+              fill={emissive ? 'var(--color-accent)' : 'var(--color-text-1)'}
+            >
+              {stage.id}
+            </text>
+            {/* Stage count (6, 4, 2, 8, 4) ou nada */}
+            {stage.count ? (
+              <text
+                x={x + STAGE_W / 2}
+                y={ROW_Y + 13}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="2.4"
+                fontFamily="var(--font-mono)"
+                fill="var(--color-accent)"
+              >
+                {stage.count} agents
+              </text>
+            ) : null}
+            {/* Stage title curto embaixo */}
+            <text
+              x={x + STAGE_W / 2}
+              y={ROW_Y + STAGE_H - 3}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="1.65"
+              fontFamily="var(--font-mono)"
+              fill={emissive ? 'var(--color-accent)' : 'var(--color-text-2)'}
+            >
+              {stage.title}
+            </text>
+          </g>
+        );
+      })}
 
-      {/* Footer label */}
+      {/* Footer mono uppercase tracking-widest */}
       <text
         x="50"
-        y="57"
+        y="50"
         textAnchor="middle"
         fontSize="1.8"
         fontFamily="var(--font-mono)"
         fill="var(--color-text-3)"
         letterSpacing="0.2"
       >
-        22 AGENTES · 5 SQUADS · APROVAÇÃO HUMANA ≤10 MIN/DIA
+        22 AGENTES · 5 SQUADS · APROVAÇÃO HUMANA ≤10 MIN/DIA · CRON 03H–07H30
       </text>
     </svg>
   );
-}
-
-function hexPoints(cx: number, cy: number, r: number): string {
-  const pts: string[] = [];
-  for (let i = 0; i < 6; i += 1) {
-    const angle = (Math.PI / 3) * i - Math.PI / 2;
-    pts.push(`${(cx + r * Math.cos(angle)).toFixed(2)},${(cy + r * Math.sin(angle)).toFixed(2)}`);
-  }
-  return pts.join(' ');
 }
 
 // =================================================================
