@@ -99,7 +99,7 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
       onBlur={() => setHover(false)}
       className={cn(
         'group/cell relative isolate flex h-full flex-col gap-4 overflow-hidden p-6 sm:p-7',
-        'rounded-2xl border border-(--color-hairline) bg-(--color-surface)',
+        'rounded-2xl border border-(--color-hairline) glass-panel',
         // Inset bisel at rest (Vercel/Linear edge lift). Stack with glow on hover.
         'shadow-(--shadow-inset-bisel)',
         'transition-[border-color,transform,box-shadow]',

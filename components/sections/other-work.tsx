@@ -29,12 +29,11 @@ export function OtherWorkSection() {
         <h2
           className={[
             'text-3xl font-semibold text-(--color-text-1)',
-            'sm:text-4xl lg:text-5xl',
-            '!tracking-tight !leading-[1.05]',
+            'sm:text-4xl',
+            '!tracking-tight !leading-[1.05] text-balance',
           ].join(' ')}
         >
-          Breadth · sites institucionais
-          <br className="hidden sm:block" />a algoritmos C
+          De sites institucionais a algoritmos C.
         </h2>
         <p className="max-w-prose text-reading text-(--color-text-2)">
           Primeiro produto em produção (Estética MD), CLI universitária (Caronas Java), fundamento C
@@ -132,9 +131,7 @@ function MiniCard({
 
       {/* Copy block */}
       <div className="relative z-10 flex flex-1 flex-col gap-3">
-        <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
-          {tech}
-        </p>
+        <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">{tech}</p>
         <h3 className="text-lg font-semibold !tracking-tight !leading-[1.15] text-(--color-text-1)">
           {label}
         </h3>

@@ -79,7 +79,7 @@ export function BentoSkillsSection() {
     <section id="skills" className="container-max section-pad-y border-t border-(--color-hairline)">
       <header className="mb-10 flex flex-col gap-3 sm:mb-14">
         <p className="eyebrow">STACK</p>
-        <h2 className="text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl !leading-[0.95]">
+        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl !leading-[1.05] text-balance">
           Ferramentas que entram em produção.
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">

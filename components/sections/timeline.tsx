@@ -48,10 +48,8 @@ export function TimelineSection() {
     >
       <header className="mb-14 flex flex-col gap-3 sm:mb-20">
         <p className="eyebrow">JORNADA</p>
-        <h2 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl !leading-[0.95]">
-          Da automação industrial
-          <br />
-          pra IA multi-agente.
+        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl !leading-[1.05] text-balance">
+          Da automação industrial pra IA multi-agente.
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Cinco anos. Quatro estágios. Um fio condutor: construir sistemas que funcionam quando

@@ -35,9 +35,9 @@ export function FeaturedWorkSection() {
         <p className="eyebrow">FEATURED WORK</p>
         <h2
           className={cn(
-            'text-4xl font-semibold text-(--color-text-1) sm:text-5xl lg:text-6xl',
+            'text-3xl font-semibold text-(--color-text-1) sm:text-4xl',
             // Tight cinema headline: -0.025em + leading 1.05
-            '!tracking-tight !leading-[1.05]'
+            '!tracking-tight !leading-[1.05] text-balance'
           )}
         >
           Três produtos.
@@ -103,7 +103,7 @@ function SequenceLabel({ index, total, label }: { index: number; total: number; 
 
 const TILE_SHELL = [
   'group/tile relative isolate overflow-hidden rounded-2xl outline-none',
-  'border border-(--color-hairline) bg-(--color-surface)',
+  'border border-(--color-hairline) glass-panel',
   // Stack 2-layer at rest: ambient md shadow + inset bisel (Vercel/Linear edge lift).
   // Bisel = 1px highlight stroke + top edge luminance, applied via single token.
   'shadow-[var(--shadow-md),var(--shadow-inset-bisel)]',

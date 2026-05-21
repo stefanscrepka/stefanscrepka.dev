@@ -34,8 +34,8 @@ export function ContactSection() {
           <h2
             className={cn(
               'headline-display text-(--color-text-1)',
-              'text-[clamp(2.5rem,1.5rem+5vw,5rem)]',
-              'tracking-[-0.035em] !leading-[0.95]'
+              'text-3xl sm:text-4xl',
+              'tracking-[-0.025em] !leading-[1.05] text-balance'
             )}
           >
             Tem algo complexo demais
@@ -54,10 +54,9 @@ export function ContactSection() {
         <div
           className={cn(
             'mx-auto w-full max-w-3xl',
-            'rounded-3xl border border-(--color-hairline) bg-(--color-surface)/60',
+            'rounded-3xl border border-(--color-hairline) glass-panel',
             'shadow-(--shadow-inset-bisel)',
-            'p-6 sm:p-10 lg:p-12',
-            'backdrop-blur-[2px]'
+            'p-6 sm:p-10 lg:p-12'
           )}
         >
           <ContactForm />

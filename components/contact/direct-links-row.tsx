@@ -100,7 +100,7 @@ export function DirectLinksRow() {
               rel={item.external ? 'noreferrer' : undefined}
               className={cn(
                 'group/link flex h-full flex-col gap-3 rounded-xl px-4 py-4 sm:px-5 sm:py-5',
-                'border border-(--color-hairline) bg-(--color-surface)/40',
+                'border border-(--color-hairline) glass-panel',
                 'shadow-(--shadow-inset-bisel)',
                 'outline-none transition-[border-color,background-color,transform,box-shadow]',
                 'duration-(--motion-fast) ease-(--ease-standard)',
