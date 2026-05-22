@@ -80,7 +80,7 @@ export async function HeroSection() {
         ].join(' ')}
       >
         <div className="flex max-w-5xl flex-col gap-6 lg:gap-7">
-          <SplitTextHeadline className="text-4xl sm:text-5xl !leading-[0.92] !tracking-[-0.035em] font-semibold">
+          <SplitTextHeadline className="text-4xl sm:text-5xl !leading-[0.92] !tracking-[-0.035em] font-semibold text-balance">
             Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto
             inteiro ao redor dela.
           </SplitTextHeadline>
@@ -98,7 +98,7 @@ export async function HeroSection() {
         <StatsRow />
       </div>
 
-      {/* Partner marquee — logos infinite scroll */}
+      {/* Partner marquee — logos infinite scroll. Stefan AMA esse modulo. */}
       <div className="relative z-10">
         <PartnerMarquee />
       </div>

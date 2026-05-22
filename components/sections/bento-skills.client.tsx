@@ -43,12 +43,16 @@ interface BentoSkillsGridProps {
   cells: BentoSkillsCell[];
 }
 
+// Pattern B — Scale entry (Bento Skills).
+// Cells entram de scale 0.96 -> 1 + opacity 0 -> 1. Stagger 50ms (snap Disney).
+// Easing snappy (back.out spring overshoot leve) da VIDA pras cells (vs flat fade).
+// Casa com Lando explosion feel.
 const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, scale: 0.96 },
   visible: {
     opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: EASES.dramatic },
+    scale: 1,
+    transition: { duration: 0.5, ease: EASES.snappy },
   },
 };
 

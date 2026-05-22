@@ -47,8 +47,15 @@ export function TimelineSection() {
       data-slot="timeline"
     >
       <header className="mb-14 flex flex-col gap-3 sm:mb-20">
-        <p className="eyebrow">JORNADA</p>
-        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl !leading-[1.05] text-balance">
+        {/* Eyebrow editorial italic — raro no site (PP Editorial NAO usado aqui,
+            usa Geist italic). Quebra padrao mono universal das outras sections. */}
+        <p
+          className="text-base italic text-(--color-text-3) sm:text-lg"
+          style={{ letterSpacing: '-0.01em' }}
+        >
+          jornada
+        </p>
+        <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl !leading-[1.05] text-balance">
           Da automação industrial pra IA multi-agente.
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">

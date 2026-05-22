@@ -42,7 +42,7 @@ for (const viewport of VIEWPORTS) {
     test('home-sections-scroll-stops', async ({ page }) => {
       await page.goto('/', { waitUntil: 'networkidle' });
       await page.waitForTimeout(600);
-      const sections = ['hero', 'work', 'skills', 'manifesto', 'contato'];
+      const sections = ['hero', 'work', 'skills', 'manifesto', 'signature', 'contato'];
       for (const id of sections) {
         await page.evaluate((el) => {
           document.getElementById(el)?.scrollIntoView({ behavior: 'instant', block: 'start' });

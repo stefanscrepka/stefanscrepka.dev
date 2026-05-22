@@ -72,7 +72,15 @@ export function ContactSection() {
 
           {/* Headline editorial + sub */}
           <div className="flex max-w-4xl flex-col gap-5 sm:gap-6">
-            <p className="eyebrow">VAMOS CONVERSAR</p>
+            {/* Eyebrow numeric final — "12 / 12" sequence (esta e a ultima section
+                substantiva antes do footer). Anti-padrao mono uppercase universal. */}
+            <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+              <span className="text-(--color-accent) tabular-nums">12</span>
+              <span className="mx-1.5 text-(--color-text-3)/60">/</span>
+              <span className="tabular-nums">12</span>
+              <span className="mx-2.5 text-(--color-text-3)/60">—</span>
+              <span>vamos conversar</span>
+            </p>
             <h2
               className={cn(
                 'headline-display text-(--color-text-1)',

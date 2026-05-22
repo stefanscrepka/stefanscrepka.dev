@@ -133,16 +133,29 @@ export function Footer() {
           </FooterColumn>
         </div>
 
-        {/* ROW 2 — Copyright row (hairline top, font-mono small) */}
-        <div className="flex flex-col gap-4 border-t border-(--color-hairline) pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-          <p className="font-mono text-2xs tracking-wide text-(--color-text-3)">
-            © 2026 Stefan Heinz Screpka{' '}
-            <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
-              ·
-            </span>
-            Construído em Ponta Grossa, PR
-          </p>
+        {/* ROW 2 — Closing line memoravel (peak-end rule) + meta links.
+            Copy autoral recursivo com manifesto pull-quote ("Software serio
+            tem o mesmo padrao... funciona 24/7 ou alguem perde dinheiro").
+            Substitui copyright generico anterior. */}
+        <div className="flex flex-col gap-6 border-t border-(--color-hairline) pt-8 sm:gap-8">
+          {/* Closing statement — frase autoral memoravel */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+            <p
+              className="max-w-2xl text-base leading-snug text-(--color-text-1) sm:text-lg"
+              style={{ letterSpacing: '-0.015em' }}
+            >
+              Se não funciona 24/7, não conta.{' '}
+              <span className="text-(--color-text-3)">— stefan</span>{' '}
+              <span aria-hidden="true" className="text-(--color-accent)">
+                ✺
+              </span>
+            </p>
+            <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) shrink-0">
+              ponta grossa · 2026
+            </p>
+          </div>
 
+          {/* Meta row — meta links discretos */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-2xs tracking-wide text-(--color-text-3)">
             <Link
               href="#about-this-site"

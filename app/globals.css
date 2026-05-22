@@ -464,6 +464,15 @@
     font-optical-sizing: auto;
     font-feature-settings: 'ss01' 1, 'calt' 1, 'liga' 1, 'kern' 1;
   }
+
+  /* text-balance universal em headlines (h1/h2/h3). Browser ajusta line-break
+     pra distribuir caracteres por linha de forma mais elegante. Chromium 114+,
+     Safari 17.4+, Firefox 121+. Fallback degrada pra normal sem quebrar. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 }
 
 /* ============================================================

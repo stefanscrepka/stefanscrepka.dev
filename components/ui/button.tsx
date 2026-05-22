@@ -13,6 +13,9 @@ const buttonVariants = cva(
     'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-border-focus)',
     "[&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
     'aria-busy:cursor-progress',
+    // Tactile press feedback universal — scale 0.98 em active (Linear/Vercel pattern).
+    // Aplicado em todas variants pra micro-acknowledge de click sem decoracao.
+    'active:scale-[0.98]',
   ].join(' '),
   {
     variants: {
@@ -20,7 +23,7 @@ const buttonVariants = cva(
         default: [
           'rounded-pill bg-accent text-(--color-text-on-accent) font-semibold',
           'shadow-(--shadow-md) hover:shadow-(--shadow-glow-lime-sm)',
-          'hover:bg-(--color-accent-hover) active:scale-[0.98]',
+          'hover:bg-(--color-accent-hover)',
         ].join(' '),
         secondary:
           'rounded-md bg-(--color-surface-elevated) text-(--color-text-1) hover:bg-(--color-surface-overlay)',

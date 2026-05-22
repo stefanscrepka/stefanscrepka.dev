@@ -150,6 +150,24 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           // biome-ignore lint/security/noDangerouslySetInnerHtml: structured data SSR
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
+        {/* Easter egg console — dev abre DevTools, entra no clube. ASCII SH + contato.
+            Print direto no console com %c CSS styled. Production only (NODE_ENV) pra
+            nao poluir dev console do proprio Stefan. */}
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: easter egg console.log autoral
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                if(typeof window==='undefined')return;
+                var st=[
+                  'color:#D2FF00;font-family:monospace;font-size:12px;line-height:1.3;font-weight:bold',
+                  'color:#A8A8A8;font-family:monospace;font-size:11px;line-height:1.5'
+                ];
+                console.log('%c    ____ _   _\\n   / ___| | | |\\n   \\\\___ \\\\| |_| |\\n    ___) |  _  |\\n   |____/|_| |_|\\n','%cprocurando dev?\\nwa.me/5542998592522 · stefanheinz2006@gmail.com\\nmulti-agent em producao · ✺ ponta grossa, br',st[0],st[1]);
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="antialiased">
         <a href="#main" className="skip-link">

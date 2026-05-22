@@ -107,8 +107,9 @@ const TILE_SHELL = [
   // Stack 2-layer at rest: ambient md shadow + inset bisel (Vercel/Linear edge lift).
   // Bisel = 1px highlight stroke + top edge luminance, applied via single token.
   'shadow-[var(--shadow-md),var(--shadow-inset-bisel)]',
-  // Hover: lift -2px + glow border expand. Duration 600ms ease-smooth (NÃO ease-snappy).
-  'transition-[transform,border-color,box-shadow] duration-(--motion-page) ease-(--ease-smooth)',
+  // Hover meio-termo 350ms (Stefan escolheu entre snap 200ms e cinematic 600ms).
+  // Era 600ms (sluggish), 200ms snap parecia agressivo, 350ms equilibra.
+  'transition-[transform,border-color,box-shadow] duration-[350ms] ease-(--ease-standard)',
   'hover:-translate-y-[2px] hover:border-(--color-accent)',
   'hover:shadow-[var(--shadow-lg),var(--shadow-inset-bisel),0_0_48px_var(--color-accent-glow)]',
   'focus-visible:-translate-y-[2px] focus-visible:border-(--color-accent)',

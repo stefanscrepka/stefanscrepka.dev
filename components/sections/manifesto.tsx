@@ -7,6 +7,7 @@ import { useMemo, useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 import { ManifestoBackdrop } from './manifesto-backdrop';
+import { ManifestoSignatureReveal } from './manifesto-signature-reveal.client';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -83,7 +84,8 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
     >
       <ManifestoBackdrop />
       <div className="container-prose flex flex-col gap-12 sm:gap-14">
-        <p className="eyebrow">Manifesto</p>
+        {/* Eyebrow removido — Manifesto e o pico do site. Pull-quote serve
+            como anchor visual sozinho. Anti-padrao "eyebrow mecanico em todas". */}
 
         {/* ATO 1 — Pull-quote display tight. Sem italic editorial (regra "PP Editorial
             italic APENAS em multi-agente"): peso editorial vem via Geist semibold
@@ -182,6 +184,12 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
           </p>
         </div>
       </div>
+
+      {/* ATO 6 — Assinatura visual pinned scroll-scrubbed (Lando style).
+          Componente fica FORA do container-prose pra escape full-bleed:
+          width screen + bg opaco isolate cria "camara escura" propria,
+          manifesto/contato nao vazam atras durante pin. */}
+      <ManifestoSignatureReveal />
     </section>
   );
 }

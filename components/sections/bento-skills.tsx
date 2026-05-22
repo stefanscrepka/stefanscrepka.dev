@@ -78,7 +78,14 @@ export function BentoSkillsSection() {
   return (
     <section id="skills" className="container-max section-pad-y border-t border-(--color-hairline)">
       <header className="mb-10 flex flex-col gap-3 sm:mb-14">
-        <p className="eyebrow">STACK</p>
+        {/* Eyebrow com glyph ✺ — quebra padrao mono uppercase universal.
+            Glyph repete como leitmotiv visual em outras sections (manifesto, footer). */}
+        <p className="inline-flex items-center gap-2 font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+          <span aria-hidden="true" className="text-(--color-accent)">
+            ✺
+          </span>
+          <span>stack que entra em produção</span>
+        </p>
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl !leading-[1.05] text-balance">
           Ferramentas que entram em produção.
         </h2>
