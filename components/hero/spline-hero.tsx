@@ -5,15 +5,11 @@ import { Suspense, useEffect, useState } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
-// Spline scene CC0 — community asset gratuito.
-// Stefan: substituir URL abaixo quando exportar Glass Materials do community
-// (https://app.spline.design/community/file/1813aafd-d1e9-4df6-8f5f-cc8c89d52255)
-// 1. Open community link → Remix → File → Export → Code Export → copy URL .splinecode
-// 2. Paste URL aqui em SPLINE_SCENE_URL
-// Por padrão usa um asset demo público enquanto Stefan nao exporta o final.
-const SPLINE_SCENE_URL =
-  process.env.NEXT_PUBLIC_SPLINE_HERO_URL ??
-  'https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode';
+// Spline scene CC0 — Glass Materials asset (Stefan dropou .spline local em
+// public/hero/). @splinetool/react-spline aceita URL relativa pra arquivo
+// binario Spline servido como static.
+// Override via env: NEXT_PUBLIC_SPLINE_HERO_URL=https://prod.spline.design/...
+const SPLINE_SCENE_URL = process.env.NEXT_PUBLIC_SPLINE_HERO_URL ?? '/hero/glass_materials.spline';
 
 // Dynamic import client-only — react-spline NAO suporta SSR direto (Three.js).
 // Loader fica leve (~3KB), spline runtime entra apos paint principal.
