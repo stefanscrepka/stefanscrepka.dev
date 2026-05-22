@@ -58,7 +58,11 @@ export function SplineHero({ className }: SplineHeroProps) {
 
   return (
     <div
-      className={cn('relative w-full overflow-hidden', 'aspect-square max-w-[520px]', className)}
+      className={cn(
+        'relative w-full overflow-hidden isolate',
+        'aspect-square max-w-[520px]',
+        className
+      )}
       aria-hidden="true"
       data-slot="spline-hero"
     >
@@ -74,13 +78,16 @@ export function SplineHero({ className }: SplineHeroProps) {
           width: '100%',
           height: '100%',
           background: 'transparent',
+          position: 'relative',
+          zIndex: 1,
         }}
       />
       {/* Watermark "Built with Spline" coberto — canto inferior direito.
-          Free tier mostra badge mesmo em CC0 community assets. */}
+          z-index acima do canvas (z-1). bg-base solido + safety margin no tamanho
+          (160x56) cobre badge mesmo se Spline mover o anchor point. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 h-12 w-36 bg-(--color-base)"
+        className="pointer-events-none absolute right-0 bottom-0 z-10 h-14 w-40 bg-(--color-base)"
       />
     </div>
   );
