@@ -2,26 +2,49 @@ import { CTAGroup } from '@/components/hero/cta-group';
 import { EditorialAccent } from '@/components/hero/editorial-accent';
 import { MonoSubhead } from '@/components/hero/mono-subhead';
 import { PartnerMarquee } from '@/components/hero/partner-marquee';
-import { SplineHero } from '@/components/hero/spline-hero';
 import { SplitTextHeadline } from '@/components/hero/split-text-headline';
 import { StatsRow } from '@/components/hero/stats-row';
 
 // ============================================================
-// Section 1 — Hero
+// Section 1 — Hero (single-column)
 //
-// Layout: dual-column editorial. Coluna esquerda (1.2fr) carrega tipografia
-// massiva + subhead + CTAs. Coluna direita (0.8fr) hospeda HeroGlassCard
-// refractive — vibe Polo/Johan Beker + Rive Translucent Window + Huly portal.
+// Layout: single-column editorial editorial (midu/landonorris). Headline
+// massiva ocupa largura ate max-w-5xl. Subhead mono + CTAs + Spotify widget.
+// Slot direito do dual-column anterior (Spline glass) foi removido — asset
+// estava deslocado + peso pesado.
 //
-// Mobile (<lg): single-col stack natural — card desce abaixo dos CTAs em
-// largura cheia. Desktop (>=lg): grid 1.2fr/0.8fr com gap-12 + items-center.
+// Background eclipse lime aparece SO nesta section via div absolute inset-0
+// dentro do <section>. Mask gradient corta bottom 25% (caracteres CJK da
+// imagem original) + fade pra dark.
 // ============================================================
 
 export async function HeroSection() {
   return (
     <section id="hero" className="relative overflow-hidden">
+      {/* Background MIDU-style — "STEFAN" lime glow gigante ancorado no bottom.
+          Imagem dropada pelo Stefan em public/bg/Midu-Style.png. Tratamento:
+          - Position center 115% empurra letras pra fora do viewport ate so o
+            topo aparecer (vibe wallpaper/signature, nao protagonista).
+          - Mask gradient top 0->50% transparent garante headline limpa.
+          - Opacity 0.7 — presenca sem competir com CTAs. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+        style={{
+          backgroundImage: 'url(/bg/Midu-Style.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 115%',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.7,
+          maskImage:
+            'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,1) 65%)',
+          WebkitMaskImage:
+            'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,1) 65%)',
+        }}
+      />
+
       {/* Atmosphere — radial lime beam emanating from bottom-center.
-          Stage-light pattern. Layered atrás do grid, mix-blend screen pra
+          Stage-light pattern. Layered atrás do conteudo, mix-blend screen pra
           reforçar luz emergente sem clarear texto/CTA por cima. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-0">
         <div
@@ -47,18 +70,16 @@ export async function HeroSection() {
         }}
       />
 
-      {/* Main grid — dual-column desktop, single stack mobile.
-          1.2fr/0.8fr distribui peso pro texto; items-center alinha card
-          vertical no centro do bloco editorial. */}
+      {/* Main column — single-column editorial. max-w-5xl evita esticar
+          full container-max em telas xl+ (mantem ritmo de leitura). */}
       <div
         className={[
-          'container-max relative z-10',
+          'container-max relative z-10 flex flex-col',
           'pt-28 pb-12 sm:pt-32 sm:pb-16',
           'lg:pb-20 lg:pt-32',
-          'grid grid-cols-1 gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:gap-12',
         ].join(' ')}
       >
-        <div className="flex flex-col gap-6 lg:gap-7">
+        <div className="flex max-w-5xl flex-col gap-6 lg:gap-7">
           <SplitTextHeadline className="text-4xl sm:text-5xl !leading-[0.92] !tracking-[-0.035em] font-semibold">
             Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto
             inteiro ao redor dela.
@@ -69,13 +90,6 @@ export async function HeroSection() {
           </MonoSubhead>
 
           <CTAGroup />
-        </div>
-
-        {/* Right column — SplineHero (asset 3D CC0 community).
-            Background transparent — Spline scene flutua sobre atmosfera CSS lime.
-            Reduced-motion / sem WebGL: placeholder atmospheric discreto. */}
-        <div className="flex justify-center lg:justify-end">
-          <SplineHero />
         </div>
       </div>
 

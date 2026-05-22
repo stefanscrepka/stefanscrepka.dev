@@ -32,6 +32,7 @@
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@react-three/postprocessing": "^3.0.4",
+    "@rive-app/react-canvas": "^4.28.6",
     "@sentry/nextjs": "^10.53.1",
     "@splinetool/react-spline": "^4.1.0",
     "@splinetool/runtime": "^1.12.94",
