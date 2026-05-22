@@ -155,6 +155,25 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a href="#main" className="skip-link">
           Pular para o conteúdo
         </a>
+        {/* Background eclipse lime — fixed atras de tudo. Imagem original tem
+            caracteres CJK pequenos no bottom center. Usamos mask-image gradient
+            pra fade out antes deles + position top pra escala maior. Pointer-
+            events none evita interferencia em scroll/click. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+          style={{
+            backgroundImage: 'url(/bg/eclipse-lime.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.55,
+            maskImage:
+              'linear-gradient(to bottom, black 0%, black 55%, transparent 75%)',
+            WebkitMaskImage:
+              'linear-gradient(to bottom, black 0%, black 55%, transparent 75%)',
+          }}
+        />
         <MotionProvider>
           <LenisProvider>
             <CalModalProvider>
