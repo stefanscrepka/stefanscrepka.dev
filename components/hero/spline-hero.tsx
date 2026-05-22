@@ -1,20 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useMounted } from '@/hooks/use-mounted';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
-// Spline scene CC0 — Glass Materials embedded via iframe oficial.
-// `my.spline.design/[SLUG]/` e a URL publica de compartilhamento que o Spline
-// gera para qualquer projeto exportado. O scene .splinecode tem CORS bloqueado
-// pra @splinetool/react-spline em cross-origin, mas iframe e a forma oficial
-// de embed e funciona sem auth nem build/bundle pesado.
+// Spline scene via <spline-viewer> web component oficial.
+// Stefan dropou: prod.spline.design/jjNMtx2gQrvzJIPp/scene.splinecode
+// Vantagens vs iframe: sem fundo branco (canvas direto), sem watermark visivel,
+// sem CORS issue, suporte nativo a background transparent.
 //
-// Override via env: NEXT_PUBLIC_SPLINE_HERO_URL=https://my.spline.design/...
-const SPLINE_EMBED_URL =
+// Web component loader: unpkg.com/@splinetool/viewer — carregado dinamicamente
+// no mount (uma vez por sessao, customElements.get evita duplicacao).
+const SPLINE_SCENE_URL =
   process.env.NEXT_PUBLIC_SPLINE_HERO_URL ??
-  'https://my.spline.design/glassmaterials-eBnWeckUI283to0CikuXZltb/';
+  'https://prod.spline.design/jjNMtx2gQrvzJIPp/scene.splinecode';
+
+const SPLINE_VIEWER_SCRIPT = 'https://unpkg.com/@splinetool/viewer@1.12.94/build/spline-viewer.js';
 
 interface SplineHeroProps {
   className?: string;
@@ -23,13 +25,32 @@ interface SplineHeroProps {
 export function SplineHero({ className }: SplineHeroProps) {
   const reduced = useReducedMotionSafe();
   const mounted = useMounted();
-  const [loaded, setLoaded] = useState(false);
+  const [scriptReady, setScriptReady] = useState(false);
 
-  // Reduced-motion → placeholder estatico (Spline asset rotaciona/anima sozinho).
-  // SSR → placeholder ate hidratar (evita FOUC + permite controle de load).
-  if (reduced || !mounted) {
+  // Carrega o web component <spline-viewer> uma vez por sessao.
+  // customElements.get evita re-injection em re-renders / fast refresh.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.customElements?.get('spline-viewer')) {
+      setScriptReady(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = SPLINE_VIEWER_SCRIPT;
+    script.onload = () => setScriptReady(true);
+    script.onerror = () => setScriptReady(false);
+    document.head.appendChild(script);
+  }, []);
+
+  // Reduced-motion → placeholder estatico (asset Spline anima sozinho via WebGL).
+  // SSR / pre-script-load → placeholder ate web component disponivel.
+  if (reduced || !mounted || !scriptReady) {
     return (
-      <div className={cn('relative w-full', className)} aria-hidden="true">
+      <div
+        className={cn('relative w-full overflow-hidden', 'aspect-square max-w-[520px]', className)}
+        aria-hidden="true"
+      >
         <SplinePlaceholder />
       </div>
     );
@@ -41,46 +62,25 @@ export function SplineHero({ className }: SplineHeroProps) {
       aria-hidden="true"
       data-slot="spline-hero"
     >
-      {/* Placeholder sob iframe pra cover o periodo de carregamento (~2-4s).
-          Fade out depois do iframe disparar onLoad. */}
-      <div
-        className={cn(
-          'absolute inset-0 transition-opacity duration-(--motion-page) ease-(--ease-smooth)',
-          loaded ? 'pointer-events-none opacity-0' : 'opacity-100'
-        )}
-      >
-        <SplinePlaceholder />
-      </div>
-      {/* Iframe Spline. mix-blend-mode nao funciona em iframe (stacking context
-          isolado). Solucao: radial mask sobre o iframe que fade do branco do
-          Spline pro dark do site nos cantos — asset central permanece visivel,
-          bordas fundem com a atmosfera lime do hero. Stefan: exportar com
-          background transparente no Spline editor (File > Settings > Scene >
-          Background alpha 0) deixa essa mascara ainda mais limpa. */}
-      <iframe
-        src={SPLINE_EMBED_URL}
-        title="Glass Materials — cena 3D decorativa"
-        loading="lazy"
-        onLoad={() => setLoaded(true)}
-        className="absolute inset-0 h-full w-full border-0"
-        style={{ background: 'transparent' }}
-        allow="autoplay; xr-spatial-tracking"
-      />
-      {/* Radial fade overlay — branco do iframe vira dark base nos cantos.
-          Asset 3D no center fica nitido, cantos fundem com a section. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
+      {/* Custom element <spline-viewer>. React nao reconhece o tag por default
+          em TS, mas o JSX runtime aceita lowercase com hyphen como custom el.
+          Props HTML attribute string (url, loading-anim-type, background). */}
+      {/* @ts-expect-error spline-viewer is a custom element from @splinetool/viewer */}
+      <spline-viewer
+        url={SPLINE_SCENE_URL}
+        loading-anim-type="none"
+        events-target="global"
         style={{
-          background:
-            'radial-gradient(circle at 50% 50%, transparent 30%, var(--color-base) 85%)',
+          width: '100%',
+          height: '100%',
+          background: 'transparent',
         }}
       />
-      {/* Watermark "Built with Spline" sumido — canto inferior direito coberto
-          por bg-base solido (free tier mostra watermark mesmo CC0). */}
+      {/* Watermark "Built with Spline" coberto — canto inferior direito.
+          Free tier mostra badge mesmo em CC0 community assets. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 bottom-0 h-10 w-32 bg-(--color-base)"
+        className="pointer-events-none absolute right-0 bottom-0 h-12 w-36 bg-(--color-base)"
       />
     </div>
   );
