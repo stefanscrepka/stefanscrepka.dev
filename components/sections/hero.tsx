@@ -21,27 +21,32 @@ import { StatsRow } from '@/components/hero/stats-row';
 export async function HeroSection() {
   return (
     <section id="hero" className="relative overflow-hidden">
-      {/* Background MIDU-style — "STEFAN" lime glow gigante ancorado no bottom.
-          Imagem dropada pelo Stefan em public/bg/Midu-Style.png. Tratamento:
-          - Position center 115% empurra letras pra fora do viewport ate so o
-            topo aparecer (vibe wallpaper/signature, nao protagonista).
-          - Mask gradient top 0->50% transparent garante headline limpa.
-          - Opacity 0.7 — presenca sem competir com CTAs. */}
+      {/* Background video — anime minimalista (Stefan dropou). Autoplay loop
+          muted playsInline pra autoplay garantido em iOS/Safari. Mask gradient
+          mantida do bg image anterior pra preservar headline limpa em cima e
+          fade pra dark embaixo. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
         style={{
-          backgroundImage: 'url(/bg/Midu-Style.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center 115%',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.7,
           maskImage:
             'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,1) 65%)',
           WebkitMaskImage:
             'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,1) 65%)',
         }}
-      />
+      >
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="h-full w-full object-cover"
+          style={{ opacity: 0.7 }}
+        >
+          <source src="/bg/Anime_minimalista_no_song_202605220236.mp4" type="video/mp4" />
+        </video>
+      </div>
 
       {/* Atmosphere — radial lime beam emanating from bottom-center.
           Stage-light pattern. Layered atrás do conteudo, mix-blend screen pra

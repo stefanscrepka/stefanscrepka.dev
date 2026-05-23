@@ -3,58 +3,81 @@
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useMemo, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 import { ManifestoBackdrop } from './manifesto-backdrop';
-import { ManifestoSignatureReveal } from './manifesto-signature-reveal.client';
+import { ManifestoBody } from './manifesto-body';
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Section 11 — Manifesto em 4 atos editorial:
-//   ATO 1 — Pull-quote serif italic 32-44px (primeira frase isolada, o gancho).
-//   ATO 2 — 4 hairlines horizontais 60-100px stagger (break editorial).
-//   ATO 3 — Prose corpo 18-19px text-1 72ch leading 1.6 (parágrafos do meio com
-//           word-stagger GSAP — ritmo, não decoração).
-//   ATO 4 — Assinatura final serif italic 28-32px peso heavy (close emocional).
-//   ATO 5 — Mono signature row: nome · cidade · disponibilidade (footer da seção).
-// Backdrop existente expande full-section com light beam vertical lime.
+// Section #manifesto — UNICA section, arquitetura Lando-fiel.
+//
+// Research agente confirma Lando real:
+//   - NAO usa position: sticky CSS comum NEM GSAP pin: true
+//   - 2 sections position:absolute top:0 stackeadas dentro de outer wrapper
+//     com altura grande (~1800px = 2 viewports)
+//   - Sticky CSS no inner conseguimos replicar esse comportamento
+//   - Exit = translateY natural do outer wrapper (sem fade, sem cascade)
+//   - 0px gap entre reveal e proxima section (NAO ha tela preta)
+//
+// Aqui:
+//   <section id="manifesto" h-[200vh] bg-base relative>
+//     <div sticky top-0 h-screen overflow-hidden>
+//       <ManifestoBackdrop /> + <bg name> + <atmosphere>
+//       <inner manifesto REAL — encolhe scale 1 → 0.4>
+//         <frame wrapper — bg/border emerge (vira retangulo)>
+//           <ManifestoBody />
+//         </frame>
+//       </inner>
+//       <signature SVG lime overtop com clip-path reveal>
+//     </div>
+//   </section>
+//
+// Sticky range = section.height - viewport.height = 200vh - 100vh = 100vh
+// de scroll travado durante o reveal. Apos esse range, sticky desprende
+// NATURALMENTE, inner translata up junto com outer, ContactSection emerge
+// pelo bottom no doc flow. ZERO teletransporte, ZERO buraco.
 
-const MANIFESTO_PULL_QUOTE =
-  'Software sério tem o mesmo padrão de qualquer sistema crítico: ou funciona 24/7 ou alguém perde dinheiro.';
-
-const MANIFESTO_BODY_PARAGRAPHS = [
-  'Eu construo nesse padrão. TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude SDK orquestrado em squads. Três produtos em produção — NexaCore, Content Engine, STJ App — provam.',
-  'Não vendo “ajudo empresas a inovar”. Vendo entrega que paga conta. Aprovação humana em ≤10 minutos por dia. Anti-slop validator com 14 regex pt-BR. Stack local GPU subsidiando custo de inferência.',
-];
-
-const MANIFESTO_SIGNATURE =
-  'Construo IA multi-agente em produção — e o produto inteiro ao redor dela.';
+const FINAL_SCALE = 0.4;
+const FRAME_BG = 'color-mix(in oklch, var(--color-surface-deep) 75%, transparent)';
+const FRAME_BORDER = 'color-mix(in oklch, var(--color-accent) 28%, transparent)';
 
 interface ManifestoSectionProps {
   className?: string;
 }
 
 export function ManifestoSection({ className }: ManifestoSectionProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLDivElement>(null);
+  const atmosphereRef = useRef<HTMLDivElement>(null);
+  const sigRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionSafe();
+  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
 
-  const paragraphsWithWords = useMemo(
-    () =>
-      MANIFESTO_BODY_PARAGRAPHS.map((para) => ({
-        text: para,
-        words: para.split(/(\s+)/),
-      })),
-    []
-  );
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/signature-stefan.svg')
+      .then((res) => res.text())
+      .then((text) => {
+        if (!cancelled) setSvgMarkup(text);
+      })
+      .catch(() => {
+        if (!cancelled) setSvgMarkup(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
+  // Word-stagger no manifesto natural (entrada do sticky).
   useGSAP(
     () => {
-      if (!ref.current || reduced === null || reduced) return;
-
-      const wordEls = ref.current.querySelectorAll<HTMLSpanElement>('[data-word]');
+      if (!innerRef.current || reduced === null || reduced) return;
+      const wordEls = innerRef.current.querySelectorAll<HTMLSpanElement>('[data-word]');
       if (wordEls.length === 0) return;
-
       const tween = gsap.from(wordEls, {
         opacity: 0,
         y: 8,
@@ -62,13 +85,8 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
         duration: 0.6,
         stagger: 0.035,
         ease: 'expo.out',
-        scrollTrigger: {
-          trigger: ref.current,
-          start: 'top 70%',
-          once: true,
-        },
+        scrollTrigger: { trigger: innerRef.current, start: 'top 70%', once: true },
       });
-
       return () => {
         tween.kill();
       };
@@ -76,120 +94,171 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
     { dependencies: [reduced] }
   );
 
+  // Timeline scrubbed que anima durante o range do sticky.
+  useGSAP(
+    () => {
+      const section = sectionRef.current;
+      const inner = innerRef.current;
+      const frame = frameRef.current;
+      const name = nameRef.current;
+      const atmosphere = atmosphereRef.current;
+      const sig = sigRef.current;
+      if (!section || !inner || !frame || !name || !atmosphere || !sig) return;
+      if (reduced === null || svgMarkup === null) return;
+
+      if (reduced) {
+        gsap.set(inner, { scale: FINAL_SCALE });
+        gsap.set(frame, { backgroundColor: FRAME_BG, borderColor: FRAME_BORDER });
+        gsap.set(name, { opacity: 0.08, scale: 1 });
+        gsap.set(atmosphere, { opacity: 1 });
+        gsap.set(sig, { opacity: 1, clipPath: 'inset(0 0% 0 0)' });
+        return;
+      }
+
+      // Initial state — manifesto natural visivel, sem frame/bg/signature.
+      gsap.set(inner, { scale: 1, opacity: 1, transformOrigin: 'center center' });
+      gsap.set(frame, { backgroundColor: 'transparent', borderColor: 'transparent' });
+      gsap.set(name, { opacity: 0, scale: 1.2 });
+      gsap.set(atmosphere, { opacity: 0 });
+      gsap.set(sig, { opacity: 0, clipPath: 'inset(0 100% 0 0)' });
+
+      const tl = gsap.timeline();
+
+      // ENTRY (0 → 0.5) — manifesto encolhe + bg layers emergem + sig fade-in.
+      tl.to(name, { opacity: 0.08, scale: 1, ease: 'power2.out', duration: 0.45 }, 0);
+      tl.to(atmosphere, { opacity: 1, ease: 'power1.out', duration: 0.15 }, 0);
+      tl.to(inner, { scale: FINAL_SCALE, ease: 'expo.inOut', duration: 0.5 }, 0);
+      tl.to(
+        frame,
+        { backgroundColor: FRAME_BG, borderColor: FRAME_BORDER, ease: 'power2.out', duration: 0.4 },
+        0.05
+      );
+
+      // SIGNATURE drawn (0.3 → 0.85) — clip-path reveal esquerda → direita.
+      // NOTA: Lando usa Rive .riv com Trim Path keyframes seguindo o ductus
+      // natural da escrita (curvado, com easing por segmento). Nossa SVG
+      // solida nao suporta isso sem conversao pra stroke-based. Mantemos
+      // clip-path linear como aproximacao.
+      tl.to(sig, { opacity: 1, ease: 'power1.out', duration: 0.06 }, 0.3);
+      tl.to(sig, { clipPath: 'inset(0 0% 0 0)', ease: 'power2.inOut', duration: 0.55 }, 0.3);
+
+      // HOLD signature visible (0.85 → 1.0) — sticky CSS libera naturalmente
+      // depois desse range, inner translata up junto com outer, ContactSection
+      // emerge pelo bottom. Sem cascading exit manual.
+
+      const trigger = ScrollTrigger.create({
+        trigger: section,
+        // Animation roda durante o range em que o sticky inner esta travado:
+        // section.top → section.bottom - viewport_height.
+        start: 'top top',
+        end: () => `+=${section.offsetHeight - window.innerHeight}`,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        animation: tl,
+      });
+
+      const fontsReady = (document as Document & { fonts?: { ready: Promise<unknown> } }).fonts
+        ?.ready;
+      if (fontsReady) {
+        fontsReady.then(() => ScrollTrigger.refresh());
+      }
+
+      return () => {
+        trigger.kill();
+      };
+    },
+    { dependencies: [reduced, svgMarkup] }
+  );
+
   return (
     <section
       id="manifesto"
-      className={cn('relative isolate section-pad-y-lg', className)}
+      ref={sectionRef}
+      className={cn(
+        'relative isolate bg-(--color-base)',
+        // Altura define scroll length total. 200vh = 1 viewport sticky travado
+        // + 1 viewport pra exit natural (inner translata up + contato emerge).
+        'h-[200vh]',
+        className
+      )}
       data-slot="manifesto"
     >
-      <ManifestoBackdrop />
-      <div className="container-prose flex flex-col gap-12 sm:gap-14">
-        {/* Eyebrow removido — Manifesto e o pico do site. Pull-quote serve
-            como anchor visual sozinho. Anti-padrao "eyebrow mecanico em todas". */}
+      {/* Inner sticky — pin natural via CSS. Quando section.bottom passa
+          viewport.bottom, sticky libera, inner sobe COM o outer junto. */}
+      <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden">
+        <ManifestoBackdrop />
 
-        {/* ATO 1 — Pull-quote display tight. Sem italic editorial (regra "PP Editorial
-            italic APENAS em multi-agente"): peso editorial vem via Geist semibold
-            comprimido + tracking-tighter + leading 1.05 + border-l-2 lime. */}
-        <blockquote className="border-l-2 border-(--color-accent) py-2 pl-6 sm:pl-8">
-          <p
-            className={cn(
-              'font-semibold leading-[1.05] tracking-[-0.025em]',
-              'text-[1.875rem] sm:text-[2.25rem] lg:text-[2.625rem]',
-              'text-(--color-text-1)'
-            )}
-          >
-            “{MANIFESTO_PULL_QUOTE}”
-          </p>
-        </blockquote>
-
-        {/* ATO 2 — 4 hairlines horizontais break editorial */}
-        <div aria-hidden="true" className="my-1 flex flex-col gap-1.5">
-          {[60, 80, 100, 70].map((w, i) => (
-            <span
-              // Width único por linha → key estável; índice apenas pra opacity calc.
-              key={`break-width-${w}`}
-              className="block h-px bg-(--color-accent)"
-              style={{ width: `${w}px`, opacity: 0.45 - i * 0.08 }}
-            />
-          ))}
-        </div>
-
-        {/* ATO 3 — Prose corpo Apple-sweet-spot 17-19px (text-reading utility).
-            tracking -0.003em + leading 1.6 = readability máxima em parágrafos longos
-            sem perder densidade editorial. Word-stagger GSAP scroll-driven. */}
+        {/* Background nome "STEFAN HEINZ SCREPKA" gigante atras (z-5). */}
         <div
-          ref={ref}
-          className={cn(
-            'flex flex-col gap-7 text-(--color-text-1)',
-            'text-reading [&_p]:leading-[1.6]'
-          )}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center overflow-hidden"
+          style={{
+            maskImage:
+              'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+            WebkitMaskImage:
+              'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+          }}
         >
-          {paragraphsWithWords.map((para) => {
-            const paraId = para.text.slice(0, 24);
-            return (
-              <p key={`p-${paraId}-${para.words.length}`}>
-                {para.words.map((word, wIdx) => {
-                  // Word + index dentro do parágrafo + tamanho dão chave estável.
-                  // (paraId no prefix evita colisão entre parágrafos com mesma word.)
-                  const key = `w-${paraId}-${wIdx}-${word.length}`;
-                  if (word.trim() === '') {
-                    return <span key={key}>{word}</span>;
-                  }
-                  return (
-                    <span key={key} data-word className="inline-block">
-                      {word}
-                    </span>
-                  );
-                })}
-              </p>
-            );
-          })}
+          <h2
+            ref={nameRef}
+            className="whitespace-nowrap font-bold uppercase leading-none tracking-[0.02em] text-(--color-text-3) will-change-transform"
+            style={{ fontSize: 'clamp(120px, 18vw, 280px)', opacity: 0 }}
+          >
+            STEFAN HEINZ SCREPKA
+          </h2>
         </div>
 
-        {/* ATO 4 — Assinatura emocional Geist semibold lime. Sem italic
-            (regra "PP Editorial italic APENAS em multi-agente"): peso editorial
-            vem via Geist semibold + tracking-tighter + lime accent. */}
-        <p
-          className={cn(
-            'font-semibold leading-[1.1] tracking-[-0.025em]',
-            'text-[1.75rem] sm:text-[2rem] lg:text-[2.25rem]',
-            'text-(--color-accent)'
-          )}
-        >
-          {MANIFESTO_SIGNATURE}
-        </p>
+        {/* Atmosphere radial lime — z-10. */}
+        <div
+          ref={atmosphereRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[10]"
+          style={{
+            background: `radial-gradient(ellipse 55% 40% at 50% 50%,
+              color-mix(in oklch, var(--color-accent) 14%, transparent) 0%,
+              color-mix(in oklch, var(--color-accent) 5%, transparent) 35%,
+              transparent 70%)`,
+            opacity: 0,
+          }}
+        />
 
-        {/* ATO 5 — Mono signature row (peak-end pre-close).
-            Hairline curta + nome completo + cidade + disponibilidade.
-            Lime ✺ glyph faz eco com o accent da seção sem competir. */}
-        <div className="mt-2 flex flex-col gap-3">
-          <span
-            aria-hidden="true"
-            className="block h-px w-12 bg-(--color-accent)"
-            style={{ opacity: 0.6 }}
-          />
-          <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) leading-relaxed">
-            Stefan Heinz Screpka{' '}
-            <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
-              ·
-            </span>
-            Ponta Grossa, Paraná{' '}
-            <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
-              ·
-            </span>
-            <span className="text-(--color-accent)">disponível</span>{' '}
-            <span aria-hidden="true" className="text-(--color-accent)">
-              ✺
-            </span>
-          </p>
+        {/* Inner manifesto + frame — z-20. Manifesto REAL (ATOS 1-5 completos),
+            encolhe scale 1 → 0.4. Frame wrapper bg/border emerge. */}
+        <div
+          ref={innerRef}
+          className="container-prose relative z-[20] will-change-transform"
+        >
+          <div
+            ref={frameRef}
+            className="relative rounded-3xl border px-6 py-8 sm:px-10 sm:py-12 will-change-transform"
+            style={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
+          >
+            <ManifestoBody enableWordStagger />
+          </div>
+        </div>
+
+        {/* Signature SVG lime cursive overtop — z-30 com drop-shadow glow. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[30] flex items-center justify-center px-6"
+        >
+          <div
+            ref={sigRef}
+            className="flex w-full max-w-3xl items-center justify-center will-change-transform"
+            style={{
+              color: 'var(--color-accent)',
+              filter:
+                'drop-shadow(0 0 28px color-mix(in oklch, var(--color-accent) 40%, transparent)) drop-shadow(0 0 10px color-mix(in oklch, var(--color-accent) 60%, transparent))',
+            }}
+          >
+            <div
+              className="flex w-full items-center justify-center [&>svg]:h-auto [&>svg]:max-h-[55vh] [&>svg]:w-full"
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG markup local trusted (asset proprio)
+              dangerouslySetInnerHTML={svgMarkup ? { __html: svgMarkup } : undefined}
+            />
+          </div>
         </div>
       </div>
-
-      {/* ATO 6 — Assinatura visual pinned scroll-scrubbed (Lando style).
-          Componente fica FORA do container-prose pra escape full-bleed:
-          width screen + bg opaco isolate cria "camara escura" propria,
-          manifesto/contato nao vazam atras durante pin. */}
-      <ManifestoSignatureReveal />
     </section>
   );
 }
