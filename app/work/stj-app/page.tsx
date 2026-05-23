@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { CompareSlider } from '@/components/ui-effects/compare-slider';
 import { TracingBeam } from '@/components/ui-effects/tracing-beam';
+import { CaseImpactTriad } from '@/components/work/case-impact-triad';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
 import { ProductCover } from '@/components/work/product-cover';
 import { getCaseStudy } from '@/lib/work/data';
@@ -37,6 +38,9 @@ export default function STJAppPage() {
   return (
     <main className="pb-32">
       <CaseStudyHero cs={CS} />
+
+      {/* W3.2: Problema → Solução → Impacto antes do mergulho técnico. */}
+      <CaseImpactTriad cs={CS} />
 
       <section className="container-max mt-12 flex flex-col gap-6">
         <p className="eyebrow">Antes · Depois</p>

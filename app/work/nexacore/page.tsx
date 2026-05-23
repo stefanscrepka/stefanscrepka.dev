@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { MacBookScroll } from '@/components/ui-effects/macbook-scroll';
+import { CaseImpactTriad } from '@/components/work/case-impact-triad';
 import { CaseStudyCover } from '@/components/work/case-study-cover';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
 import { getCaseStudy } from '@/lib/work/data';
@@ -20,6 +21,9 @@ export default function NexaCorePage() {
   return (
     <main className="pb-32">
       <CaseStudyHero cs={CS} />
+
+      {/* W3.2: Problema → Solução → Impacto antes do mergulho técnico. */}
+      <CaseImpactTriad cs={CS} />
 
       <MacBookScroll
         title={

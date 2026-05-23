@@ -56,3 +56,48 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  # W3.5 (2026-05-23): Lighthouse CI gate — bloqueia PR se Performance < 90,
+  # Accessibility < 95, Best Practices < 95 ou SEO < 95. lighthouserc.json
+  # gerencia thresholds + páginas rodadas (home + /privacidade). 3 runs por URL
+  # pra estabilidade (variância média de ~2-3 pts).
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Next.js build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_BASE_URL: https://stefanscrepka.dev
+
+      - name: Lighthouse CI
+        run: pnpm lhci
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          retention-days: 7

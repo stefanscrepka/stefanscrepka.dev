@@ -30,7 +30,10 @@ const ppEditorial = localFont({
   ],
   variable: '--font-editorial',
   display: 'swap',
-  fallback: ['Georgia', 'Times New Roman', 'serif'],
+  // W2.8 (2026-05-23): "PPEditorial Fallback" é synthetic @font-face em
+  // globals.css com size-adjust + ascent/descent override que aproxima
+  // Georgia das métricas de PP Editorial Italic. Reduz CLS no swap.
+  fallback: ['PPEditorial Fallback', 'Georgia', 'Times New Roman', 'serif'],
 });
 
 export const navItems: TopBarNavItem[] = [

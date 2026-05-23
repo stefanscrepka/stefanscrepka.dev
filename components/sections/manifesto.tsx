@@ -176,9 +176,10 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       ref={sectionRef}
       className={cn(
         'relative isolate bg-(--color-base)',
-        // Altura define scroll length total. 200vh = 1 viewport sticky travado
-        // + 1 viewport pra exit natural (inner translata up + contato emerge).
-        'h-[200vh]',
+        // Altura define scroll length total. W2.3 (2026-05-23): reduzido de
+        // 200vh → 180vh — pin range de 100vh → 80vh. Reveal mantém impacto
+        // sem o "stuck feeling" do scroll travado por viewport inteiro.
+        'h-[180vh]',
         className
       )}
       data-slot="manifesto"

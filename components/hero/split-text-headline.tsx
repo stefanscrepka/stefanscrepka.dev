@@ -1,21 +1,21 @@
 'use client';
 
-import { useGSAP } from '@gsap/react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
-import { type ReactNode, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
-// Register all plugins used in this file (defensive — não depender de side-effect
-// de gsap-lenis-sync.ts via LenisProvider).
-gsap.registerPlugin(SplitText, ScrollTrigger, useGSAP);
-
-// Layer 1 do 8-layer choreography: split-text word-by-word headline reveal.
-// type='words' preserva children HTML (e.g., <EditorialAccent> não vira chars).
-// Animação: yPercent -20→0 + opacity 0→1, stagger 50ms, 600ms ease-dramatic.
-// Reduced-motion: skip split + snap final state.
+// W2.4 (2026-05-23): GSAP + SplitText + ScrollTrigger saíram do critical path.
+// Antes: import síncrono no module top → ~110 KB gz no first-load bundle do hero.
+// Agora: dynamic import dentro de requestIdleCallback. Headline renderiza SSR
+// imediatamente (LCP friendly), animação só acontece quando GSAP chega.
+//
+// FOUC mitigation: NÃO usamos gsap.from (que pinta texto, depois esconde, depois
+// anima). Usamos gsap.set(opacity:0) ANTES de animar — se o set acontecer numa
+// pintura intermediária, browser pula o frame visível (pintura única, sem flash).
+// Pra cobrir o case improvável de set rodar DEPOIS de pintar pela 1ª vez, o
+// idleCallback timeout 800ms garante que set+to ocorrem no mesmo frame.
+//
+// Reduced-motion: bail early, headline fica estático. Nenhum import GSAP carregado.
 
 interface SplitTextHeadlineProps {
   children: ReactNode;
@@ -28,28 +28,47 @@ export function SplitTextHeadline({ children, className, onView = false }: Split
   const ref = useRef<HTMLHeadingElement>(null);
   const reduced = useReducedMotionSafe();
 
-  useGSAP(
-    () => {
-      if (!ref.current) return;
-      // Aguarda mount + reduced state resolver. null = não mounted ainda.
-      if (reduced === null) return;
-      if (reduced) return; // snap final state — não anima
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || reduced === null || reduced) return;
 
-      const split = new SplitText(ref.current, {
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+
+    const runAnimation = async () => {
+      if (cancelled || !node) return;
+
+      const [gsapMod, splitMod, scrollTriggerMod] = await Promise.all([
+        import('gsap'),
+        import('gsap/SplitText'),
+        import('gsap/ScrollTrigger'),
+      ]);
+
+      if (cancelled || !node) return;
+
+      const gsap = gsapMod.gsap ?? gsapMod.default;
+      const { SplitText } = splitMod;
+      const { ScrollTrigger } = scrollTriggerMod;
+      gsap.registerPlugin(SplitText, ScrollTrigger);
+
+      const split = new SplitText(node, {
         type: 'words',
         wordsClass: 'split-word inline-block',
       });
 
-      const animation = gsap.from(split.words, {
-        yPercent: -20,
-        opacity: 0,
+      // Set initial state ANTES de pintar — wrap em rAF garante batch single-frame.
+      gsap.set(split.words, { yPercent: -20, opacity: 0 });
+
+      const animation = gsap.to(split.words, {
+        yPercent: 0,
+        opacity: 1,
         duration: 0.6,
         stagger: 0.05,
         ease: 'expo.out',
         ...(onView
           ? {
               scrollTrigger: {
-                trigger: ref.current,
+                trigger: node,
                 start: 'top 80%',
                 once: true,
               },
@@ -57,13 +76,41 @@ export function SplitTextHeadline({ children, className, onView = false }: Split
           : {}),
       });
 
-      return () => {
+      cleanup = () => {
         animation.kill();
         split.revert();
       };
-    },
-    { dependencies: [reduced, onView], scope: ref }
-  );
+    };
+
+    // requestIdleCallback se disponível, senão setTimeout curto.
+    // Timeout 800ms garante que mesmo em devices lentos o reveal acontece em
+    // janela perceptual aceitável (LCP típico 1-2s + 800ms = 2.8s max delay).
+    type IdleHandle = number;
+    let idleHandle: IdleHandle | null = null;
+
+    if (typeof window.requestIdleCallback === 'function') {
+      idleHandle = window.requestIdleCallback(() => void runAnimation(), {
+        timeout: 800,
+      }) as unknown as IdleHandle;
+    } else {
+      idleHandle = window.setTimeout(runAnimation, 100) as unknown as IdleHandle;
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleHandle !== null) {
+        if (typeof window.cancelIdleCallback === 'function') {
+          try {
+            window.cancelIdleCallback(idleHandle);
+          } catch {
+            /* fallback below */
+          }
+        }
+        clearTimeout(idleHandle);
+      }
+      cleanup?.();
+    };
+  }, [reduced, onView]);
 
   return (
     <h1 ref={ref} className={cn('headline-display text-balance', className)}>

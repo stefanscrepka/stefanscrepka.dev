@@ -113,14 +113,19 @@ export function DirectLinksRow() {
       </ul>
 
       {/* Cal.com trigger — ghost minimal abaixo dos cards.
-          NUNCA link externo per HANDOFF §97: modal embedded always. */}
+          NUNCA link externo per HANDOFF §97: modal embedded always.
+          W3.7 (2026-05-23): linha de qualificação adicionada — "projetos B2B
+          · escopo mínimo 4 semanas" filtra curiosos sem expor pricing. */}
       <div className="flex flex-col gap-3 border-t border-(--color-hairline) pt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
             Prefere agendar direto?
           </p>
           <p className="text-sm leading-relaxed text-(--color-text-2)">
             15 minutos · modal embedded · sem ida-e-volta de email pra marcar horário.
+          </p>
+          <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+            <span className="text-(--color-accent)">›</span> Projetos B2B · escopo mínimo 4 semanas
           </p>
         </div>
         <button

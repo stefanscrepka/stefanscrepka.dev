@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { CaseImpactTriad } from '@/components/work/case-impact-triad';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
 import { CONTENT_ENGINE_PANELS, ContentEnginePanel } from '@/components/work/content-engine-panels';
 import { ScrollPinnedHorizontal } from '@/components/work/scroll-pinned-horizontal';
@@ -29,6 +30,9 @@ export default function ContentEnginePage() {
   return (
     <main className="pb-32">
       <CaseStudyHero cs={CS} />
+
+      {/* W3.2: Problema → Solução → Impacto antes do mergulho técnico. */}
+      <CaseImpactTriad cs={CS} />
 
       <ScrollPinnedHorizontal
         panels={panels}

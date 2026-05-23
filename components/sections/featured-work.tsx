@@ -121,6 +121,42 @@ const TILE_SHELL = [
    Anti-scale: arrow movimenta-se em vez do botão escalar.
    ============================================================ */
 
+/* ============================================================
+   Impact banner — outcome operacional/financeiro ACIMA dos highlights
+   técnicos. Tradução de "stack" pra "valor de negócio".
+   W2.1 (2026-05-23): consenso 4/4 IAs identificou que cases vendiam stack
+   técnico, faltava bullet pra decisor não-dev. Metric em lime mono tabular
+   + context em reading text, ambos sobre fundo lime-subtle.
+   ============================================================ */
+
+function ImpactBanner({
+  impact,
+  className,
+}: {
+  impact: CaseStudy['impact'];
+  className?: string;
+}) {
+  if (!impact) return null;
+  return (
+    <div
+      className={cn(
+        'flex flex-col gap-1.5 rounded-lg border border-(--color-accent-emissive)',
+        'bg-(--color-accent-subtle) px-4 py-3',
+        className
+      )}
+    >
+      <span
+        className="font-mono text-2xs uppercase tracking-widest tabular-nums text-(--color-accent)"
+        aria-label="Impacto operacional"
+      >
+        <span aria-hidden="true" className="mr-1.5">›</span>
+        {impact.metric}
+      </span>
+      <span className="text-sm leading-snug text-(--color-text-1)">{impact.context}</span>
+    </div>
+  );
+}
+
 function CaseCTA({ className }: { className?: string }) {
   return (
     <span
@@ -193,6 +229,10 @@ function HeroTile({
         </h3>
 
         <p className="text-reading text-(--color-text-2)">{caseStudy.tagline}</p>
+
+        {/* W2.1: Impact banner ANTES dos highlights — outcome lê primeiro,
+            stack lê em segundo. Caso decisor não-dev pare aqui, já tem valor. */}
+        <ImpactBanner impact={caseStudy.impact} />
 
         {/* 3 highlights compactos — substituí chips ruidosos por bullets clean */}
         <ul className="mt-1 flex flex-col gap-2.5 text-sm leading-snug text-(--color-text-2)">
@@ -268,6 +308,9 @@ function HalfTile({
         {caseStudy.title}
       </h3>
       <p className="text-sm leading-relaxed text-(--color-text-2)">{caseStudy.tagline}</p>
+
+      {/* W2.1: Impact banner também nos half tiles (NexaCore + STJ App). */}
+      <ImpactBanner impact={caseStudy.impact} />
 
       {highlights.length > 0 ? (
         <ul className="mt-1 flex flex-col gap-2 text-sm leading-snug text-(--color-text-2)">

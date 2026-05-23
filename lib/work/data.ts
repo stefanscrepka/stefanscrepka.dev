@@ -49,6 +49,18 @@ export interface CaseStudy {
   accent: 'lime' | 'amber';
   /** Microcopy do card "Other Work" + index gallery */
   shortLine: string;
+  /** W2.1 (2026-05-23): impact line — bullet de outcome operacional/financeiro,
+   *  renderizado ACIMA dos highlights técnicos em FeaturedWorkSection. Traduz
+   *  stack pra valor de negócio (Auditor 1+2+3+4 sinalizaram consenso). */
+  impact?: {
+    metric: string;
+    context: string;
+  };
+  /** W3.2 (2026-05-23): problema que o case resolve. Render junto com solution
+   *  (tagline) + impact num triad "Problema · Solução · Impacto" no topo
+   *  da página /work/[slug]. Permite o decisor não-técnico entender o "por quê"
+   *  antes do mergulho em squads + stack. */
+  problem?: string;
 }
 
 export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
@@ -91,6 +103,12 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     accent: 'lime',
     shortLine:
       'Sistema multi-agente Claude SDK · 22 agentes em 5 squads · substitui agência inteira.',
+    impact: {
+      metric: '≤10 min/dia',
+      context: 'humano aprova via Telegram — substitui equipe de 4-6 pessoas',
+    },
+    problem:
+      'Volume + variedade de conteúdo pra múltiplas marcas exige equipe de 4-6 pessoas trabalhando full-time. Agência tradicional não escala, freelancer não bate o padrão.',
   },
   nexacore: {
     slug: 'nexacore',
@@ -132,6 +150,12 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     diagram: 'nexacore',
     accent: 'lime',
     shortLine: 'B2B SaaS clínicas estéticas · Next 14 + Clerk + WhatsApp + 61 componentes design.',
+    impact: {
+      metric: 'Em produção',
+      context: 'CRM + agenda + faturamento + WhatsApp num único deploy multi-tenant',
+    },
+    problem:
+      'Clínicas estéticas operam em 5+ ferramentas separadas (CRM, agenda, faturamento, WhatsApp, analytics). Fricção pra equipe, dados inconsistentes, custo somado caro.',
   },
   'stj-app': {
     slug: 'stj-app',
@@ -168,15 +192,21 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       },
       { label: 'Post-mortem técnico →', href: '#post-mortem', variant: 'outline' },
     ],
-    screenshot: '/work-screenshots/stj-app-desktop.png',
+    screenshot: '/work-screenshots/stj-app-desktop.avif',
     heroAsset: {
-      src: '/work-screenshots/stj-app-desktop.png',
+      src: '/work-screenshots/stj-app-desktop.avif',
       type: 'image',
       aspect: '16/10',
     },
     diagram: 'stj',
     accent: 'lime',
     shortLine: 'PWA cockpit · Claude Haiku 4.5 streaming · prompt cache 2 camadas · 162 testes.',
+    impact: {
+      metric: 'Cockpit interno',
+      context: 'equipe @linareis.fit aprovando conteúdo + treino + métricas num só app',
+    },
+    problem:
+      'Equipe operacional aprovando conteúdo, gerenciando treinos e consultando métricas em apps separados (Notion + Drive + Excel + Telegram). Lentidão, contexto perdido, sem auditoria.',
   },
   'estetica-md': {
     slug: 'estetica-md',
@@ -215,9 +245,9 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
         variant: 'outline',
       },
     ],
-    screenshot: '/work-screenshots/estetica-md-home.png',
+    screenshot: '/work-screenshots/estetica-md-home.avif',
     heroAsset: {
-      src: '/work-screenshots/estetica-md-home.png',
+      src: '/work-screenshots/estetica-md-home.avif',
       type: 'image',
       aspect: '16/10',
     },

@@ -60,10 +60,14 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
 
             {/* Year + NOW badge row */}
             <div className="flex items-baseline gap-4">
+              {/* W2.10 + W3.6 (2026-05-23): text-[2.25rem] no smallest pra
+                  caber "2021—2023" em 1 linha @ 320px. year-editorial substitui
+                  mono-stats — adiciona lining-nums + ss01 pra glyph editorial
+                  sem perder tabular alignment. */}
               <p
                 className={cn(
-                  'mono-stats font-bold leading-[0.88] tabular-nums text-(--color-accent)',
-                  'text-[3.5rem] sm:text-[4.5rem] lg:text-[5.5rem]'
+                  'year-editorial font-bold leading-[0.88] text-(--color-accent)',
+                  'text-[2.25rem] sm:text-[4.5rem] lg:text-[5.5rem]'
                 )}
                 style={{ letterSpacing: '-0.04em' }}
               >

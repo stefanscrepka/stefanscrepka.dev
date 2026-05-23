@@ -30,14 +30,19 @@ export async function HeroSection() {
             • poster AVIF 50 KB pintado no LCP enquanto o vídeo carrega.
             • <source media> gate só carrega vídeo em desktop sem reduced-motion;
               mobile fica só com poster + bg dark sem custar 5 MB de banda 4G. */}
+      {/* W3.3 (2026-05-23): refinamento light do hero existente — sem trocar asset.
+          • Mask gradient começa mais cedo (transparent 0% → 0.5 alpha 40% → opaque
+            70%) — anime aparece mais sutil no topo, headline ganha breathing room.
+          • opacity 0.7 → 0.55 reduz noise visual sem perder cinema.
+          • saturate(0.85) cala levemente o verde sem distorcer hue (CSS-safe). */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
         style={{
           maskImage:
-            'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,1) 65%)',
+            'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,1) 70%)',
           WebkitMaskImage:
-            'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.4) 35%, rgba(0,0,0,1) 65%)',
+            'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,1) 70%)',
         }}
       >
         <video
@@ -49,7 +54,7 @@ export async function HeroSection() {
           poster="/bg/hero-poster.avif"
           aria-hidden="true"
           className="h-full w-full object-cover"
-          style={{ opacity: 0.7 }}
+          style={{ opacity: 0.55, filter: 'saturate(0.85)' }}
         >
           <source
             src="/bg/Anime_minimalista_no_song_202605220236.mp4"
@@ -60,18 +65,19 @@ export async function HeroSection() {
       </div>
 
       {/* Atmosphere — radial lime beam emanating from bottom-center.
-          Stage-light pattern. Layered atrás do conteudo, mix-blend screen pra
-          reforçar luz emergente sem clarear texto/CTA por cima. */}
+          Stage-light pattern. Layered atrás do conteudo.
+          W2.5 (2026-05-23): mixBlendMode 'screen' removido — forçava recálculo
+          GPU absurdo com video por trás (Safari iOS jank). Alpha bakeado
+          diretamente nos stops OKLCH dá mesma luminância sem compositing custo. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-0">
         <div
           className="absolute left-1/2 bottom-[-30%] h-[140%] w-[160%] -translate-x-1/2 blur-3xl"
           style={{
             background: `radial-gradient(ellipse 50% 80% at 50% 100%,
-              color-mix(in oklch, var(--color-accent) 18%, transparent) 0%,
-              color-mix(in oklch, var(--color-accent) 7%, transparent) 28%,
-              color-mix(in oklch, var(--color-accent) 2%, transparent) 55%,
+              oklch(94% 0.22 124 / 0.12) 0%,
+              oklch(94% 0.22 124 / 0.05) 28%,
+              oklch(94% 0.22 124 / 0.015) 55%,
               transparent 75%)`,
-            mixBlendMode: 'screen',
           }}
         />
       </div>
