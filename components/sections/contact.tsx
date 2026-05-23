@@ -49,8 +49,10 @@ export function ContactSection() {
                 boxShadow: 'var(--shadow-cinema), 0 0 32px var(--color-accent-glow)',
               }}
             >
+              {/* W0.4 (2026-05-23): avatar PNG 3.07 MB → AVIF 384×512 15 KB
+                  (-99.5%). next/image continua negociando densidade via sizes. */}
               <Image
-                src="/avatar-stefan.png"
+                src="/avatar-stefan.avif"
                 alt="Stefan Heinz Screpka — retrato autoral"
                 fill
                 sizes="(min-width: 1024px) 192px, (min-width: 640px) 160px, 128px"
@@ -74,11 +76,14 @@ export function ContactSection() {
           <div className="flex max-w-4xl flex-col gap-5 sm:gap-6">
             {/* Eyebrow numeric final — "12 / 12" sequence (esta e a ultima section
                 substantiva antes do footer). Anti-padrao mono uppercase universal. */}
+            {/* W1.4 (2026-05-23): separadores /60 ficavam ~1.5:1 sobre base
+                (invisível). Trocados por hairline-strong + aria-hidden — sai
+                de scope de WCAG e mantém visual de "receipt". */}
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               <span className="text-(--color-accent) tabular-nums">12</span>
-              <span className="mx-1.5 text-(--color-text-3)/60">/</span>
+              <span aria-hidden="true" className="mx-1.5 text-(--color-hairline-strong)">/</span>
               <span className="tabular-nums">12</span>
-              <span className="mx-2.5 text-(--color-text-3)/60">—</span>
+              <span aria-hidden="true" className="mx-2.5 text-(--color-hairline-strong)">—</span>
               <span>vamos conversar</span>
             </p>
             <h2

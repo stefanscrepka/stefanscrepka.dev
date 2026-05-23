@@ -144,11 +144,11 @@ export function ManifestoMonoRow({ className }: { className?: string }) {
       />
       <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) leading-relaxed">
         Stefan Heinz Screpka{' '}
-        <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
+        <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
           ·
         </span>
         Ponta Grossa, Paraná{' '}
-        <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
+        <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
           ·
         </span>
         <span className="text-(--color-accent)">disponível</span>{' '}

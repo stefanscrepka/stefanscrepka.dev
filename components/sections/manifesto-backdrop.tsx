@@ -33,12 +33,14 @@ export function ManifestoBackdrop() {
         }}
       />
 
-      {/* Grain extra — amplificado em relação ao global */}
+      {/* Grain extra — amplificado em relação ao global.
+          W0.3 (2026-05-23): aria-hidden explícito (pai já era hidden, mas alguns
+          AT antigos não herdavam confiavelmente sobre <svg><title>). */}
       <svg
         className="absolute inset-0 h-full w-full opacity-[0.06] mix-blend-overlay"
+        aria-hidden="true"
         focusable="false"
       >
-        <title>manifesto grain texture</title>
         <filter id="manifesto-grain">
           <feTurbulence
             type="fractalNoise"

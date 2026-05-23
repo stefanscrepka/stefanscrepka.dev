@@ -183,6 +183,11 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       )}
       data-slot="manifesto"
     >
+      {/* W1.5 (2026-05-23): h2 sr-only pra heading outline ter entrada
+          "Manifesto" na navegação por headings (AT). Texto visível é blockquote
+          + signature, sem heading semântico próprio antes. */}
+      <h2 className="sr-only">Manifesto</h2>
+
       {/* Inner sticky — pin natural via CSS. Quando section.bottom passa
           viewport.bottom, sticky libera, inner sobe COM o outer junto. */}
       <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden">
@@ -199,13 +204,18 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
               'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
           }}
         >
-          <h2
+          {/* W0.2 (2026-05-23): era <h2> decorativo. Saía no document outline
+              de leitor de tela mesmo com aria-hidden no pai. Trocado por <div>
+              com role=presentation pra cair fora da heading navigation. */}
+          <div
             ref={nameRef}
+            role="presentation"
+            aria-hidden="true"
             className="whitespace-nowrap font-bold uppercase leading-none tracking-[0.02em] text-(--color-text-3) will-change-transform"
             style={{ fontSize: 'clamp(120px, 18vw, 280px)', opacity: 0 }}
           >
             STEFAN HEINZ SCREPKA
-          </h2>
+          </div>
         </div>
 
         {/* Atmosphere radial lime — z-10. */}

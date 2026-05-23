@@ -11,7 +11,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { EASES } from '@/lib/animation/eases';
 import { type ContactState, submitContact } from '@/lib/server-actions/contact';
-import { jsonToFormData } from '@/lib/server-actions/form-data-bridge';
 import { cn } from '@/lib/utils';
 import {
   type ContactInput,
@@ -52,11 +51,10 @@ export function ContactForm() {
 
   const {
     register,
-    handleSubmit,
     formState: { errors },
-    setValue,
     watch,
     reset,
+    trigger,
   } = useForm<ContactInput>({
     resolver: zodResolver(ContactSchema),
     defaultValues: {
@@ -84,11 +82,18 @@ export function ContactForm() {
     // RHF não tem setError tipado pra batch — caso necessário, expandir aqui.
   }, [state]);
 
-  const onValid = (data: ContactInput) => {
-    if (!formRef.current) return;
-    const fd = jsonToFormData(data);
-    formRef.current.requestSubmit();
-    void fd;
+  // W1.1+W1.3 (2026-05-23): submit nativo via React 19 form action.
+  // RHF agora SÓ valida (trigger()), não controla submit. Se inválido, bloqueia
+  // o submit nativo via preventDefault — erros renderizam via formState.errors.
+  // Se válido, deixa o submit nativo passar — browser monta FormData a partir
+  // dos inputs com name="..." e React invoca action={action} com esse FormData.
+  // Antes: onValid() chamava requestSubmit() recursivo + jsonToFormData
+  // descartado com void fd → bug + radio "prefere" sem name → null no server.
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const ok = await trigger();
+    if (!ok) {
+      e.preventDefault();
+    }
   };
 
   const handleSendAnother = () => {
@@ -197,7 +202,7 @@ export function ContactForm() {
     <form
       ref={formRef}
       action={action}
-      onSubmit={handleSubmit(onValid)}
+      onSubmit={handleSubmit}
       noValidate
       className="flex flex-col gap-6 sm:gap-7"
       aria-describedby={`${formId}-status`}
@@ -273,12 +278,15 @@ export function ContactForm() {
             const id = `${formId}-prefere-${option}`;
             return (
               <label key={option} htmlFor={id} className="contents">
+                {/* W1.3 (2026-05-23): {...register('prefere')} adiciona
+                    name="prefere" + ref/onChange RHF. Sem isso, Server Action
+                    fazia formData.get('prefere') === null → Zod parse falhava
+                    silenciosamente e o canal preferido nunca chegava no email. */}
                 <input
+                  {...register('prefere')}
                   id={id}
                   type="radio"
                   value={option}
-                  checked={active}
-                  onChange={() => setValue('prefere', option, { shouldValidate: true })}
                   className="peer sr-only"
                 />
                 <span
@@ -356,17 +364,30 @@ export function ContactForm() {
           {isPending ? 'Enviando…' : 'Enviar →'}
         </Button>
 
-        <p
-          id={`${formId}-status`}
-          role="status"
-          aria-live="polite"
-          className={cn(
-            'font-mono text-2xs uppercase tracking-widest leading-relaxed',
-            state.status === 'error' ? 'text-(--color-danger)' : 'text-(--color-text-3)'
-          )}
-        >
-          {state.status === 'error' ? state.message : 'Resposta em <12h em dias úteis.'}
-        </p>
+        <div className="flex flex-col gap-1">
+          <p
+            id={`${formId}-status`}
+            role="status"
+            aria-live="polite"
+            className={cn(
+              'font-mono text-2xs uppercase tracking-widest leading-relaxed',
+              state.status === 'error' ? 'text-(--color-danger)' : 'text-(--color-text-3)'
+            )}
+          >
+            {state.status === 'error' ? state.message : 'Resposta em <12h em dias úteis.'}
+          </p>
+          {/* W1.6 (2026-05-23): consentimento LGPD — link pra política. */}
+          <p className="font-mono text-2xs tracking-wide text-(--color-text-3)">
+            Ao enviar, você aceita a{' '}
+            <a
+              href="/privacidade"
+              className="text-(--color-accent) underline-offset-4 hover:underline"
+            >
+              política de privacidade
+            </a>
+            .
+          </p>
+        </div>
       </div>
     </form>
   );

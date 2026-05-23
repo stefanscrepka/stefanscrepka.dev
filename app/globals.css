@@ -42,7 +42,10 @@
   /* === Text === */
   --color-text-1: oklch(98% 0.005 130);
   --color-text-2: oklch(75% 0.005 130);
-  --color-text-3: oklch(55% 0.005 130);
+  /* W0.1 (2026-05-23): subido de 55% pra 63% L pra atender WCAG 2.2 AA (≥4.5:1)
+     em microcopy text-2xs (11px). Antes ≈ 4.25:1 (falha sistemática em 20+ pontos).
+     Reservar oklch(55%) só pra decorativos com aria-hidden. */
+  --color-text-3: oklch(63% 0.005 130);
   --color-text-on-accent: oklch(13% 0.005 130);
 
   /* === Borders & hairlines ===

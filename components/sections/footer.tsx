@@ -14,9 +14,12 @@ import { cn } from '@/lib/utils';
 // Anti-padrões evitados: sem "Made with ♥", sem newsletter fake, sem 6+ col,
 // sem marquee redundante (já tem no Hero), sem sign-off competindo com Contact.
 
+// W0.8 (2026-05-23): "Process" passou de '#process' (id inexistente na home,
+// dead link) pra '/process' — alinha com o nav top-bar que aponta pra rota
+// separada app/process/page.tsx.
 const NAV_LINKS = [
   { label: 'Work', href: '#work' },
-  { label: 'Process', href: '#process' },
+  { label: 'Process', href: '/process' },
   { label: 'Manifesto', href: '#manifesto' },
   { label: 'Contato', href: '#contato' },
 ] as const;
@@ -79,7 +82,7 @@ export function Footer() {
             </p>
             <p className="mt-1 font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               Ponta Grossa, Paraná{' '}
-              <span aria-hidden="true" className="mx-1 text-(--color-text-3)/60">
+              <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
                 ·
               </span>
               <span className="text-(--color-accent)">disponível</span>
@@ -114,7 +117,7 @@ export function Footer() {
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"
-                      className="size-3 shrink-0 text-(--color-text-3)/70"
+                      className="size-3 shrink-0 text-(--color-text-3)"
                       aria-hidden="true"
                       focusable="false"
                     >
@@ -155,7 +158,8 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Meta row — meta links discretos */}
+          {/* Meta row — meta links discretos. W1.6 (2026-05-23): adicionado
+              link "Privacidade →" pro /privacidade, requisito LGPD. */}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-2xs tracking-wide text-(--color-text-3)">
             <Link
               href="#about-this-site"
@@ -166,6 +170,16 @@ export function Footer() {
               )}
             >
               About this site →
+            </Link>
+            <Link
+              href="/privacidade"
+              className={cn(
+                'inline-flex items-center gap-1 outline-none transition-colors',
+                'duration-(--motion-fast) ease-(--ease-standard)',
+                'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
+              )}
+            >
+              Privacidade →
             </Link>
             <a
               href="https://github.com/stefanscrepka/stefanscrepka-dev"

@@ -24,7 +24,12 @@ export async function HeroSection() {
       {/* Background video — anime minimalista (Stefan dropou). Autoplay loop
           muted playsInline pra autoplay garantido em iOS/Safari. Mask gradient
           mantida do bg image anterior pra preservar headline limpa em cima e
-          fade pra dark embaixo. */}
+          fade pra dark embaixo.
+          W0.5 (2026-05-23):
+            • preload="auto" → "metadata" — não baixa 5 MB antes de scroll.
+            • poster AVIF 50 KB pintado no LCP enquanto o vídeo carrega.
+            • <source media> gate só carrega vídeo em desktop sem reduced-motion;
+              mobile fica só com poster + bg dark sem custar 5 MB de banda 4G. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
@@ -40,11 +45,17 @@ export async function HeroSection() {
           loop
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
+          poster="/bg/hero-poster.avif"
+          aria-hidden="true"
           className="h-full w-full object-cover"
           style={{ opacity: 0.7 }}
         >
-          <source src="/bg/Anime_minimalista_no_song_202605220236.mp4" type="video/mp4" />
+          <source
+            src="/bg/Anime_minimalista_no_song_202605220236.mp4"
+            type="video/mp4"
+            media="(min-width: 768px) and (prefers-reduced-motion: no-preference)"
+          />
         </video>
       </div>
 

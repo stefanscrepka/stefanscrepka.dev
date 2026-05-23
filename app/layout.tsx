@@ -16,18 +16,16 @@ import './globals.css';
 
 // PP Editorial New (Pangram Pangram, EULA "Free for personal use" — cobre portfolio
 // pessoal). Italic usado pelo <EditorialAccent /> na palavra "multi-agente" no hero
-// (único momento editorial serif do site). Regular reservado pra pull-quotes futuras.
+// (único momento editorial serif do site).
+// W0.7 (2026-05-23): Regular weight removido — zero consumidores no código,
+// economiza ~58 KB de transfer + 1 font face de decode. Re-adicionar quando
+// houver pull-quote serif planejado.
 const ppEditorial = localFont({
   src: [
     {
       path: '../public/fonts/PPEditorialNew-Italic.otf',
       weight: '400',
       style: 'italic',
-    },
-    {
-      path: '../public/fonts/PPEditorialNew-Regular.otf',
-      weight: '400',
-      style: 'normal',
     },
   ],
   variable: '--font-editorial',
