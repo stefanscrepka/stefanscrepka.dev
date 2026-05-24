@@ -30,11 +30,14 @@ export async function HeroSection() {
             • poster AVIF 50 KB pintado no LCP enquanto o vídeo carrega.
             • <source media> gate só carrega vídeo em desktop sem reduced-motion;
               mobile fica só com poster + bg dark sem custar 5 MB de banda 4G. */}
-      {/* W3.3 (2026-05-23): refinamento light do hero existente — sem trocar asset.
-          • Mask gradient começa mais cedo (transparent 0% → 0.5 alpha 40% → opaque
-            70%) — anime aparece mais sutil no topo, headline ganha breathing room.
-          • opacity 0.7 → 0.55 reduz noise visual sem perder cinema.
-          • saturate(0.85) cala levemente o verde sem distorcer hue (CSS-safe). */}
+      {/* W4.4 (2026-05-23): hero video recortado pros primeiros 3s em loop +
+          áudio AAC removido + reencoded H264 (412 KB) + VP9 webm (525 KB).
+          Source original 5.05 MB com AAC track desnecessário foi descartado
+          da árvore servida. Loop perceptualmente seamless porque o anime
+          minimalista usa swirl contínuo sem início/fim óbvio.
+
+          W3.3: mask gradient começa mais cedo + opacity 0.55 + saturate 0.85
+          mantêm o anime sutil sem competir com headline. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
@@ -56,8 +59,16 @@ export async function HeroSection() {
           className="h-full w-full object-cover"
           style={{ opacity: 0.55, filter: 'saturate(0.85)' }}
         >
+          {/* WebM/VP9 preferido por browsers modernos. <source media> mantém
+              gate por viewport + prefers-reduced-motion (mobile + reduced =
+              só poster, zero MB de video). */}
           <source
-            src="/bg/Anime_minimalista_no_song_202605220236.mp4"
+            src="/bg/hero-loop.webm"
+            type="video/webm"
+            media="(min-width: 768px) and (prefers-reduced-motion: no-preference)"
+          />
+          <source
+            src="/bg/hero-loop.mp4"
             type="video/mp4"
             media="(min-width: 768px) and (prefers-reduced-motion: no-preference)"
           />

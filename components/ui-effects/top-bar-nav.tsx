@@ -2,6 +2,7 @@
 
 import { m } from 'motion/react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { type ReactNode, useEffect, useState } from 'react';
 import { SHMonogram } from '@/components/shared/sh-monogram';
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -10,6 +11,16 @@ import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { EASES } from '@/lib/animation/eases';
 import { useAnchorScroll } from '@/lib/scroll/anchor-scroll';
 import { cn } from '@/lib/utils';
+
+// W4.1 (2026-05-23): hrefs do nav agora são `/#anchor` (absolutos) pra
+// funcionar em qualquer rota. Quando estamos NA home, interceptamos o
+// click e usamos Lenis smooth scroll. Quando NÃO estamos, deixa o
+// browser navegar nativamente (vai pra home e o hash dispara scroll).
+function extractAnchor(href: string): string | null {
+  if (href.startsWith('#')) return href;
+  if (href.startsWith('/#')) return href.slice(1);
+  return null;
+}
 
 // Top bar full-width estilo midu.design + vercel.com — substitui o FloatingDock
 // (Aceternity Apple-dock pattern) que nao casava com a hierarquia tipografica
@@ -57,9 +68,12 @@ export function TopBarNav({ items, className }: TopBarNavProps) {
 
 function NavLogo() {
   return (
+    // W3.x (2026-05-23): aria-label "Stefan — home" inclui o texto visível
+    // ("Stefan") no início pra atender label-content-name-mismatch audit do
+    // Lighthouse. Voice-control users falam "Stefan" e bate.
     <Link
       href="/"
-      aria-label="Stefan Heinz Screpka — home"
+      aria-label="Stefan — home"
       className={cn(
         'group inline-flex items-center gap-3 rounded-md outline-none',
         'transition-colors',
@@ -85,13 +99,17 @@ function NavLinks({ items }: { items: TopBarNavItem[] }) {
   const scroll = useAnchorScroll();
   const reduced = useReducedMotionSafe();
   const activeHash = useActiveHash(items);
+  const pathname = usePathname();
 
   const onClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('#')) {
+    const anchor = extractAnchor(href);
+    // Só intercepta + smooth scroll quando temos um anchor E estamos na home.
+    // Em qualquer outra rota, deixa o link navegar pra `/#anchor` nativamente.
+    if (anchor && pathname === '/') {
       e.preventDefault();
-      scroll(href);
+      scroll(anchor);
       if (typeof window !== 'undefined') {
-        window.history.replaceState(null, '', href);
+        window.history.replaceState(null, '', anchor);
       }
     }
   };
@@ -103,7 +121,10 @@ function NavLinks({ items }: { items: TopBarNavItem[] }) {
   return (
     <nav aria-label="Navegação principal" className="hidden items-center gap-1 md:flex">
       {items.map((item, i) => {
-        const isActive = activeHash === item.href;
+        // activeHash retorna "#work" / "#manifesto" etc. Comparamos com o
+        // anchor extraído de href (que pode ser `#x` ou `/#x`).
+        const itemAnchor = extractAnchor(item.href);
+        const isActive = itemAnchor !== null && activeHash === itemAnchor;
         return (
           <m.a
             key={item.href}
@@ -148,6 +169,7 @@ function NavLinks({ items }: { items: TopBarNavItem[] }) {
 function NavMobileSheet({ items }: { items: TopBarNavItem[] }) {
   const [open, setOpen] = useState(false);
   const scroll = useAnchorScroll();
+  const pathname = usePathname();
 
   return (
     <div className="md:hidden">
@@ -195,10 +217,13 @@ function NavMobileSheet({ items }: { items: TopBarNavItem[] }) {
                 <a
                   href={item.href}
                   onClick={(e) => {
-                    if (item.href.startsWith('#')) {
+                    const anchor = extractAnchor(item.href);
+                    // Smooth scroll só quando na home. Em outras rotas, deixa
+                    // o link navegar pra `/#anchor` nativamente — Sheet fecha.
+                    if (anchor && pathname === '/') {
                       e.preventDefault();
                       setOpen(false);
-                      requestAnimationFrame(() => scroll(item.href));
+                      requestAnimationFrame(() => scroll(anchor));
                     }
                   }}
                   className={cn(
@@ -237,8 +262,11 @@ function useActiveHash(items: TopBarNavItem[]): string | null {
   useEffect(() => {
     if (!mounted) return;
 
-    const hashes = items.map((i) => i.href).filter((h) => h.startsWith('#'));
-    const targets = hashes
+    // W4.1: aceita hrefs `#x` e `/#x` (após mudança pra absolute anchors).
+    const anchors = items
+      .map((i) => extractAnchor(i.href))
+      .filter((a): a is string => a !== null);
+    const targets = anchors
       .map((h) => document.getElementById(h.slice(1)))
       .filter((el): el is HTMLElement => el !== null);
 

@@ -14,14 +14,15 @@ import { cn } from '@/lib/utils';
 // Anti-padrões evitados: sem "Made with ♥", sem newsletter fake, sem 6+ col,
 // sem marquee redundante (já tem no Hero), sem sign-off competindo com Contact.
 
-// W0.8 (2026-05-23): "Process" passou de '#process' (id inexistente na home,
-// dead link) pra '/process' — alinha com o nav top-bar que aponta pra rota
-// separada app/process/page.tsx.
+// W0.8 + W4.1 (2026-05-23): hrefs agora absolute (`/#work`) pra funcionar
+// quando footer é montado em rotas internas (case studies, /privacidade etc).
+// AnchorLink intercepta `#x` puro pra smooth scroll, então `/#work` cai pro
+// fallback `<a href>` nativo que navega + dispara hash scroll.
 const NAV_LINKS = [
-  { label: 'Work', href: '#work' },
+  { label: 'Work', href: '/#work' },
   { label: 'Process', href: '/process' },
-  { label: 'Manifesto', href: '#manifesto' },
-  { label: 'Contato', href: '#contato' },
+  { label: 'Manifesto', href: '/#manifesto' },
+  { label: 'Contato', href: '/#contato' },
 ] as const;
 
 const SOCIAL_LINKS = [

@@ -54,21 +54,21 @@ export function FeaturedWorkSection() {
       <FeaturedWorkReveal>
         <div className="flex flex-col gap-12 sm:gap-16 lg:gap-20">
           {/* Hero tile FULL-BLEED — Content Engine flagship */}
-          <HeroTile caseStudy={contentEngine} sequenceIndex={1} totalCount={4} />
+          <HeroTile caseStudy={contentEngine} sequenceIndex={1} totalCount={3} />
 
           {/* Half-tiles ESPELHADOS — gap-10 generoso */}
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
             <HalfTile
               caseStudy={nexacore}
               sequenceIndex={2}
-              totalCount={4}
+              totalCount={3}
               direction="text-left"
               aspectRatio="4/3"
             />
             <HalfTile
               caseStudy={stjApp}
               sequenceIndex={3}
-              totalCount={4}
+              totalCount={3}
               direction="text-right"
               aspectRatio="16/9"
             />

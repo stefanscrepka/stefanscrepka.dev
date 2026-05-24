@@ -36,11 +36,15 @@ const ppEditorial = localFont({
   fallback: ['PPEditorial Fallback', 'Georgia', 'Times New Roman', 'serif'],
 });
 
+// W4.1 (2026-05-23): anchors agora são absolutos `/#...` pra funcionar em
+// QUALQUER rota (case studies, /process, /privacidade, etc). Antes os links
+// `#work` eram dead em páginas internas — usuário clicava e nada acontecia.
+// O TopBarNav detecta pathname + faz scroll local quando estamos na home.
 export const navItems: TopBarNavItem[] = [
-  { label: 'Work', href: '#work', icon: <WorkIcon />, subtitle: 'Três produtos em produção' },
+  { label: 'Work', href: '/#work', icon: <WorkIcon />, subtitle: 'Três produtos em produção' },
   { label: 'Process', href: '/process', icon: <ProcessIcon />, subtitle: 'Como eu construo' },
-  { label: 'Manifesto', href: '#manifesto', icon: <ManifestoIcon />, subtitle: 'Princípios' },
-  { label: 'Contato', href: '#contato', icon: <ContactIcon />, subtitle: 'Respondo em <12h' },
+  { label: 'Manifesto', href: '/#manifesto', icon: <ManifestoIcon />, subtitle: 'Princípios' },
+  { label: 'Contato', href: '/#contato', icon: <ContactIcon />, subtitle: 'Respondo em <12h' },
 ];
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://stefanscrepka.dev';

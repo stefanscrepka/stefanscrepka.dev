@@ -55,6 +55,8 @@ export function ContactForm() {
     watch,
     reset,
     trigger,
+    setError,
+    setFocus,
   } = useForm<ContactInput>({
     resolver: zodResolver(ContactSchema),
     defaultValues: {
@@ -76,11 +78,29 @@ export function ContactForm() {
     }
   }, [state, reset]);
 
-  // Server-side validation errors injetados no form (caso bypass do client passe).
+  // W4.5 (2026-05-23): server-side validation errors injetados no RHF via
+  // setError. Acontece quando client validation passa (e.g. honeypot ou
+  // user manipulou DOM) mas Zod no Server Action rejeita. Antes: o status
+  // 'validation' chegava no state mas não renderizava nada no form — usuário
+  // ficava sem feedback. Agora cada fieldError vira inline error + foco vai
+  // pro primeiro campo problemático.
   useEffect(() => {
     if (state.status !== 'validation') return;
-    // RHF não tem setError tipado pra batch — caso necessário, expandir aqui.
-  }, [state]);
+    const fields = ['nome', 'email', 'prefere', 'mensagem'] as const;
+    let firstErrorField: (typeof fields)[number] | null = null;
+    for (const field of fields) {
+      const messages = state.fieldErrors[field];
+      const first = messages?.[0];
+      if (first) {
+        setError(field, { type: 'server', message: first });
+        if (!firstErrorField) firstErrorField = field;
+      }
+    }
+    if (firstErrorField) {
+      // setFocus dispara após repaint pra não competir com aria-live status.
+      requestAnimationFrame(() => setFocus(firstErrorField as keyof ContactInput));
+    }
+  }, [state, setError, setFocus]);
 
   // W1.1+W1.3 (2026-05-23): submit nativo via React 19 form action.
   // RHF agora SÓ valida (trigger()), não controla submit. Se inválido, bloqueia

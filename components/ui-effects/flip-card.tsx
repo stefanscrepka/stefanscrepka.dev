@@ -67,10 +67,21 @@ export function FlipCard({
         )}
         style={{ boxShadow: `0 0 32px ${TONE_GLOW[tone]}` }}
       >
-        <div className={cn('relative', flipped ? 'sr-only' : '')} aria-hidden={flipped}>
+        {/* W3.x (2026-05-23): inert atribuído junto com aria-hidden — Lighthouse
+            aria-hidden-focus audit exige que focáveis dentro de aria-hidden
+            sejam removidos do tab order. inert faz isso nativamente. */}
+        <div
+          className={cn('relative', flipped ? 'sr-only' : '')}
+          aria-hidden={flipped}
+          inert={flipped || undefined}
+        >
           {front}
         </div>
-        <div className={cn('relative', flipped ? '' : 'sr-only')} aria-hidden={!flipped}>
+        <div
+          className={cn('relative', flipped ? '' : 'sr-only')}
+          aria-hidden={!flipped}
+          inert={!flipped || undefined}
+        >
           {back}
         </div>
       </button>
@@ -102,7 +113,7 @@ export function FlipCard({
         className="relative h-full w-full"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Front face */}
+        {/* Front face — inert quando virado (sai do tab order). */}
         <div
           className={cn(
             'relative rounded-2xl',
@@ -115,11 +126,13 @@ export function FlipCard({
             boxShadow: `var(--shadow-md), 0 0 32px ${TONE_GLOW[tone]}`,
           }}
           aria-hidden={flipped}
+          inert={flipped || undefined}
         >
           {front}
         </div>
 
-        {/* Back face — rotated 180° to be flush with front */}
+        {/* Back face — inert quando NÃO virado (botão "Agendar consulta" + WhatsApp
+            deeplink ficariam tabuláveis dentro de aria-hidden sem isso). */}
         <div
           className={cn(
             'absolute inset-0 rounded-2xl',
@@ -133,6 +146,7 @@ export function FlipCard({
             boxShadow: `var(--shadow-md), 0 0 32px ${TONE_GLOW[tone]}`,
           }}
           aria-hidden={!flipped}
+          inert={!flipped || undefined}
         >
           {back}
         </div>
