@@ -235,10 +235,7 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
 
         {/* Inner manifesto + frame — z-20. Manifesto REAL (ATOS 1-5 completos),
             encolhe scale 1 → 0.4. Frame wrapper bg/border emerge. */}
-        <div
-          ref={innerRef}
-          className="container-prose relative z-[20] will-change-transform"
-        >
+        <div ref={innerRef} className="container-prose relative z-[20] will-change-transform">
           <div
             ref={frameRef}
             className="relative rounded-3xl border px-6 py-8 sm:px-10 sm:py-12 will-change-transform"

@@ -120,13 +120,12 @@ export default function PrivacidadePage() {
           )}
         >
           O que coleto, por quê,
-          <br />
-          e como você apaga.
+          <br />e como você apaga.
         </h1>
         <p className="mt-3 max-w-prose text-reading text-(--color-text-2)">
           Sem letrinha miúda. Sem template legal copiado. Aqui está exatamente quais dados passam
-          por mim, com quem compartilho, por quanto tempo guardo e o que você pode exigir a
-          qualquer momento.
+          por mim, com quem compartilho, por quanto tempo guardo e o que você pode exigir a qualquer
+          momento.
         </p>
         <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
           Atualizado em {LAST_UPDATED}

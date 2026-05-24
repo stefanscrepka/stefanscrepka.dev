@@ -527,8 +527,7 @@ for (let i = 0; i < Math.min(20, lines.length); i++) {
   }
 }
 
-const bodyMd =
-  splitIdx >= 0 ? lines.slice(splitIdx + 1).join('\n') : md;
+const bodyMd = splitIdx >= 0 ? lines.slice(splitIdx + 1).join('\n') : md;
 
 const bodyHtml = marked.parse(bodyMd);
 

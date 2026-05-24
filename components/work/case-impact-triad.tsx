@@ -43,10 +43,7 @@ export function CaseImpactTriad({ cs, className }: CaseImpactTriadProps) {
   return (
     <section
       aria-label="Problema, solução e impacto"
-      className={cn(
-        'container-max border-t border-(--color-hairline) py-16 sm:py-20',
-        className
-      )}
+      className={cn('container-max border-t border-(--color-hairline) py-16 sm:py-20', className)}
     >
       <div className="grid gap-8 sm:gap-10 lg:grid-cols-3 lg:gap-12">
         {cells.map((cell) => (

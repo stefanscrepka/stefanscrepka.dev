@@ -263,9 +263,7 @@ function useActiveHash(items: TopBarNavItem[]): string | null {
     if (!mounted) return;
 
     // W4.1: aceita hrefs `#x` e `/#x` (após mudança pra absolute anchors).
-    const anchors = items
-      .map((i) => extractAnchor(i.href))
-      .filter((a): a is string => a !== null);
+    const anchors = items.map((i) => extractAnchor(i.href)).filter((a): a is string => a !== null);
     const targets = anchors
       .map((h) => document.getElementById(h.slice(1)))
       .filter((el): el is HTMLElement => el !== null);

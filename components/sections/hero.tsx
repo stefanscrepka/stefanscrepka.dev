@@ -55,7 +55,6 @@ export async function HeroSection() {
           playsInline
           preload="metadata"
           poster="/bg/hero-poster.avif"
-          aria-hidden="true"
           className="h-full w-full object-cover"
           style={{ opacity: 0.55, filter: 'saturate(0.85)' }}
         >

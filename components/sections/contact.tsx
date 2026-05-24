@@ -81,9 +81,13 @@ export function ContactSection() {
                 de scope de WCAG e mantém visual de "receipt". */}
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               <span className="text-(--color-accent) tabular-nums">12</span>
-              <span aria-hidden="true" className="mx-1.5 text-(--color-hairline-strong)">/</span>
+              <span aria-hidden="true" className="mx-1.5 text-(--color-hairline-strong)">
+                /
+              </span>
               <span className="tabular-nums">12</span>
-              <span aria-hidden="true" className="mx-2.5 text-(--color-hairline-strong)">—</span>
+              <span aria-hidden="true" className="mx-2.5 text-(--color-hairline-strong)">
+                —
+              </span>
               <span>vamos conversar</span>
             </p>
             <h2

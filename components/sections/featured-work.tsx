@@ -129,13 +129,7 @@ const TILE_SHELL = [
    + context em reading text, ambos sobre fundo lime-subtle.
    ============================================================ */
 
-function ImpactBanner({
-  impact,
-  className,
-}: {
-  impact: CaseStudy['impact'];
-  className?: string;
-}) {
+function ImpactBanner({ impact, className }: { impact: CaseStudy['impact']; className?: string }) {
   if (!impact) return null;
   return (
     <div
@@ -145,11 +139,11 @@ function ImpactBanner({
         className
       )}
     >
-      <span
-        className="font-mono text-2xs uppercase tracking-widest tabular-nums text-(--color-accent)"
-        aria-label="Impacto operacional"
-      >
-        <span aria-hidden="true" className="mr-1.5">›</span>
+      <span className="font-mono text-2xs uppercase tracking-widest tabular-nums text-(--color-accent)">
+        <span className="sr-only">Impacto operacional: </span>
+        <span aria-hidden="true" className="mr-1.5">
+          ›
+        </span>
         {impact.metric}
       </span>
       <span className="text-sm leading-snug text-(--color-text-1)">{impact.context}</span>

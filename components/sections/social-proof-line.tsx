@@ -88,7 +88,6 @@ export function SocialProofLine() {
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6 lg:gap-10">
         {PROOF_LINES.map((line, idx) => (
           <li
-            // biome-ignore lint/correctness/useUniqueElementIds: stagger key is the href which is unique
             key={line.href}
             className={cn(
               'transition-[opacity,transform] duration-(--motion-page) ease-(--ease-dramatic)',
