@@ -52,3 +52,13 @@ yarn-error.log*
 next-env.d.ts
 
 screenshots-2026-05-21/
+
+# scratch / build artifacts not for git
+/pdf-pages-temp/
+/download/
+/screenshots-helmet-deep/
+/screenshots-lando-ontrack/
+/screenshots-tour/
+/_prompts/videos-gerados/
+/brand-book.html
+/brand-book.pdf
