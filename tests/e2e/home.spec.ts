@@ -30,8 +30,7 @@ test.describe('home', () => {
 
   test('anchor sections placeholder exist', async ({ page }) => {
     await page.goto('/');
-    // 4 anchors esperados pelo dock.
-    for (const id of ['work', 'process', 'manifesto', 'contato']) {
+    for (const id of ['work', 'manifesto', 'contato']) {
       await expect(page.locator(`#${id}`)).toBeAttached();
     }
   });

@@ -246,8 +246,8 @@ function SceneContent({
     const toY = stackAfter * DISC_HEIGHT + DISC_HEIGHT / 2;
     const peakY = LIFT_HEIGHT;
 
-    let x = fromPos[0];
-    let y = fromY;
+    let x: number;
+    let y: number;
     if (t < 1 / 3) {
       // Phase 1: LIFT (fromY → peakY at fromPos.x)
       const k = ease(t * 3);

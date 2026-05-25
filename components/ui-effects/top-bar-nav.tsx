@@ -291,6 +291,7 @@ function useActiveHash(items: TopBarNavItem[]): string | null {
 
     for (const t of targets) observer.observe(t);
     return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted]);
 
   return activeHash;

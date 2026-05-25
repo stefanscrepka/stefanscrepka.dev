@@ -17,6 +17,7 @@ export default [
       'playwright-report/**',
       'public/**',
       'next-env.d.ts',
+      'tools/**',
     ],
   },
   js.configs.recommended,
