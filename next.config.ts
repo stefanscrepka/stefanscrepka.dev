@@ -45,6 +45,18 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // Long-cache para assets immutable: bundles _next/static hasheados,
+      // fontes/SVG/AVIF em /fonts /icons /brand /bg /work-screenshots.
+      // Resolve audit `uses-long-cache-ttl` sem afetar UX (Next já injeta hash
+      // nos chunks, invalidação automática no deploy).
+      {
+        source: '/_next/static/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/:path*\\.(woff2|otf|ttf|avif|webp|svg|mp4|webm)',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
     ];
   },
 };

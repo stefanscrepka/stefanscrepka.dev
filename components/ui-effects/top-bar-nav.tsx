@@ -81,7 +81,7 @@ function NavLogo() {
       )}
     >
       <span className="text-(--color-accent) transition-colors group-hover:text-(--color-accent-hover)">
-        <SHMonogram size={28} />
+        <SHMonogram size={28} decorative />
       </span>
       <span aria-hidden="true" className="hidden h-5 w-px bg-(--color-hairline-strong) sm:block" />
       <span className="hidden font-mono text-xs uppercase tracking-widest text-(--color-text-1) sm:inline">
@@ -204,7 +204,7 @@ function NavMobileSheet({ items }: { items: TopBarNavItem[] }) {
         <SheetContent side="right" className="w-72 sm:w-80">
           <div className="flex items-center gap-3">
             <span className="text-(--color-accent)">
-              <SHMonogram size={28} />
+              <SHMonogram size={28} decorative />
             </span>
             <span className="font-mono text-xs uppercase tracking-widest text-(--color-text-1)">
               Stefan
