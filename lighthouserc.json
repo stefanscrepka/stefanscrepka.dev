@@ -26,6 +26,7 @@
 
         "color-contrast": "off",
         "bf-cache": "off",
+        "errors-in-console": "warn",
         "unminified-javascript": "off",
         "unused-javascript": "off",
         "valid-source-maps": "off",
