@@ -29,7 +29,10 @@ export function CTAGroup({ className }: CTAGroupProps) {
       animate="visible"
       variants={{
         hidden: {},
-        visible: { transition: { staggerChildren: 0.05, delayChildren: 0.6 } },
+        // W-motion #5: delayChildren 0.6 → 0.3. Antes os CTAs apareciam 600ms+
+        // após mount (depois do reveal headline GSAP idle), e em mobile o user
+        // já scrollava antes de ver. Material spec hero CTAs: 200-400ms após LCP.
+        visible: { transition: { staggerChildren: 0.05, delayChildren: 0.3 } },
       }}
       className={cn('flex flex-wrap items-center gap-3 sm:gap-4', className)}
     >
@@ -47,7 +50,7 @@ export function CTAGroup({ className }: CTAGroupProps) {
             }}
             asChild
           >
-            <a href="#work">Ver os produtos →</a>
+            <a href="#work">Ver os 3 produtos →</a>
           </Button>
         </MagneticCTA>
       </m.div>
@@ -63,7 +66,7 @@ export function CTAGroup({ className }: CTAGroupProps) {
           onClick={openModal}
           aria-haspopup="dialog"
         >
-          Conversar 15min →
+          Agendar 15min →
         </Button>
       </m.div>
     </m.div>

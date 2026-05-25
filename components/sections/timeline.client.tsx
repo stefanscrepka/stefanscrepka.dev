@@ -42,20 +42,21 @@ interface TimelineMarkersProps {
 export function TimelineMarkers({ markers }: TimelineMarkersProps) {
   return (
     <TracingBeam>
-      <m.ol
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '0px 0px -100px 0px' }}
-        variants={{
-          hidden: {},
-          // Disney overlapping action: 50ms stagger (era 220ms — lento demais pra
-          // sequência editorial). Tightening dá ritmo sem perder leitura.
-          visible: { transition: { staggerChildren: 0.05, delayChildren: 0.1 } },
-        }}
-        className="flex flex-col gap-[8rem] sm:gap-[12rem] lg:gap-[14rem]"
-      >
+      {/* W-motion #4: ANTES o stagger 50ms acontecia em container reveal único
+          quando topo da timeline entrava no viewport. Com spacing 12-14rem
+          entre markers, o último marker animava 250ms+ depois de já estar
+          visível em viewport. AGORA cada marker tem seu próprio whileInView —
+          Disney Timing per element. Cada marker anima quando ENTRA, ritmo
+          alinhado ao scroll natural do user. */}
+      <ol className="flex flex-col gap-[8rem] sm:gap-[12rem] lg:gap-[14rem]">
         {markers.map((marker, idx) => (
-          <m.li key={marker.year} variants={itemVariants} className="relative flex flex-col gap-6">
+          <m.li
+            key={marker.year}
+            initial={itemVariants.hidden}
+            whileInView={itemVariants.visible}
+            viewport={{ once: true, amount: 0.3 }}
+            className="relative flex flex-col gap-6"
+          >
             <MarkerDot index={idx} isCurrent={marker.isCurrent} />
 
             {/* Year + NOW badge row */}
@@ -137,7 +138,7 @@ export function TimelineMarkers({ markers }: TimelineMarkersProps) {
             ) : null}
           </m.li>
         ))}
-      </m.ol>
+      </ol>
 
       {/* Beam end glow — soft lime blur depois do último marker (não corta seco) */}
       <div
@@ -177,9 +178,16 @@ function MarkerDot({ index, isCurrent }: { index: number; isCurrent?: boolean | 
       data-active={inView ? '' : undefined}
       data-marker-index={index}
     >
-      <span
+      {/* W-motion #6: bounce-once Disney Squash & Stretch quando marker entra
+          no viewport. Inner dot anima scale [1, 1.25, 1] em 500ms — Follow
+          Through visual celebrando o "progresso lime". isCurrent ainda recebe
+          o `animate-pulse` contínuo separado. */}
+      <m.span
+        initial={{ scale: 1 }}
+        animate={inView ? { scale: [1, 1.25, 1] } : { scale: 1 }}
+        transition={{ duration: 0.5, ease: EASES.outQuint, times: [0, 0.4, 1] }}
         className={cn(
-          'block size-3 rounded-full transition-all duration-(--motion-modal)',
+          'block size-3 rounded-full transition-colors duration-(--motion-modal)',
           inView ? 'bg-(--color-accent) shadow-(--shadow-glow-lime-sm)' : 'bg-(--color-text-3)',
           isCurrent && 'animate-pulse'
         )}

@@ -22,6 +22,10 @@ interface CaseStudyCoverProps {
   tilt?: 'none' | 'subtle' | 'cinema' | undefined;
   /** Habilita hover lift. Default false (parent usually é Link). */
   interactive?: boolean;
+  /** Marca como `priority` no Next/Image. Use no PRIMEIRO cover above-the-fold
+   *  (FeaturedWork HeroTile) — pode ser o LCP element em mobile com hero video
+   *  gated. Default false. */
+  priority?: boolean;
   className?: string | undefined;
 }
 
@@ -38,6 +42,7 @@ export function CaseStudyCover({
   aspectRatio = '16/10',
   tilt = 'subtle',
   interactive: _interactive = false,
+  priority = false,
   className,
 }: CaseStudyCoverProps) {
   // ─────────────────────────────────────────────────────────────────────
@@ -56,7 +61,7 @@ export function CaseStudyCover({
           fill
           sizes="(min-width: 1024px) 50vw, 100vw"
           className="object-cover"
-          priority={false}
+          priority={priority}
         />
       </MockupFrame>
     );

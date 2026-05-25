@@ -144,7 +144,9 @@ export function DirectLinksRow() {
           aria-haspopup="dialog"
           aria-expanded={calOpen}
         >
-          <span>Cal.com 15min</span>
+          {/* W-copy: "Cal.com 15min" → "Reservar 15min · Cal.com" — verbo first,
+              brand como sufixo informacional. */}
+          <span>Reservar 15min · Cal.com</span>
           <svg
             viewBox="0 0 24 24"
             fill="none"

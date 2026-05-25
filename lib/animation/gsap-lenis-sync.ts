@@ -37,7 +37,10 @@ export function initSmoothScroll(options: SmoothScrollOptions = {}): Lenis {
   const {
     duration = 1.2,
     smoothWheel = true,
-    syncTouch = true, // gotcha #3 iOS momentum scrolling fix
+    // W-mob (2026-05-24): syncTouch removido do default. Lenis em touch
+    // gera lag + conflito com momentum nativo iOS 17+. LenisProvider já
+    // bail-eia em touch devices via useIsTouch — esse caller é desktop-only.
+    syncTouch = false,
   } = options;
 
   lenisInstance = new Lenis({

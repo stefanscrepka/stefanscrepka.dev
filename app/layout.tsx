@@ -4,7 +4,7 @@ import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
-import { AboutThisSiteModal } from '@/components/contact/about-this-site-modal';
+import { AboutThisSiteGate } from '@/components/contact/about-this-site-gate.client';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { MotionProvider } from '@/components/providers/motion-provider';
 import { Footer } from '@/components/sections/footer';
@@ -67,19 +67,31 @@ export const metadata: Metadata = {
   },
   twitter: { card: 'summary_large_image' },
   robots: { index: true, follow: true },
-  alternates: { canonical: baseUrl },
+  // W-seo #7: hreflang PT-BR + x-default. Single-locale mas explicit signal pra
+  // crawlers (Google prefere `alternates.languages` mesmo em monolíngue).
+  alternates: {
+    canonical: baseUrl,
+    languages: {
+      'pt-BR': baseUrl,
+      'x-default': baseUrl,
+    },
+  },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
   themeColor: '#080A07',
   colorScheme: 'dark',
 };
 
+// W-seo #3: @id permite ligação cross-schema (case study CreativeWork.creator
+// aponta pra esse Person via URI canônico).
 const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
+  '@id': `${baseUrl}/#person`,
   name: 'Stefan Heinz Screpka',
   jobTitle: 'AI Product Engineer',
   url: baseUrl,
@@ -140,6 +152,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       suppressHydrationWarning
     >
       <head>
+        {/* W-perf #12: preload AVIF poster (LCP candidate em mobile). type=image/avif
+            ajuda browser a casar com o uso real do video poster. */}
+        <link
+          rel="preload"
+          as="image"
+          type="image/avif"
+          href="/bg/hero-poster.avif"
+          fetchPriority="high"
+        />
         {/* Pre-hydration FOUC gate — seta atributo ANTES de paint inicial.
             Script roda síncrono em <head>, antes do body renderizar. CSS rule
             em globals.css `html[data-pre-hydration] .anim-pre-hidden { opacity: 0 }`
@@ -189,7 +210,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </CalModalProvider>
           </LenisProvider>
         </MotionProvider>
-        <AboutThisSiteModal />
+        <AboutThisSiteGate />
         <GrainOverlay />
         <Analytics />
         <SpeedInsights />

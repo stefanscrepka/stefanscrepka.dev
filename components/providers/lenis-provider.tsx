@@ -2,9 +2,9 @@
 
 import type Lenis from 'lenis';
 import { useEffect, useState } from 'react';
+import { useIsTouch } from '@/hooks/use-is-touch';
 import { LenisContext } from '@/hooks/use-lenis';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
-import { destroySmoothScroll, initSmoothScroll } from '@/lib/animation/gsap-lenis-sync';
 
 interface LenisProviderProps {
   children: React.ReactNode;
@@ -13,23 +13,37 @@ interface LenisProviderProps {
 export function LenisProvider({ children }: LenisProviderProps) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
   const reduced = useReducedMotionSafe();
+  const isTouch = useIsTouch();
 
   useEffect(() => {
-    // Não inicia Lenis se prefers-reduced-motion ou ainda não mounted (null)
-    if (reduced !== false) return;
+    // W-perf #2: GSAP + Lenis (40 KB gz) carregados via dynamic import APÓS
+    // o bail-out de reduced/touch. Antes static import vazava o bundle pra
+    // toda rota — mobile/touch (que NUNCA inicializa Lenis) pagava o custo.
+    if (reduced !== false || isTouch !== false) return;
 
-    const instance = initSmoothScroll({
-      duration: 1.2,
-      smoothWheel: true,
-      syncTouch: true,
-    });
-    setLenis(instance);
+    let cancelled = false;
+    let cleanup: (() => void) | undefined;
+
+    (async () => {
+      const { initSmoothScroll, destroySmoothScroll } = await import(
+        '@/lib/animation/gsap-lenis-sync'
+      );
+      if (cancelled) return;
+
+      const instance = initSmoothScroll({ duration: 1.2, smoothWheel: true });
+      setLenis(instance);
+
+      cleanup = () => {
+        destroySmoothScroll();
+        setLenis(null);
+      };
+    })();
 
     return () => {
-      destroySmoothScroll();
-      setLenis(null);
+      cancelled = true;
+      cleanup?.();
     };
-  }, [reduced]);
+  }, [reduced, isTouch]);
 
   // Pause Lenis quando Radix Dialog abre (seta body[data-scroll-locked]).
   // Sem isso, scroll vaza atrás do modal em mobile (syncTouch:true especialmente).

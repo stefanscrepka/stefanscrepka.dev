@@ -1,13 +1,22 @@
 'use client';
 
-import { AnimatePresence, m } from 'motion/react';
+import { AnimatePresence, domMax, LazyMotion, m } from 'motion/react';
 import dynamic from 'next/dynamic';
 import { type KeyboardEvent, useCallback, useRef, useState } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
-import { FibonacciViz } from './fibonacci-viz';
-import { ParensViz } from './parens-viz';
+
+// W-perf #11: FibonacciViz (recharts ~150 KB) + ParensViz (Motion layout)
+// agora dynamic — só carregam quando a tab é ativada. Hanoi3D já era dynamic.
+const FibonacciViz = dynamic(() => import('./fibonacci-viz').then((m) => m.FibonacciViz), {
+  ssr: false,
+  loading: () => <VizSkeleton label="Carregando Fibonacci…" />,
+});
+const ParensViz = dynamic(() => import('./parens-viz').then((m) => m.ParensViz), {
+  ssr: false,
+  loading: () => <VizSkeleton label="Carregando Parens…" />,
+});
 
 // Playground orchestrator: 3 tabs persistentes seguindo WAI-ARIA tabs pattern
 // com automatic activation (Arrow ←/→, Home/End movem foco + ativam tab).
@@ -54,75 +63,80 @@ export function PlaygroundPage() {
   );
 
   return (
-    <section className="container-max section-pad-y" data-slot="playground">
-      <header className="mb-10 flex flex-col gap-3 sm:mb-14">
-        <p className="eyebrow">PLAYGROUND</p>
-        <h1 className="text-3xl font-semibold sm:text-4xl lg:text-5xl !leading-[1.02] !tracking-[-0.025em]">
-          Algoritmos C que aprendi na faculdade — visualizados.
-        </h1>
-        <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
-          Hanoi recursivo, Fibonacci memoizado vs ingênuo, e balanceamento de parênteses com pilha.
-          Saíram do repo{' '}
-          <a
-            href="https://github.com/stefanscrepka/estrutura-de-dados"
-            target="_blank"
-            rel="noreferrer"
-            className="font-mono text-(--color-accent) underline-offset-4 hover:underline"
-          >
-            estrutura-de-dados
-          </a>{' '}
-          (Estrutura de Dados I, Unicesumar).
-        </p>
-      </header>
+    // W-perf #7: LazyMotion override local com features={domMax} — necessário
+    // pelo <m.div layout> do parens-viz (popLayout). Layout root usa domAnimation
+    // (-5 KB gz na home). Nested LazyMotion herda apenas pra subtree.
+    <LazyMotion features={domMax} strict>
+      <section className="container-max section-pad-y" data-slot="playground">
+        <header className="mb-10 flex flex-col gap-3 sm:mb-14">
+          <p className="eyebrow">PLAYGROUND</p>
+          <h1 className="text-3xl font-semibold sm:text-4xl lg:text-5xl !leading-[1.02] !tracking-[-0.025em]">
+            Algoritmos C que aprendi na faculdade — visualizados.
+          </h1>
+          <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
+            Hanoi recursivo, Fibonacci memoizado vs ingênuo, e balanceamento de parênteses com
+            pilha. Saíram do repo{' '}
+            <a
+              href="https://github.com/stefanscrepka/estrutura-de-dados"
+              target="_blank"
+              rel="noreferrer"
+              className="font-mono text-(--color-accent) underline-offset-4 hover:underline"
+            >
+              estrutura-de-dados
+            </a>{' '}
+            (Estrutura de Dados I, Unicesumar).
+          </p>
+        </header>
 
-      <div
-        role="tablist"
-        aria-label="Visualizações de algoritmos"
-        onKeyDown={handleKeyDown}
-        className="mb-8 flex flex-wrap gap-2 border-b border-(--color-hairline)"
-      >
-        {TABS.map((tab, idx) => (
-          <TabButton
-            key={tab.id}
-            ref={(el) => {
-              tabRefs.current[idx] = el;
-            }}
-            tab={tab}
-            active={activeTab === tab.id}
-            onSelect={() => setActiveTab(tab.id)}
-          />
-        ))}
-      </div>
+        <div
+          role="tablist"
+          aria-label="Visualizações de algoritmos"
+          onKeyDown={handleKeyDown}
+          className="mb-8 flex flex-wrap gap-2 border-b border-(--color-hairline)"
+        >
+          {TABS.map((tab, idx) => (
+            <TabButton
+              key={tab.id}
+              ref={(el) => {
+                tabRefs.current[idx] = el;
+              }}
+              tab={tab}
+              active={activeTab === tab.id}
+              onSelect={() => setActiveTab(tab.id)}
+            />
+          ))}
+        </div>
 
-      {/* Todos os painéis ficam montados (hidden quando inativos) pra screen readers
+        {/* Todos os painéis ficam montados (hidden quando inativos) pra screen readers
           terem âncoras estáveis pros aria-controls dos tabs. Hanoi r3f só monta quando
           ativo (lazy chunk evita custar 245KB se usuário nunca clicar nele). */}
-      <div className="rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-4 sm:p-6">
-        <AnimatePresence mode="wait">
-          <m.div
-            key={activeTab}
-            initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduced ? { opacity: 1 } : { opacity: 0, y: -8 }}
-            transition={{ duration: reduced ? 0 : 0.2, ease: EASES.standard }}
-          >
-            {TABS.map((tab) => (
-              <div
-                key={tab.id}
-                role="tabpanel"
-                id={`panel-${tab.id}`}
-                aria-labelledby={`tab-${tab.id}`}
-                hidden={activeTab !== tab.id}
-              >
-                {tab.id === 'hanoi' && activeTab === 'hanoi' ? <Hanoi3DLazy /> : null}
-                {tab.id === 'fibonacci' && activeTab === 'fibonacci' ? <FibonacciViz /> : null}
-                {tab.id === 'parens' && activeTab === 'parens' ? <ParensViz /> : null}
-              </div>
-            ))}
-          </m.div>
-        </AnimatePresence>
-      </div>
-    </section>
+        <div className="rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-4 sm:p-6">
+          <AnimatePresence mode="wait">
+            <m.div
+              key={activeTab}
+              initial={reduced ? { opacity: 1 } : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? { opacity: 1 } : { opacity: 0, y: -8 }}
+              transition={{ duration: reduced ? 0 : 0.2, ease: EASES.standard }}
+            >
+              {TABS.map((tab) => (
+                <div
+                  key={tab.id}
+                  role="tabpanel"
+                  id={`panel-${tab.id}`}
+                  aria-labelledby={`tab-${tab.id}`}
+                  hidden={activeTab !== tab.id}
+                >
+                  {tab.id === 'hanoi' && activeTab === 'hanoi' ? <Hanoi3DLazy /> : null}
+                  {tab.id === 'fibonacci' && activeTab === 'fibonacci' ? <FibonacciViz /> : null}
+                  {tab.id === 'parens' && activeTab === 'parens' ? <ParensViz /> : null}
+                </div>
+              ))}
+            </m.div>
+          </AnimatePresence>
+        </div>
+      </section>
+    </LazyMotion>
   );
 }
 
@@ -161,13 +175,17 @@ function TabButton({ ref, tab, active, onSelect }: TabButtonProps) {
 }
 
 function HanoiSkeleton() {
+  return <VizSkeleton label="Carregando Three.js…" />;
+}
+
+function VizSkeleton({ label }: { label: string }) {
   return (
     <div
       className="grid h-[28rem] place-items-center text-(--color-text-3)"
       aria-busy="true"
       aria-live="polite"
     >
-      <p className="font-mono text-xs uppercase tracking-widest">Carregando Three.js…</p>
+      <p className="font-mono text-xs uppercase tracking-widest">{label}</p>
     </div>
   );
 }

@@ -7,7 +7,7 @@ export function Input({ className, type, ...props }: ComponentProps<'input'>) {
       type={type ?? 'text'}
       data-slot="input"
       className={cn(
-        'flex h-10 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-sm',
+        'flex h-10 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base sm:text-sm',
         // W3.x (2026-05-23): placeholder usava text-3 que numa surface glass
         // (oklch 16.5% efetivo) caía pra ~3.8:1, abaixo de WCAG AA. Subindo
         // pra text-2 (oklch 75% L) — ~6:1, passa folgado.

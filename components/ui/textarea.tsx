@@ -6,7 +6,7 @@ export function Textarea({ className, ...props }: ComponentProps<'textarea'>) {
     <textarea
       data-slot="textarea"
       className={cn(
-        'flex min-h-24 w-full rounded-md border bg-transparent px-3 py-2 text-sm field-sizing-content',
+        'flex min-h-24 w-full rounded-md border bg-transparent px-3 py-2 text-base sm:text-sm field-sizing-content',
         // W3.x: placeholder text-3 → text-2 (mesma razão do Input).
         'border-(--color-hairline-strong) text-(--color-text-1) placeholder:text-(--color-text-2)',
         'shadow-(--shadow-inner-highlight)',

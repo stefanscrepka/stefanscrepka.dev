@@ -103,16 +103,21 @@ export async function HeroSection() {
       />
 
       {/* Main column — single-column editorial. max-w-5xl evita esticar
-          full container-max em telas xl+ (mantem ritmo de leitura). */}
+          full container-max em telas xl+ (mantem ritmo de leitura).
+          W-mob2 #4: pt-28 → pt-20 mobile (top-bar 56px + 24px breath); pb-12 → pb-8 mobile.
+          Economiza ~80px de scroll inicial sem comprometer hero respiração desktop. */}
       <div
         className={[
           'container-max relative z-10 flex flex-col',
-          'pt-28 pb-12 sm:pt-32 sm:pb-16',
+          'pt-20 pb-8 sm:pt-32 sm:pb-16',
           'lg:pb-20 lg:pt-32',
         ].join(' ')}
       >
         <div className="flex max-w-5xl flex-col gap-6 lg:gap-7">
-          <SplitTextHeadline className="text-4xl sm:text-5xl !leading-[0.92] !tracking-[-0.035em] font-semibold text-balance">
+          {/* W-mob2 #1: leading-[0.92] mobile (text-4xl=60px → ~55px line-height) faz
+              descendentes de "g/p/q/y" de "multi-agente" italic colidirem com linha
+              abaixo. Em mobile usar 0.98; sm:↑ retoma 0.92 cinematográfico. */}
+          <SplitTextHeadline className="text-4xl sm:text-5xl !leading-[0.98] sm:!leading-[0.92] !tracking-[-0.035em] font-semibold text-balance">
             Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto
             inteiro ao redor dela.
           </SplitTextHeadline>

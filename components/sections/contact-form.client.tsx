@@ -32,10 +32,12 @@ import {
 // States: idle / submitting / success / error / validation.
 // aria-live polite + spring overshoot na success card pra fechar o loop emocional.
 
+// W-mob2 #7: "Cal.com 15min" era longest pill em 343px — pode wrappear num row
+// só de 3 pills. "Cal.com" mantém clareza (15min vive no contexto da section).
 const PREFERE_LABELS: Record<PrefereCanal, string> = {
   whatsapp: 'WhatsApp',
   email: 'Email',
-  calcom: 'Cal.com 15min',
+  calcom: 'Cal.com',
 };
 
 const initialState: ContactState = { status: 'idle' };
@@ -394,7 +396,7 @@ export function ContactForm() {
               state.status === 'error' ? 'text-(--color-danger)' : 'text-(--color-text-3)'
             )}
           >
-            {state.status === 'error' ? state.message : 'Resposta em <12h em dias úteis.'}
+            {state.status === 'error' ? state.message : 'Respondo em até 12h · dias úteis.'}
           </p>
           {/* W1.6 (2026-05-23): consentimento LGPD — link pra política. */}
           <p className="font-mono text-2xs tracking-wide text-(--color-text-3)">

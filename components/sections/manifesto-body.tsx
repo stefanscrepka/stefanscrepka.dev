@@ -1,3 +1,4 @@
+import { EditorialAccent } from '@/components/hero/editorial-accent';
 import { cn } from '@/lib/utils';
 
 // Conteudo do manifesto extraido em componente reutilizavel.
@@ -18,6 +19,18 @@ export const MANIFESTO_BODY_PARAGRAPHS = [
 
 export const MANIFESTO_SIGNATURE =
   'Construo IA multi-agente em produção — e o produto inteiro ao redor dela.';
+
+// W-design #3: leitmotif tipográfico — PP Editorial italic em "multi-agente"
+// no manifesto signature (eco do hero). 3 batidas pelo site: Hero, Manifesto,
+// Contact (+ "landing genérica" no Contact h2). Cria assinatura tipográfica.
+function ManifestoSignatureRich() {
+  return (
+    <>
+      Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto inteiro
+      ao redor dela.
+    </>
+  );
+}
 
 interface ManifestoBodyProps {
   enableWordStagger?: boolean;
@@ -40,8 +53,14 @@ export function ManifestoBody({
 
   return (
     <div className="flex flex-col gap-12 sm:gap-14">
-      {/* ATO 1 — Pull-quote */}
-      <blockquote className="border-l-2 border-(--color-accent) py-2 pl-6 sm:pl-8">
+      {/* ATO 1 — Pull-quote.
+          W-a11y crítico #3: blockquote agora tem cite="" pointing to anchor +
+          <footer><cite> com autor (Stefan Heinz Screpka). Sem isso, screen
+          readers anunciam "quote" sem source. */}
+      <blockquote
+        cite="https://stefanscrepka.dev/#manifesto"
+        className="border-l-2 border-(--color-accent) py-2 pl-6 sm:pl-8"
+      >
         <p
           className={cn(
             'font-semibold leading-[1.05] tracking-[-0.025em]',
@@ -51,6 +70,9 @@ export function ManifestoBody({
         >
           “{MANIFESTO_PULL_QUOTE}”
         </p>
+        <footer className="sr-only">
+          <cite>Stefan Heinz Screpka — Manifesto</cite>
+        </footer>
       </blockquote>
 
       {/* ATO 2 — Hairlines */}
@@ -103,7 +125,7 @@ export function ManifestoBody({
             'text-(--color-accent)'
           )}
         >
-          {MANIFESTO_SIGNATURE}
+          <ManifestoSignatureRich />
         </p>
       )}
 
@@ -126,7 +148,7 @@ export function ManifestoFinal({ className }: { className?: string }) {
           'text-(--color-accent)'
         )}
       >
-        {MANIFESTO_SIGNATURE}
+        <ManifestoSignatureRich />
       </p>
       <ManifestoMonoRow />
     </div>

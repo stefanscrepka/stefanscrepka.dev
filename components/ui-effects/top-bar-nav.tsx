@@ -48,6 +48,7 @@ export function TopBarNav({ items, className }: TopBarNavProps) {
         'fixed inset-x-0 top-0 z-50 w-full',
         'border-b border-(--color-hairline-strong) bg-(--color-base)/85 backdrop-blur-md',
         'h-14 md:h-16',
+        'pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]',
         className
       )}
     >

@@ -44,15 +44,16 @@ interface BentoSkillsGridProps {
 }
 
 // Pattern B — Scale entry (Bento Skills).
-// Cells entram de scale 0.96 -> 1 + opacity 0 -> 1. Stagger 50ms (snap Disney).
-// Easing snappy (back.out spring overshoot leve) da VIDA pras cells (vs flat fade).
-// Casa com Lando explosion feel.
+// W-motion #3: era EASES.snappy (overshoot back-out). Em grid de 6 cells com
+// stagger 50ms, micro-overshoots somavam-se em jiggle coletivo. Apple HIG /
+// Material recomendam easeOut PURO para grid reveals. EASES.outQuint dá curva
+// dramática sem rebound — mais cinematic, sem ruído visual.
 const itemVariants = {
   hidden: { opacity: 0, scale: 0.96 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: EASES.snappy },
+    transition: { duration: 0.5, ease: EASES.outQuint },
   },
 };
 
@@ -102,8 +103,12 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
       onFocus={() => setHover(true)}
       onBlur={() => setHover(false)}
       className={cn(
-        'group/cell relative isolate flex h-full flex-col gap-4 overflow-hidden p-6 sm:p-7',
-        'rounded-2xl border border-(--color-hairline) glass-panel',
+        'group/cell relative isolate flex h-full flex-col gap-4 overflow-hidden p-4 sm:p-7',
+        // W-design #1: trocado `glass-panel` (alpha 0.55 + backdrop-blur) por
+        // surface-elevated opaco. Remove 5º layer ambíguo do stacking dark→
+        // base→surface→elevated→glass. Mais cinematic, sem custo de
+        // backdrop-filter compositing.
+        'rounded-2xl border border-(--color-hairline) bg-(--color-surface-elevated)',
         // Inset bisel at rest (Vercel/Linear edge lift). Stack with glow on hover.
         'shadow-(--shadow-inset-bisel)',
         'transition-[border-color,transform,box-shadow]',
@@ -144,7 +149,7 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         <div className="relative flex flex-1 flex-col items-center justify-center gap-3 py-4">
           <span
             className="mono-stats font-bold tabular-nums leading-none text-(--color-accent)"
-            style={{ fontSize: 'clamp(5rem, 12vw, 9rem)', letterSpacing: '-0.04em' }}
+            style={{ fontSize: 'clamp(4.5rem, 18vw, 9rem)', letterSpacing: '-0.04em' }}
           >
             {cell.count}
           </span>

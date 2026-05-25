@@ -45,9 +45,15 @@ export function PartnerMarquee({ className }: PartnerMarqueeProps) {
   useGSAP(
     () => {
       if (!trackRef.current || reduced === null || reduced) return;
+      // W-motion #1: duration agora lê token --motion-marquee (40s) em vez de
+      // hardcoded 50s. Sincroniza com outros marquees do site (consistência).
+      // Fallback 40 se var não definida.
+      const root = getComputedStyle(document.documentElement);
+      const raw = root.getPropertyValue('--motion-marquee').trim();
+      const seconds = raw.endsWith('s') ? Number.parseFloat(raw) : 40;
       animationRef.current = gsap.to(trackRef.current, {
         x: '-50%',
-        duration: 50,
+        duration: Number.isFinite(seconds) && seconds > 0 ? seconds : 40,
         ease: 'none',
         repeat: -1,
       });

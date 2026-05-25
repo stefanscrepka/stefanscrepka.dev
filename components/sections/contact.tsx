@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import { ContactMonogramBackdrop } from '@/components/contact/contact-monogram-backdrop';
 import { DirectLinksRow } from '@/components/contact/direct-links-row';
+import { EditorialAccent } from '@/components/hero/editorial-accent';
 import { cn } from '@/lib/utils';
-import { ContactForm } from './contact-form.client';
+import { ContactFormLazyMount } from './contact-form-lazy.client';
 
 // Section 12 — Contact cinematic close.
 //
@@ -42,7 +43,9 @@ export function ContactSection() {
                 'relative overflow-hidden rounded-2xl',
                 'border border-(--color-hairline-strong)',
                 'shadow-(--shadow-cinema)',
-                'h-44 w-32 sm:h-56 sm:w-40 lg:h-64 lg:w-48'
+                // W-mob2 #5: w-28 (era w-32) em mobile — column single + headline editorial
+                // não compete por largura. Mantém 3:4 portrait ratio.
+                'h-40 w-28 sm:h-56 sm:w-40 lg:h-64 lg:w-48'
               )}
               style={{
                 transform: 'rotate(-2deg)',
@@ -88,7 +91,7 @@ export function ContactSection() {
               <span aria-hidden="true" className="mx-2.5 text-(--color-hairline-strong)">
                 —
               </span>
-              <span>vamos conversar</span>
+              <span>próximo passo</span>
             </p>
             <h2
               className={cn(
@@ -99,8 +102,11 @@ export function ContactSection() {
             >
               Tem algo complexo demais
               <br className="hidden sm:block" />
+              {/* W-design #3: 3ª batida do leitmotif PP Editorial italic.
+                  Hero "multi-agente", Manifesto "multi-agente", Contact "landing
+                  genérica" — assinatura tipográfica recorrente. */}
               <span className="text-(--color-text-2)"> pra virar </span>
-              <span className="text-(--color-accent)">landing genérica</span>?
+              <EditorialAccent>landing genérica</EditorialAccent>?
             </h2>
             <p className="max-w-prose text-reading text-(--color-text-2)">
               Form chega direto no meu email. Confirmação automática. Se prefere síncrono, WhatsApp
@@ -119,7 +125,7 @@ export function ContactSection() {
             'p-6 sm:p-10 lg:p-12'
           )}
         >
-          <ContactForm />
+          <ContactFormLazyMount />
         </div>
 
         {/* DIRECT LINKS row + Cal.com trigger (componente client) */}

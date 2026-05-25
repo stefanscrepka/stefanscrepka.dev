@@ -100,7 +100,11 @@ export function CalcomModal({ open, onOpenChange, calLink = DEFAULT_LINK }: Calc
             </a>
           </DialogDescription>
         </div>
-        <div className="flex-1 overflow-auto bg-(--color-base)">
+        {/* W-a11y médio #5: aria-live + aria-busy + sr-only label até Cal SDK
+            inicializar. Antes, screen readers viam div vazia durante carrega-
+            mento do iframe (~500-1500ms em 4G). */}
+        <div className="flex-1 overflow-auto bg-(--color-base)" aria-live="polite" aria-busy={open}>
+          <span className="sr-only">Carregando calendário Cal.com…</span>
           <div ref={containerRef} className="h-full w-full" data-cal-modal-container />
         </div>
       </DialogContent>

@@ -102,9 +102,18 @@ function MiniCard({
   secondaryLabel,
   children,
 }: MiniCardProps) {
+  // W-a11y médio #7: <article> deve ter heading associado via aria-labelledby
+  // — antes só tinha <h3>{label}</h3> inside sem id, screen readers anunciavam
+  // "article" sem name. Slug do label vira id ancorável.
+  const articleId = `mini-${label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')}`;
+
   return (
     <article
       data-other-card="mini"
+      aria-labelledby={articleId}
       className={[
         'group/mini relative isolate flex h-full flex-col gap-5 overflow-hidden rounded-2xl p-6 sm:p-7',
         'border border-(--color-hairline) bg-(--color-surface)',
@@ -132,7 +141,10 @@ function MiniCard({
       {/* Copy block */}
       <div className="relative z-10 flex flex-1 flex-col gap-3">
         <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">{tech}</p>
-        <h3 className="text-lg font-semibold !tracking-tight !leading-[1.15] text-(--color-text-1)">
+        <h3
+          id={articleId}
+          className="text-lg font-semibold !tracking-tight !leading-[1.15] text-(--color-text-1)"
+        >
           {label}
         </h3>
         <p className="text-sm leading-relaxed text-(--color-text-2)">{line}</p>

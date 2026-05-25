@@ -110,11 +110,14 @@
   --text-4xl--line-height: 1.0;
   --text-4xl--letter-spacing: -0.025em;
 
-  --text-5xl: clamp(5rem, 3.1818rem + 9.0909vw, 6.75rem);
+  /* W-design #5: scale 1.5 ratio nos extremos (era ~1.333 perfect fourth).
+     Gap dramático top do scale sem refazer base toda. Caps subidos +11%
+     (6.75→7.5rem, 9→10rem) — drama cinematográfico editorial-tier. */
+  --text-5xl: clamp(5rem, 3.5rem + 7vw, 7.5rem);
   --text-5xl--line-height: 0.95;
   --text-5xl--letter-spacing: -0.025em;
 
-  --text-6xl: clamp(6.75rem, 3.8864rem + 14.0909vw, 9rem);
+  --text-6xl: clamp(7rem, 4rem + 15vw, 10rem);
   --text-6xl--line-height: 0.92;
   --text-6xl--letter-spacing: -0.03em;
 
@@ -216,6 +219,20 @@
    Keyframes (top-level — referenced by --animate-* tokens above)
    ============================================================ */
 
+/* W-motion #10: hairline lime do footer (gradient mesh em divisor) "respira"
+   sutilmente — opacity oscila 0.4 → 0.6 em 4s ease-in-out infinite. Awwwards
+   2025 trend: hairlines pulsam slow em closings cinematic. Reduced-motion
+   pausa via prefers-reduced-motion bloco abaixo. */
+@keyframes hairline-breathe {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
 @keyframes grain-drift {
   0% {
     transform: translate(0, 0);
@@ -288,14 +305,21 @@
   font-feature-settings: 'tnum' 1, 'lnum' 1, 'ss01' 1, 'calt' 1, 'zero' 1;
 }
 
+/* W-mob2 #6: tracking-widest (0.16em) em 11px mono em 375px viewport ≈ 1.76px
+   por glyph = apertado e ruidoso. Mobile usa wider (0.08em) — sm:↑ retoma
+   widest pra ritmo editorial desktop. */
 @utility eyebrow {
   font-family: var(--font-mono);
   text-transform: uppercase;
-  letter-spacing: var(--tracking-widest);
+  letter-spacing: var(--tracking-wider);
   font-size: 0.6875rem;
   font-weight: 500;
   color: var(--color-text-3);
   font-feature-settings: 'tnum' 1, 'calt' 1;
+
+  @media (min-width: 640px) {
+    letter-spacing: var(--tracking-widest);
+  }
 }
 
 /* Reading-pace body — Apple's 17px sweet spot pra body text em superficies
@@ -344,12 +368,16 @@
   padding-inline: 1rem;
 }
 
+/* W-mob2 #5: mín baixado de 4rem→2.5rem (40px). Em 375px viewport, antes 64px
+   × 2 = 128px por section × 12 = 1536px de padding puro. Agora 80px total =
+   economiza ~480px de scroll vertical em mobile sem comprometer rhythm desktop
+   (cap 8rem inalterado). */
 @utility section-pad-y {
-  padding-block: clamp(4rem, 6vw, 8rem);
+  padding-block: clamp(2.5rem, 5vw, 8rem);
 }
 
 @utility section-pad-y-lg {
-  padding-block: clamp(6rem, 10vw, 12rem);
+  padding-block: clamp(4rem, 8vw, 12rem);
 }
 
 @utility glass-panel {
@@ -448,6 +476,18 @@
 /* ============================================================
    Base layer
    ============================================================ */
+
+/* W-design #4: line-height override mobile pra text-5xl/6xl. Em <640px
+   o leading 0.95/0.92 + clamp() causa descender collision (q/g/y de Geist
+   semibold). Subir pra 1.0 mobile preserva drama e elimina overlap. */
+@media (max-width: 639px) {
+  .text-5xl {
+    line-height: 1;
+  }
+  .text-6xl {
+    line-height: 1;
+  }
+}
 
 @layer base {
   html {

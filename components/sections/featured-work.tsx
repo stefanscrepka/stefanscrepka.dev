@@ -52,12 +52,14 @@ export function FeaturedWorkSection() {
       </header>
 
       <FeaturedWorkReveal>
-        <div className="flex flex-col gap-12 sm:gap-16 lg:gap-20">
+        {/* W-mob2 #2: mobile gap-8 (era 12) reduz scroll fatigue entre 3 cards
+            de 600vh+. Desktop mantém 16/20 generoso. */}
+        <div className="flex flex-col gap-8 sm:gap-16 lg:gap-20">
           {/* Hero tile FULL-BLEED — Content Engine flagship */}
           <HeroTile caseStudy={contentEngine} sequenceIndex={1} totalCount={3} />
 
-          {/* Half-tiles ESPELHADOS — gap-10 generoso */}
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
+          {/* Half-tiles ESPELHADOS — gap-10 generoso (mobile gap-6) */}
+          <div className="grid gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-12">
             <HalfTile
               caseStudy={nexacore}
               sequenceIndex={2}
@@ -193,16 +195,20 @@ function HeroTile({
       data-reveal
       className={cn(
         TILE_SHELL,
-        'grid p-5 sm:p-7 lg:p-8',
+        // W-mob2 #4: padding mobile p-4 (era p-5) reduz interior crunch em 343px net width.
+        'grid p-4 sm:p-7 lg:p-8',
         'lg:grid-cols-[1.55fr_1fr] lg:gap-10 xl:gap-14'
       )}
     >
-      {/* Cover LEFT 62% — tilt cinema, respira mais */}
+      {/* Cover LEFT 62% — tilt cinema, respira mais.
+          W-perf #10: priority no HeroTile (primeiro cover above-the-fold) —
+          frequentemente LCP element em mobile com hero video gated. */}
       <div className="relative">
         <CaseStudyCover
           caseStudy={caseStudy}
           aspectRatio="16/10"
           tilt="cinema"
+          priority
           className="relative z-10"
         />
       </div>
@@ -310,9 +316,13 @@ function HalfTile({
         <ul className="mt-1 flex flex-col gap-2 text-sm leading-snug text-(--color-text-2)">
           {highlights.map((h) => (
             <li key={h} className="flex gap-2.5">
+              {/* W-design #2: bullets HalfTile usam text-3 (não lime) — lime
+                  acumula em ~14% do site, ferindo regra 60/30/10. Reservado
+                  pro HeroTile flagship (Content Engine) + impact banners +
+                  accents pontuais. */}
               <span
                 aria-hidden="true"
-                className="mt-[7px] block h-1 w-1 shrink-0 rounded-full bg-(--color-accent)"
+                className="mt-[7px] block h-1 w-1 shrink-0 rounded-full bg-(--color-text-3)"
               />
               <span>{h}</span>
             </li>
@@ -326,7 +336,7 @@ function HalfTile({
     <Link
       href={`/work/${caseStudy.slug}`}
       data-reveal
-      className={cn(TILE_SHELL, 'flex flex-col gap-6 p-5 sm:p-7')}
+      className={cn(TILE_SHELL, 'flex flex-col gap-6 p-4 sm:p-7')}
     >
       {textFirst ? (
         <>

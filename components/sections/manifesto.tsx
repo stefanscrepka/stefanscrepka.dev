@@ -177,9 +177,11 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       className={cn(
         'relative isolate bg-(--color-base)',
         // Altura define scroll length total. W2.3 (2026-05-23): reduzido de
-        // 200vh → 180vh — pin range de 100vh → 80vh. Reveal mantém impacto
-        // sem o "stuck feeling" do scroll travado por viewport inteiro.
-        'h-[180vh]',
+        // 200vh → 180vh — pin range de 100vh → 80vh. W-mob (2026-05-24):
+        // mobile 130vh (pin range 30vh ≈ 2 swipes) preserva reveal cinemático
+        // sem prender scroll em viewport pequeno. Stick range proporcional via
+        // section.offsetHeight - innerHeight (GSAP scrub adapta automático).
+        'h-[130vh] md:h-[180vh]',
         className
       )}
       data-slot="manifesto"
@@ -213,7 +215,7 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
             role="presentation"
             aria-hidden="true"
             className="whitespace-nowrap font-bold uppercase leading-none tracking-[0.02em] text-(--color-text-3) will-change-transform"
-            style={{ fontSize: 'clamp(120px, 18vw, 280px)', opacity: 0 }}
+            style={{ fontSize: 'clamp(110px, 24vw, 280px)', opacity: 0 }}
           >
             STEFAN HEINZ SCREPKA
           </div>

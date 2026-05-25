@@ -107,9 +107,18 @@ export function FlipCard({
         className
       )}
     >
+      {/* W-motion #8: anticipation + squash-stretch sutil. Antes flip era
+          rotação pura 550ms outQuint. AGORA mid-rotation o card "afina"
+          (scale 0.98) — Disney Squash & Stretch dá peso de papel, ducto
+          curve easeInOut quartic. Duration 700ms (vs 550ms) compensa o
+          mid-frame visual extra. */}
       <m.div
-        animate={rotateAxis}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        animate={{ ...rotateAxis, scale: flipped ? [1, 0.98, 1] : [1, 0.98, 1] }}
+        transition={{
+          duration: 0.7,
+          ease: [0.65, 0, 0.35, 1],
+          scale: { duration: 0.7, times: [0, 0.5, 1] },
+        }}
         className="relative h-full w-full"
         style={{ transformStyle: 'preserve-3d' }}
       >

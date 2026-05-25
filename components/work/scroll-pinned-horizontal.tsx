@@ -3,7 +3,7 @@
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { type ReactNode, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -31,8 +31,44 @@ export function ScrollPinnedHorizontal({
 }: ScrollPinnedHorizontalProps) {
   const triggerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const mobileTrackRef = useRef<HTMLDivElement>(null);
   const [activeDot, setActiveDot] = useState(0);
   const panelCount = panels.length;
+
+  // Mobile dots sync via IntersectionObserver no carrossel snap-x.
+  // root = trackEl (não viewport) pra detectar painel mais visível DENTRO do
+  // scroll horizontal. threshold 0.5 pega quando metade do painel cruzou o
+  // center do track.
+  useEffect(() => {
+    const track = mobileTrackRef.current;
+    if (!track || panelCount < 2) return;
+    const panelEls = track.querySelectorAll<HTMLElement>('[data-mob-panel]');
+    if (panelEls.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) {
+          const idx = Number(visible[0].target.getAttribute('data-mob-panel') ?? '0');
+          setActiveDot(idx);
+        }
+      },
+      { root: track, threshold: [0.5, 0.75, 1] }
+    );
+    panelEls.forEach((el) => {
+      observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [panelCount]);
+
+  const scrollToMobilePanel = (idx: number) => {
+    const track = mobileTrackRef.current;
+    if (!track) return;
+    const panel = track.querySelector<HTMLElement>(`[data-mob-panel="${idx}"]`);
+    panel?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+  };
 
   useGSAP(
     () => {
@@ -55,17 +91,19 @@ export function ScrollPinnedHorizontal({
 
           const distance = () => -(panelCount - 1) * window.innerWidth;
 
+          // W-motion #7: era ease:'none' + scrub:1 — navegação binária 1:1
+          // com scroll. AGORA scrub:1.2 absorve mais jitter de trackpad/wheel +
+          // ease power1.inOut suaviza inflection point central. D'Silva: scrub
+          // sempre se beneficia de easing leve, mesmo quando "linear-feel".
           const tween = gsap.to(track, {
             x: distance,
-            ease: 'none',
+            ease: 'power1.inOut',
             scrollTrigger: {
               trigger,
-              // Offset 80px pro FloatingDock/TopBarNav (top:4 z-50, ~80px altura
-              // total) não cobrir o conteúdo dos panels quando a section pina.
               start: 'top top+=80',
               end: () => `+=${(panelCount - 1) * window.innerHeight}`,
               pin: true,
-              scrub: 1,
+              scrub: 1.2,
               anticipatePin: 1,
               invalidateOnRefresh: true,
               onUpdate: (self) => {
@@ -150,14 +188,10 @@ export function ScrollPinnedHorizontal({
 
         {showDots ? (
           <div className="pointer-events-none absolute bottom-8 left-1/2 z-10 -translate-x-1/2">
-            <span
-              aria-hidden="true"
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={panelCount - 1}
-              aria-valuenow={activeDot}
-              className="flex items-center gap-2"
-            >
+            {/* W-a11y médio #4: removido role="progressbar" + aria-* (conflito
+                com aria-hidden no parent). Dots são decorativos no desktop
+                (scroll natural já é a progress indication real). */}
+            <span aria-hidden="true" className="flex items-center gap-2">
               {panels.map((_, idx) => (
                 <span
                   // biome-ignore lint/suspicious/noArrayIndexKey: panels prop is static
@@ -175,13 +209,72 @@ export function ScrollPinnedHorizontal({
         ) : null}
       </div>
 
-      {/* Mobile / reduced-motion: vertical stack natural */}
-      <div className="flex flex-col gap-12 px-4 py-12 md:hidden motion-reduce:flex motion-reduce:md:flex">
+      {/* W-mob (2026-05-24): Mobile motion → carrossel CSS scroll-snap-x
+          horizontal. Native momentum + snap, zero JS pra scroll. Dots sync
+          via IntersectionObserver. Preserve "horizontal showcase" feel sem
+          GSAP pin (que conflitava com Lenis em touch). */}
+      <div className="md:hidden motion-reduce:hidden">
+        <div
+          ref={mobileTrackRef}
+          className={cn(
+            'flex gap-4 overflow-x-auto px-4 py-12',
+            'snap-x snap-mandatory scroll-px-4',
+            'scrollbar-hide [-webkit-overflow-scrolling:touch]',
+            '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+          )}
+        >
+          {panels.map((panel, idx) => (
+            <section
+              // biome-ignore lint/suspicious/noArrayIndexKey: panels prop is static
+              key={`mob-${idx}`}
+              data-mob-panel={idx}
+              className="shrink-0 w-[88vw] max-w-[440px] snap-center"
+              aria-roledescription="slide"
+              aria-label={`Painel ${idx + 1} de ${panelCount}`}
+            >
+              {panel}
+            </section>
+          ))}
+        </div>
+
+        {showDots && panelCount > 1 ? (
+          <div className="flex items-center justify-center gap-3 pb-8">
+            {panels.map((_, idx) => (
+              <button
+                // biome-ignore lint/suspicious/noArrayIndexKey: panels prop is static
+                key={`mob-dot-${idx}`}
+                type="button"
+                onClick={() => scrollToMobilePanel(idx)}
+                aria-label={`Ir para painel ${idx + 1} de ${panelCount}`}
+                aria-current={activeDot === idx ? 'true' : undefined}
+                className={cn(
+                  'flex items-center justify-center',
+                  'min-h-11 min-w-11 outline-none',
+                  'focus-visible:rounded-full focus-visible:ring-2 focus-visible:ring-(--color-border-focus)'
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'block h-1.5 rounded-full transition-all duration-(--motion-fast)',
+                    activeDot === idx
+                      ? 'w-6 bg-(--color-accent) shadow-(--shadow-glow-lime-sm)'
+                      : 'w-1.5 bg-(--color-hairline-strong)'
+                  )}
+                />
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
+
+      {/* Reduced-motion (qualquer viewport): vertical stack natural — zero
+          motion, zero carrossel. */}
+      <div className="hidden motion-reduce:flex motion-reduce:flex-col motion-reduce:gap-12 motion-reduce:px-4 motion-reduce:py-12">
         {panels.map((panel, idx) => (
           <div
             // biome-ignore lint/suspicious/noArrayIndexKey: panels prop is static
             key={`stack-${idx}`}
-            className="snap-start"
           >
             {panel}
           </div>

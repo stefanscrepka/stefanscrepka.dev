@@ -1,7 +1,8 @@
 'use client';
 
 import { m, useScroll, useTransform } from 'motion/react';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useRef } from 'react';
+import { useIsTouch } from '@/hooks/use-is-touch';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
@@ -9,7 +10,9 @@ import { cn } from '@/lib/utils';
 // 200vh container; useScroll progress → 5 transforms (scaleX, scaleY, translateY,
 // rotateX lid, opacity title).
 // Reduced-motion: render lid open (rotateX=0) statically, screenshot full-size.
-// Mobile: narrower scale ranges (window.innerWidth check).
+// W-mob (2026-05-24): touch devices renderizam versão estática compacta com
+// aspect-ratio (sem container 200vh, sem motion). Preserva experiência desktop
+// 100%; mobile ganha layout natural sem fake-scroll vazio.
 
 interface MacBookScrollProps {
   title?: ReactNode;
@@ -20,28 +23,50 @@ interface MacBookScrollProps {
 
 export function MacBookScroll({ title, badge, screen, className }: MacBookScrollProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
   const reduced = useReducedMotionSafe();
-
-  useEffect(() => {
-    const update = () => setIsMobile(window.innerWidth < 768);
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, []);
+  const isTouch = useIsTouch();
 
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
   });
 
-  // Transforms — scale ranges narrower em mobile
-  const scaleX = useTransform(scrollYProgress, [0, 0.3], isMobile ? [0.7, 1.05] : [1.2, 1.5]);
-  const scaleY = useTransform(scrollYProgress, [0, 0.3], isMobile ? [0.6, 1.05] : [0.6, 1.5]);
+  // Desktop scale ranges — mobile path nem renderiza estes hooks (early return)
+  const scaleX = useTransform(scrollYProgress, [0, 0.3], [1.2, 1.5]);
+  const scaleY = useTransform(scrollYProgress, [0, 0.3], [0.6, 1.5]);
   const translateY = useTransform(scrollYProgress, [0, 1], [0, 500]);
-  // Lid abre de 180° → 0° (fechado → aberto)
   const rotateX = useTransform(scrollYProgress, [0, 0.5], [Math.PI, 0]);
   const titleOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+
+  // Mobile/touch: layout estático compacto. Aspect-ratio 16/10 mimica a tela do
+  // laptop; sem container 200vh, sem motion. Mantém moldura visual mas usuário
+  // rola normal pela página.
+  if (isTouch === true) {
+    return (
+      <div
+        className={cn('container-max relative w-full py-12', className)}
+        data-slot="macbook-scroll-static"
+      >
+        {title ? <div className="mb-6 text-center">{title}</div> : null}
+        <div
+          className={cn(
+            'relative mx-auto w-full max-w-[860px] rounded-xl border-2 border-(--color-hairline-strong)',
+            'bg-(--color-base) p-2 shadow-(--shadow-cinema)'
+          )}
+        >
+          <div
+            className={cn(
+              'relative aspect-[16/10] w-full overflow-hidden rounded-md',
+              'bg-(--color-surface-elevated)'
+            )}
+          >
+            {screen}
+          </div>
+        </div>
+        {badge ? <div className="mt-6 flex justify-center">{badge}</div> : null}
+      </div>
+    );
+  }
 
   return (
     <div

@@ -93,9 +93,14 @@ function CountUp({ target }: { target: number }) {
 
       const node = ref.current;
       const obj = { n: 0 };
+      // W-motion #9: duration constante 1.5s sentia diferente para targets
+      // diferentes (22 vs 100 = mesmo tempo, mas 100 conta ~4.5× mais rápido).
+      // D'Silva motion principle: perceived speed ≠ duration. Log scaling
+      // mantém velocidade perceptual aproximadamente constante.
+      const duration = 0.6 + Math.log10(Math.max(target, 1)) * 0.4;
       const tween = gsap.to(obj, {
         n: target,
-        duration: 1.5,
+        duration,
         ease: toCss(EASES.dramatic),
         scrollTrigger: {
           trigger: node,

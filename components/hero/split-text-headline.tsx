@@ -38,18 +38,23 @@ export function SplitTextHeadline({ children, className, onView = false }: Split
     const runAnimation = async () => {
       if (cancelled || !node) return;
 
+      // W-mob (2026-05-24): ScrollTrigger só importa quando onView=true. Hero
+      // headline usa onView=false (default), economiza ~40ms TBT no first-load.
       const [gsapMod, splitMod, scrollTriggerMod] = await Promise.all([
         import('gsap'),
         import('gsap/SplitText'),
-        import('gsap/ScrollTrigger'),
+        onView ? import('gsap/ScrollTrigger') : Promise.resolve(null),
       ]);
 
       if (cancelled || !node) return;
 
       const gsap = gsapMod.gsap ?? gsapMod.default;
       const { SplitText } = splitMod;
-      const { ScrollTrigger } = scrollTriggerMod;
-      gsap.registerPlugin(SplitText, ScrollTrigger);
+      if (scrollTriggerMod) {
+        gsap.registerPlugin(SplitText, scrollTriggerMod.ScrollTrigger);
+      } else {
+        gsap.registerPlugin(SplitText);
+      }
 
       const split = new SplitText(node, {
         type: 'words',

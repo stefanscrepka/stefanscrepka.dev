@@ -1,10 +1,13 @@
 import Link from 'next/link';
 
+// W-a11y crítico #1: era <main> aninhado dentro de <main id="main"> do root
+// layout — viola WCAG 1.3.1 + ARIA landmarks unique. Usar <section> aqui.
+// W-copy: "pipeline quebrado" → "rota não encontrada" (universal vs jargão).
 export default function NotFound() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 text-center">
+    <section className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 text-center">
       <h1 className="text-4xl font-semibold !tracking-[-0.025em] !leading-[1.05] md:text-5xl lg:text-6xl">
-        404 — pipeline quebrado
+        404 — rota não encontrada
       </h1>
       <p className="max-w-md font-mono text-sm text-(--color-text-2)">
         Essa rota não existe (ou existiu e foi refatorada). O resto do site continua rodando.
@@ -15,6 +18,6 @@ export default function NotFound() {
       >
         Voltar pra home →
       </Link>
-    </main>
+    </section>
   );
 }
