@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/privacidade' },
 };
 
-const LAST_UPDATED = '23 de maio de 2026';
+const LAST_UPDATED = '25 de maio de 2026';
 
 interface Section {
   id: string;
@@ -53,13 +53,23 @@ const SECTIONS: Section[] = [
     eyebrow: 'Com quem',
     title: 'Processadores que tocam seus dados',
     paragraphs: [
-      'Três serviços técnicos veem trechos do seu dado em algum momento. Nenhum vê a totalidade fora do necessário.',
+      'Quatro serviços técnicos veem trechos do seu dado em algum momento. Nenhum vê a totalidade fora do necessário.',
     ],
     bullets: [
       'Resend (envio de email): recebe nome, email, mensagem pra entregar o auto-reply e me notificar. Dados armazenados pelo Resend conforme política deles (criptografia em trânsito + repouso).',
-      'Vercel (hosting): processa a request HTTPS do form. Não persiste o conteúdo da mensagem.',
+      'Vercel (hosting + BotID): processa a request HTTPS do form e roda detecção de bot anti-spam. Não persiste o conteúdo da mensagem.',
       'Vercel Analytics + Speed Insights: métricas anônimas de navegação (sem PII, sem cookie de identificação). Sem GA, sem Meta Pixel.',
-      'Sentry (logs de erro): se algo quebra no server, captura stack trace técnico. Não logo conteúdo de mensagem.',
+      'Sentry (logs de erro + Session Replay anonimizado): captura stack trace técnico. Session Replay roda em 1% das sessões de produção com todos os textos visíveis MASCARADOS (placeholders pretos sobre rasters) e mídia bloqueada. Conteúdo digitado em formulários (nome, email, mensagem) NÃO é gravado.',
+    ],
+  },
+  {
+    id: 'base-legal',
+    eyebrow: 'Por que posso',
+    title: 'Base legal LGPD',
+    paragraphs: ['Art. 7º LGPD exige base legal pra cada tratamento. Aqui são duas:'],
+    bullets: [
+      'Execução de contato a pedido do titular (Art. 7º V) — você preencheu o form pedindo retorno, eu respondo. Sem isso não dá pra trabalhar junto.',
+      'Legítimo interesse (Art. 7º IX) — métricas anônimas Vercel Analytics + Sentry pra detectar bugs e melhorar UX. Sem perfilamento, sem cross-site tracking, sem venda. Você pode pedir exclusão a qualquer momento (Art. 18).',
     ],
   },
   {
@@ -69,7 +79,7 @@ const SECTIONS: Section[] = [
     paragraphs: [
       'Mensagens via form: 12 meses após o último contato. Depois disso, deleto da minha inbox e do Resend.',
       'Métricas anônimas (Vercel Analytics): 30 dias rolling window. Não há perfil persistente.',
-      'Logs Sentry: 90 dias. Quase nunca contém PII — só payload técnico.',
+      'Logs Sentry + Session Replays (1% sessões, textos mascarados): 90 dias. Quase nunca contém PII — só payload técnico e replay visual com placeholders.',
     ],
   },
   {
@@ -108,7 +118,7 @@ const SECTIONS: Section[] = [
 
 export default function PrivacidadePage() {
   return (
-    <main className="container-narrow section-pad-y-lg pt-32 sm:pt-40">
+    <div className="container-narrow section-pad-y-lg pt-32 sm:pt-40">
       {/* Header editorial */}
       <header className="mb-20 flex flex-col gap-4 sm:mb-24">
         <p className="eyebrow">PRIVACIDADE · LGPD</p>
@@ -204,6 +214,6 @@ export default function PrivacidadePage() {
           <span aria-hidden="true">→</span>
         </Link>
       </div>
-    </main>
+    </div>
   );
 }

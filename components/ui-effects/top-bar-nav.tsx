@@ -5,7 +5,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ReactNode, useEffect, useState } from 'react';
 import { SHMonogram } from '@/components/shared/sh-monogram';
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { useMounted } from '@/hooks/use-mounted';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { EASES } from '@/lib/animation/eases';
@@ -203,6 +210,10 @@ function NavMobileSheet({ items }: { items: TopBarNavItem[] }) {
           </button>
         </SheetTrigger>
         <SheetContent side="right" className="w-72 sm:w-80">
+          <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
+          <SheetDescription className="sr-only">
+            Links principais do site: Work, Process, Manifesto e Contato.
+          </SheetDescription>
           <div className="flex items-center gap-3">
             <span className="text-(--color-accent)">
               <SHMonogram size={28} decorative />

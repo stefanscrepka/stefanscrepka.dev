@@ -3,7 +3,12 @@
   "framework": "nextjs",
   "buildCommand": "pnpm build",
   "devCommand": "pnpm dev",
-  "installCommand": "pnpm install",
+  "installCommand": "pnpm install --frozen-lockfile",
   "outputDirectory": ".next",
-  "regions": ["gru1"]
+  "regions": ["gru1"],
+  "functions": {
+    "app/**": { "maxDuration": 10 }
+  },
+  "cleanUrls": true,
+  "trailingSlash": false
 }

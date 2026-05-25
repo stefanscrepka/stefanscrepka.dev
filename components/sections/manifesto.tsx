@@ -181,7 +181,9 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
         // mobile 130vh (pin range 30vh ≈ 2 swipes) preserva reveal cinemático
         // sem prender scroll em viewport pequeno. Stick range proporcional via
         // section.offsetHeight - innerHeight (GSAP scrub adapta automático).
-        'h-[130vh] md:h-[180vh]',
+        // W-mob (2026-05-25): dvh em vez de vh — iOS Safari URL bar dinâmica
+        // criava jank ~80px de buffer + signature SVG descentrada.
+        'h-[130dvh] md:h-[180dvh]',
         className
       )}
       data-slot="manifesto"
@@ -193,7 +195,7 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
 
       {/* Inner sticky — pin natural via CSS. Quando section.bottom passa
           viewport.bottom, sticky libera, inner sobe COM o outer junto. */}
-      <div className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden">
+      <div className="sticky top-0 flex h-dvh w-full items-center justify-center overflow-hidden">
         <ManifestoBackdrop />
 
         {/* Background nome "STEFAN HEINZ SCREPKA" gigante atras (z-5). */}

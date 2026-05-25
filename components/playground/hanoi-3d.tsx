@@ -1,7 +1,7 @@
 'use client';
 
 import { OrbitControls, Text } from '@react-three/drei';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
@@ -139,12 +139,19 @@ export function Hanoi3D() {
     [maxDiscs]
   );
 
+  // W-perf (2026-05-25): frameloop="demand" quando pausado evita RAF 60fps
+  // sem propósito (syncMeshPositions no-op repetido). Quando playing=true,
+  // volta pra 'always' pra animação rolar fluida. Reduced também = demand
+  // (snap aplicado em useEffect dispara invalidate via SceneContent).
+  const shouldAnimate = playing && reduced === false;
+
   return (
     <div className="flex flex-col gap-5">
       <div className="relative h-[24rem] w-full overflow-hidden rounded-xl border border-(--color-hairline) bg-(--color-base) sm:h-[28rem]">
         <Canvas
           dpr={[1, 1.75]}
           camera={{ position: [3.5, 4.2, 6.5], fov: 38 }}
+          frameloop={shouldAnimate ? 'always' : 'demand'}
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
           style={{ background: 'transparent' }}
         >
@@ -205,6 +212,11 @@ function SceneContent({
   // Refs pros meshes dos discos (id 1..n).
   const discMeshes = useRef<Array<THREE.Mesh | null>>([]);
 
+  // W-perf (2026-05-25): Canvas roda em frameloop="demand" quando pausado.
+  // Invalidate manual após mudanças de state externas (handleStep, N change,
+  // reset, reduced snap) pra triggerar 1 frame de repaint via useFrame.
+  const { invalidate } = useThree();
+
   // Snap todos os discos pras posições atuais (chamado quando reduced=true).
   useEffect(() => {
     if (!reduced) return;
@@ -215,7 +227,15 @@ function SceneContent({
     }
     moveIndexRef.current = moves.length;
     onMoveAdvance(moves.length);
-  }, [reduced, moves, discsRef, moveIndexRef, onMoveAdvance]);
+    invalidate();
+  }, [reduced, moves, discsRef, moveIndexRef, onMoveAdvance, invalidate]);
+
+  // Trigger repaint sempre que state externo muda (handleStep, N change,
+  // pause). Em frameloop="demand", o useFrame só roda após invalidate.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: playing/n são triggers explícitos — corpo não lê os valores mas mudança de identidade deve re-disparar o effect.
+  useEffect(() => {
+    invalidate();
+  }, [playing, n, invalidate]);
 
   useFrame((_, delta) => {
     if (!playing || reduced) {

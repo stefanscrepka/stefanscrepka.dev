@@ -13,7 +13,6 @@ Portfolio premium de Stefan Heinz Screpka — AI Product Engineer.
 - **Forms**: react-hook-form + Zod 4 + Server Actions
 - **Email**: Resend + React Email
 - **Observability**: Sentry · Vercel Analytics · Speed Insights
-- **PWA**: Serwist
 - **Tooling**: Biome 2.4 · ESLint mínimo (react-hooks) · Playwright E2E · Lighthouse CI
 - **Deploy**: Vercel · Fluid Compute · Node 22 LTS
 
@@ -69,10 +68,9 @@ tests/e2e/          Playwright specs
 | 4 | r3f Canvas hydration mismatch | Canvas via `dynamic({ ssr: false })` (Phase 3) |
 | 5 | Server Actions FormData vs RHF JSON | `lib/server-actions/form-data-bridge.ts` |
 | 6 | Biome sem `react-hooks/exhaustive-deps` | ESLint minimal em paralelo |
-| 7 | Serwist cache invalidation | Headers `/sw.js` no-cache em `next.config.ts` |
-| 8 | `noUncheckedIndexedAccess` array undefined | Convenção: destructuring / optional chaining |
-| 9 | `useReducedMotion` SSR mismatch | `useReducedMotionSafe()` wrap `useMounted` |
-| 10 | Vercel Fluid cold start + Resend | Server Action direct |
+| 7 | `noUncheckedIndexedAccess` array undefined | Convenção: destructuring / optional chaining |
+| 8 | `useReducedMotion` SSR mismatch | `useReducedMotionSafe()` wrap `useMounted` |
+| 9 | Vercel Fluid cold start + Resend | Server Action direct |
 
 ## Deploy
 

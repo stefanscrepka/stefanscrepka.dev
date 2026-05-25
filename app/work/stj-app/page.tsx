@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { CompareSlider } from '@/components/ui-effects/compare-slider';
 import { TracingBeam } from '@/components/ui-effects/tracing-beam';
 import { CaseImpactTriad } from '@/components/work/case-impact-triad';
@@ -33,10 +34,10 @@ const AUTH_FLOW = [
 ];
 
 export default function STJAppPage() {
-  if (!CS) return null;
+  if (!CS) notFound();
 
   return (
-    <main className="pb-32">
+    <div className="pb-32">
       <CaseStudyHero cs={CS} />
 
       {/* W3.2: Problema → Solução → Impacto antes do mergulho técnico. */}
@@ -133,6 +134,6 @@ export default function STJAppPage() {
           </ul>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

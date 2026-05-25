@@ -8,13 +8,17 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/',
     id: '/',
     scope: '/',
-    display: 'standalone',
+    // W-deploy (2026-05-25): display 'standalone' exige service worker
+    // funcional pro Chrome aceitar install prompt. Serwist nunca foi
+    // implementado. Trocado pra 'browser' (manifest indexável mas sem
+    // promessa quebrada). Re-promover quando SW for adotado.
+    display: 'browser',
     background_color: '#080A07',
     theme_color: '#080A07',
-    orientation: 'portrait',
+    orientation: 'any',
     lang: 'pt-BR',
     dir: 'ltr',
-    categories: ['portfolio', 'developer', 'productivity'],
+    categories: ['portfolio', 'developer', 'business'],
     icons: [
       {
         src: '/icons/icon.svg',

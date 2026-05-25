@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { CaseStudyCover } from '@/components/work/case-study-cover';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
 import { getCaseStudy } from '@/lib/work/data';
@@ -14,10 +15,10 @@ export const metadata: Metadata = {
 // pattern editorial premium pra clínica buyer não-técnica.
 
 export default function EsteticaMDPage() {
-  if (!CS) return null;
+  if (!CS) notFound();
 
   return (
-    <main data-clinic-scope className="pb-32">
+    <div data-clinic-scope className="pb-32">
       <CaseStudyHero cs={CS} />
 
       <div className="container-max grid gap-12 lg:grid-cols-[1.4fr_1fr]">
@@ -77,6 +78,6 @@ export default function EsteticaMDPage() {
           </p>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

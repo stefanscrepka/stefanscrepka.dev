@@ -161,6 +161,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           href="/bg/hero-poster.avif"
           fetchPriority="high"
         />
+        {/* W-perf (2026-05-25): preconnect Cal.com — modal first-open paga
+            200-500ms de TLS+DNS+TTFB. Antecipa esse custo enquanto user navega.
+            crossOrigin necessário pra o handshake TLS contar pro iframe. */}
+        <link rel="dns-prefetch" href="https://cal.com" />
+        <link rel="preconnect" href="https://cal.com" crossOrigin="" />
+        <link rel="preconnect" href="https://app.cal.com" crossOrigin="" />
         {/* Pre-hydration FOUC gate — seta atributo ANTES de paint inicial.
             Script roda síncrono em <head>, antes do body renderizar. CSS rule
             em globals.css `html[data-pre-hydration] .anim-pre-hidden { opacity: 0 }`
@@ -189,7 +195,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
                   'color:#D2FF00;font-family:monospace;font-size:12px;line-height:1.3;font-weight:bold',
                   'color:#A8A8A8;font-family:monospace;font-size:11px;line-height:1.5'
                 ];
-                console.log('%c    ____ _   _\\n   / ___| | | |\\n   \\\\___ \\\\| |_| |\\n    ___) |  _  |\\n   |____/|_| |_|\\n','%cprocurando dev?\\nwa.me/5542998592522 · stefanheinz2006@gmail.com\\nmulti-agent em producao · ✺ ponta grossa, br',st[0],st[1]);
+                console.log('%c    ____ _   _\\n   / ___| | | |\\n   \\\\___ \\\\| |_| |\\n    ___) |  _  |\\n   |____/|_| |_|\\n','%cprocurando dev?\\nWhatsApp (42) 99859-2522 · stefanheinz2006@gmail.com\\nmulti-agente em produção · ponta grossa, BR',st[0],st[1]);
               })();
             `,
           }}

@@ -504,6 +504,17 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* W-mob (2026-05-25): neutraliza retângulo azul/cinza default do iOS Safari
+     em todo tap. Sem isso, dark + lime cinematic quebra a cada toque mobile. */
+  a,
+  button,
+  [role='button'],
+  [type='button'],
+  [type='submit'],
+  [type='reset'] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   ::selection {
     background-color: var(--color-accent);
     color: var(--color-text-on-accent);

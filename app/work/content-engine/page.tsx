@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { CaseImpactTriad } from '@/components/work/case-impact-triad';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
 import { CONTENT_ENGINE_PANELS, ContentEnginePanel } from '@/components/work/content-engine-panels';
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 // Mobile: vertical stack natural (matchMedia kill pin). Reduced-motion: same.
 
 export default function ContentEnginePage() {
-  if (!CS) return null;
+  if (!CS) notFound();
 
   const panels = CONTENT_ENGINE_PANELS.map((panel, idx) => (
     <ContentEnginePanel
@@ -28,7 +29,7 @@ export default function ContentEnginePage() {
   ));
 
   return (
-    <main className="pb-32">
+    <div className="pb-32">
       <CaseStudyHero cs={CS} />
 
       {/* W3.2: Problema → Solução → Impacto antes do mergulho técnico. */}
@@ -68,6 +69,6 @@ export default function ContentEnginePage() {
           </ul>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

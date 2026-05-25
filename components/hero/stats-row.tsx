@@ -1,21 +1,19 @@
 'use client';
 
-import { useGSAP } from '@gsap/react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { EASES, toCss } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
-
-// Defensive registerPlugin (não depender de side-effect transitivo).
-gsap.registerPlugin(ScrollTrigger);
 
 // Layer 7 do 8-layer choreography: stats row tabular-nums count-up 0→target.
 // 1500ms ease-dramatic, trigger via IntersectionObserver (on view).
 // Honesty (HANDOFF §3): 22 agentes (não 25), 27 tabelas, 100+ vitest tests
 // (não 1203 — esse number agrega pytest etc).
 // Reduced-motion: snap target values direto.
+//
+// W-perf (2026-05-25): GSAP + ScrollTrigger carregados via dynamic import
+// dentro do useEffect. Static imports vazavam 70 KB uncompressed pro
+// first-load de toda rota (StatsRow vive dentro do Hero, que é eager).
 
 interface StatItem {
   value?: number;
@@ -81,15 +79,25 @@ function CountUp({ target }: { target: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotionSafe();
 
-  useGSAP(
-    () => {
-      if (!ref.current || reduced === null) return;
+  useEffect(() => {
+    if (!ref.current || reduced === null) return;
 
-      // Reduced-motion: snap target instantly via DOM mutation (sem React commit).
-      if (reduced) {
-        ref.current.textContent = String(target);
-        return;
-      }
+    // Reduced-motion: snap target instantly via DOM mutation (sem React commit).
+    if (reduced) {
+      ref.current.textContent = String(target);
+      return;
+    }
+
+    let cancelled = false;
+    let tween: { kill(): void } | null = null;
+
+    (async () => {
+      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
+        import('gsap'),
+        import('gsap/ScrollTrigger'),
+      ]);
+      if (cancelled || !ref.current) return;
+      gsap.registerPlugin(ScrollTrigger);
 
       const node = ref.current;
       const obj = { n: 0 };
@@ -98,7 +106,7 @@ function CountUp({ target }: { target: number }) {
       // D'Silva motion principle: perceived speed ≠ duration. Log scaling
       // mantém velocidade perceptual aproximadamente constante.
       const duration = 0.6 + Math.log10(Math.max(target, 1)) * 0.4;
-      const tween = gsap.to(obj, {
+      tween = gsap.to(obj, {
         n: target,
         duration,
         ease: toCss(EASES.dramatic),
@@ -115,13 +123,13 @@ function CountUp({ target }: { target: number }) {
           node.textContent = String(Math.round(obj.n));
         },
       });
+    })();
 
-      return () => {
-        tween.kill();
-      };
-    },
-    { dependencies: [target, reduced] }
-  );
+    return () => {
+      cancelled = true;
+      tween?.kill();
+    };
+  }, [target, reduced]);
 
   return (
     <span ref={ref} className="font-semibold text-(--color-text-1)">

@@ -1,8 +1,6 @@
 'use client';
 
-import { useGSAP } from '@gsap/react';
-import { gsap } from 'gsap';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { type TechId, TechLogo } from '@/components/shared/tech-logo';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
@@ -11,6 +9,16 @@ import { cn } from '@/lib/utils';
 // Pattern Lando Norris parceiros row + AnimeJS sponsor strip.
 // GSAP gsap.to translateX -50% loop seamless (mesma técnica de code-marquee-track).
 // Reduced-motion: estático sem loop.
+//
+// W-perf (2026-05-25): GSAP carregado via dynamic import dentro do useEffect
+// pra evitar leak no first-load (Hero é eager). Static `import { gsap } from
+// 'gsap'` vazava 70 KB uncompressed pra toda rota do site.
+
+interface MarqueeTween {
+  kill(): void;
+  pause(): void;
+  resume(): void;
+}
 
 const TECH_ITEMS: TechId[] = [
   'vercel',
@@ -39,31 +47,36 @@ interface PartnerMarqueeProps {
 
 export function PartnerMarquee({ className }: PartnerMarqueeProps) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<gsap.core.Tween | null>(null);
+  const animationRef = useRef<MarqueeTween | null>(null);
   const reduced = useReducedMotionSafe();
 
-  useGSAP(
-    () => {
-      if (!trackRef.current || reduced === null || reduced) return;
-      // W-motion #1: duration agora lê token --motion-marquee (40s) em vez de
+  useEffect(() => {
+    if (!trackRef.current || reduced === null || reduced) return;
+    let cancelled = false;
+    let tween: MarqueeTween | null = null;
+    (async () => {
+      const { gsap } = await import('gsap');
+      if (cancelled || !trackRef.current) return;
+      // W-motion #1: duration lê token --motion-marquee (40s) em vez de
       // hardcoded 50s. Sincroniza com outros marquees do site (consistência).
       // Fallback 40 se var não definida.
       const root = getComputedStyle(document.documentElement);
       const raw = root.getPropertyValue('--motion-marquee').trim();
       const seconds = raw.endsWith('s') ? Number.parseFloat(raw) : 40;
-      animationRef.current = gsap.to(trackRef.current, {
+      tween = gsap.to(trackRef.current, {
         x: '-50%',
         duration: Number.isFinite(seconds) && seconds > 0 ? seconds : 40,
         ease: 'none',
         repeat: -1,
       });
-      return () => {
-        animationRef.current?.kill();
-        animationRef.current = null;
-      };
-    },
-    { dependencies: [reduced], scope: trackRef }
-  );
+      animationRef.current = tween;
+    })();
+    return () => {
+      cancelled = true;
+      tween?.kill();
+      animationRef.current = null;
+    };
+  }, [reduced]);
 
   return (
     <div

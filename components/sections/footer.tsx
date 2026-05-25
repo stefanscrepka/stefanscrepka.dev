@@ -156,10 +156,7 @@ export function Footer() {
               style={{ letterSpacing: '-0.015em' }}
             >
               Se não funciona 24/7, não conta.{' '}
-              <span className="text-(--color-text-3)">— stefan</span>{' '}
-              <span aria-hidden="true" className="text-(--color-accent)">
-                ✺
-              </span>
+              <span className="text-(--color-text-3)">— stefan</span>
             </p>
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) shrink-0">
               ponta grossa · 2026

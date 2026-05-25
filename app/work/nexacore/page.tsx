@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { MacBookScroll } from '@/components/ui-effects/macbook-scroll';
 import { CaseImpactTriad } from '@/components/work/case-impact-triad';
 import { CaseStudyCover } from '@/components/work/case-study-cover';
@@ -16,10 +17,10 @@ export const metadata: Metadata = {
 // (placeholder até Stefan drop o PNG). Bullets stack abaixo.
 
 export default function NexaCorePage() {
-  if (!CS) return null;
+  if (!CS) notFound();
 
   return (
-    <main className="pb-32">
+    <div className="pb-32">
       <CaseStudyHero cs={CS} />
 
       {/* W3.2: Problema → Solução → Impacto antes do mergulho técnico. */}
@@ -65,6 +66,6 @@ export default function NexaCorePage() {
           </ul>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -213,7 +213,7 @@ export function AboutThisSiteModal() {
 function CreditSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h4 className="font-mono text-xs uppercase tracking-widest text-(--color-accent)">{title}</h4>
+      <h3 className="font-mono text-xs uppercase tracking-widest text-(--color-accent)">{title}</h3>
       {children}
     </section>
   );

@@ -173,10 +173,7 @@ export function ManifestoMonoRow({ className }: { className?: string }) {
         <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
           ·
         </span>
-        <span className="text-(--color-accent)">disponível</span>{' '}
-        <span aria-hidden="true" className="text-(--color-accent)">
-          ✺
-        </span>
+        <span className="text-(--color-accent)">disponível</span>
       </p>
     </div>
   );
