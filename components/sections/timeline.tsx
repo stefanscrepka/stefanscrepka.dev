@@ -1,9 +1,34 @@
-import type { InstitutionId } from '@/components/shared/institution-logo';
-import { type TimelineMarker, TimelineMarkers } from './timeline.client';
+import { type InstitutionId, InstitutionLogo } from '@/components/shared/institution-logo';
+import { cn } from '@/lib/utils';
+import { TimelineReveal } from './timeline.client';
 
 // Section 10 — Jornada / Timeline. TracingBeam vertical (Aceternity) + 4 markers
 // sequenciais. Cada marker ganha logos das instituições + year tabular-nums grande lime.
 // Heritage industrial mencionado SÓ aqui (HANDOFF veta no hero).
+//
+// F3.2 (2026-06-11) — dieta de hidratação: o conteúdo dos markers
+// (MarkerContent: year + NOW badge + place + title + body + instituições)
+// é Server Component e entra na ilha TimelineReveal como children — só o
+// reveal/beam/dot hidratam. Mesmo padrão do BentoSkills.
+//
+// Timeline editorial polish:
+//   - Espaçamento vertical entre markers: 5/7/8rem (W-audit 2026-06-10)
+//   - Year tabular-nums 80–96px peso bold lime (editorial)
+//   - Microdetail hairline 60px conector entre year e place — signature
+//   - Title h3 sans tight + body curta + institution chips com hairline
+//   - MarkerDot lime emissive sobre o beam
+//   - 2026 marker → NOW badge animated + glow ending no beam
+//   - Lime único accent — zero AMBER
+
+export interface TimelineMarker {
+  year: string;
+  place: string;
+  title: string;
+  body: string;
+  institutions: InstitutionId[];
+  /** Last marker — recebe "NOW" badge + glow ending. */
+  isCurrent?: boolean;
+}
 
 const MARKERS: TimelineMarker[] = [
   {
@@ -64,7 +89,99 @@ export function TimelineSection() {
         </p>
       </header>
 
-      <TimelineMarkers markers={MARKERS} />
+      <TimelineReveal
+        items={MARKERS.map((marker) => ({
+          key: marker.year,
+          isCurrent: marker.isCurrent,
+          children: <MarkerContent marker={marker} />,
+        }))}
+      />
     </section>
+  );
+}
+
+// Conteúdo de um marker — 100% server-rendered (zero hidratação). O ping do
+// NOW badge é CSS (motion-safe/reduce), sem gate JS.
+function MarkerContent({ marker }: { marker: TimelineMarker }) {
+  return (
+    <>
+      {/* Year + NOW badge row */}
+      <div className="flex items-baseline gap-4">
+        {/* W2.10 + W3.6 (2026-05-23): text-[2.25rem] no smallest pra
+            caber "2021—2023" em 1 linha @ 320px. year-editorial substitui
+            mono-stats — adiciona lining-nums + ss01 pra glyph editorial
+            sem perder tabular alignment. */}
+        <p
+          className={cn(
+            'year-editorial font-bold leading-[0.88] text-(--color-accent)',
+            'text-[2.25rem] sm:text-[4.5rem] lg:text-[5.5rem]'
+          )}
+          style={{ letterSpacing: '-0.04em' }}
+        >
+          <span className="sr-only">Ano </span>
+          {marker.year}
+        </p>
+
+        {/* NOW badge — só no current marker */}
+        {marker.isCurrent ? (
+          <span
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-md',
+              'border border-(--color-accent) bg-(--color-accent-subtle)',
+              'px-2.5 py-1.5 font-mono text-2xs uppercase tracking-widest',
+              'text-(--color-accent)'
+            )}
+            style={{ boxShadow: 'inset 0 1px 0 oklch(100% 0 0 / 0.10)' }}
+          >
+            <span className="relative flex size-1.5 items-center justify-center">
+              <span
+                aria-hidden="true"
+                className="absolute inline-flex size-full rounded-full opacity-60 motion-safe:animate-ping motion-reduce:hidden"
+                style={{ background: 'var(--color-accent)' }}
+              />
+              <span
+                aria-hidden="true"
+                className="relative inline-flex size-1.5 rounded-full"
+                style={{ background: 'var(--color-accent)' }}
+              />
+            </span>
+            NOW
+          </span>
+        ) : null}
+      </div>
+
+      {/* Microdetail hairline 64px conector + place label — signature editorial */}
+      <div className="flex items-center gap-3">
+        <span
+          aria-hidden="true"
+          className="block h-px w-16 bg-(--color-accent)"
+          style={{ opacity: 0.6 }}
+        />
+        <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+          {marker.place}
+        </p>
+      </div>
+
+      {/* Title — sans tight, editorial */}
+      <h3
+        className={cn(
+          'text-(--color-text-1) font-semibold tracking-tight',
+          'text-2xl sm:text-3xl lg:text-[2.5rem]',
+          '!leading-[1.05]'
+        )}
+      >
+        {marker.title}
+      </h3>
+
+      {/* Body — reading pace 17px */}
+      <p className="max-w-prose text-reading text-(--color-text-2)">{marker.body}</p>
+
+      {/* Institutions — cards hairline com inset highlight */}
+      {marker.institutions.length > 0 ? (
+        <div className="pt-3">
+          <InstitutionLogo ids={marker.institutions} size={20} />
+        </div>
+      ) : null}
+    </>
   );
 }

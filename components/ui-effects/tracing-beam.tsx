@@ -47,15 +47,18 @@ export function TracingBeam({ children, className }: TracingBeamProps) {
       {/* Rail decorativo */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-3 sm:left-4 md:left-6"
-        style={{ height: `${svgHeight}px` }}
+        className="pointer-events-none absolute top-0"
+        style={{ height: `${svgHeight}px`, left: 'var(--beam-x)' }}
       >
         {/* Dot inicial */}
         <span
           className={cn(
-            'absolute -top-1 -left-2 grid size-4 place-items-center rounded-full',
-            'border border-(--color-hairline-strong) bg-(--color-base)'
+            // F4: centro em `--beam-line` (a linha vive em x=1), nao na borda
+            // esquerda do trilho — antes ficava 1px fora do eixo.
+            'absolute -top-1 grid size-4 place-items-center rounded-full',
+            'border border-(--color-hairline-strong) bg-(--color-bg)'
           )}
+          style={{ left: 'calc(1px - 0.5rem)' }}
         >
           <span
             className={cn(
@@ -106,7 +109,7 @@ export function TracingBeam({ children, className }: TracingBeamProps) {
         </svg>
       </div>
 
-      <div className="pl-10 sm:pl-12 md:pl-14">{children}</div>
+      <div style={{ paddingLeft: 'var(--beam-pad)' }}>{children}</div>
     </div>
   );
 }
