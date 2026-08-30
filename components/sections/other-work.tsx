@@ -33,11 +33,11 @@ export function OtherWorkSection() {
             '!tracking-tight !leading-[1.05] text-balance',
           ].join(' ')}
         >
-          De sites institucionais a algoritmos C.
+          Antes dos três SaaS.
         </h2>
         <p className="max-w-prose text-reading text-(--color-text-2)">
-          Primeiro produto em produção (Estética MD), CLI universitária (Caronas Java), fundamento C
-          (Estrutura de Dados) — três projetos que mostram amplitude além dos SaaS atuais.
+          Primeiro produto em produção (Estética MD), CLI universitária (Caronas Java) e fundamento
+          em C (Estrutura de Dados). Quem é Stefan antes do AI Product Engineer.
         </p>
       </header>
 
@@ -131,7 +131,7 @@ function MiniCard({
       <div
         className={[
           'relative z-10 aspect-[16/10] w-full overflow-hidden rounded-xl',
-          'border border-(--color-hairline) bg-(--color-base)',
+          'border border-(--color-hairline) bg-(--color-bg)',
           'flex items-center justify-center p-4',
         ].join(' ')}
       >
@@ -151,14 +151,17 @@ function MiniCard({
 
         {/* Links row — lime ghost, anchored bottom */}
         <div className="mt-auto flex flex-wrap items-center gap-4 pt-3">
+          {/* W-audit (2026-06-10): py-3 -my-3 infla a área de toque pra ~42px
+              (medido 18px no audit mobile — abaixo do mínimo confortável) sem
+              mexer no ritmo visual da row. */}
           <Link
             href={href}
             target="_blank"
             rel="noreferrer"
             className={[
-              'inline-flex items-center gap-1.5 font-mono text-xs text-(--color-accent)',
+              'inline-flex items-center gap-1.5 py-3 -my-3 font-mono text-xs text-(--color-accent)',
               'transition-[gap,color] duration-(--motion-transition) ease-(--ease-smooth)',
-              'outline-none hover:gap-2 hover:text-(--color-accent-hover) focus-visible:underline',
+              'hover:gap-2 hover:text-(--color-accent-hover) focus-visible:underline',
             ].join(' ')}
           >
             GitHub
@@ -168,9 +171,9 @@ function MiniCard({
             <Link
               href={secondaryHref}
               className={[
-                'inline-flex items-center gap-1.5 font-mono text-xs text-(--color-text-3)',
+                'inline-flex items-center gap-1.5 py-3 -my-3 font-mono text-xs text-(--color-text-3)',
                 'transition-[gap,color] duration-(--motion-transition) ease-(--ease-smooth)',
-                'outline-none hover:gap-2 hover:text-(--color-accent) focus-visible:text-(--color-accent)',
+                'hover:gap-2 hover:text-(--color-accent) focus-visible:text-(--color-accent)',
               ].join(' ')}
             >
               {secondaryLabel ?? secondaryHref}

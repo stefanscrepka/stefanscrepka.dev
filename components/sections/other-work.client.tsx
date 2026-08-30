@@ -3,9 +3,11 @@
 import { m, useInView } from 'motion/react';
 import { type ReactNode, useRef } from 'react';
 import { FlipCard } from '@/components/ui-effects/flip-card';
-import { ProductCover } from '@/components/work/product-cover';
+import { CaseStudyCover } from '@/components/work/case-study-cover';
+import { useIsTouch } from '@/hooks/use-is-touch';
 import { EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
+import { CASE_STUDIES } from '@/lib/work/data';
 
 // Client islands para OtherWorkSection — FlipCard amber + reveal stagger.
 // AMBER scope: `data-clinic-scope` opcional pra css overrides futuros, mas aqui o
@@ -31,27 +33,37 @@ export function OtherWorkReveal({ children }: OtherWorkRevealProps) {
   );
 }
 
+// W-audit (2026-06-10): o hint do FlipCard dizia "Toque ou passe o mouse" em
+// QUALQUER device. useIsTouch resolve o input real pós-mount; null durante
+// SSR/primeiro paint mantém o copy genérico (sem hydration mismatch — o texto
+// só muda em re-render client).
+function FlipHintCopy() {
+  const isTouch = useIsTouch();
+  if (isTouch === true) return <>Toque pra ver detalhes →</>;
+  if (isTouch === false) return <>Passe o mouse pra ver detalhes →</>;
+  return <>Toque ou passe o mouse pra ver detalhes →</>;
+}
+
 interface EsteticaFlipCardClientProps {
   deeplink: string;
 }
 
 export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps) {
+  const esteticaCs = CASE_STUDIES['estetica-md'];
   return (
     <FlipCard
       tone="amber"
-      trigger="hover"
+      trigger="auto"
       axis="y"
       ariaLabel="Virar card Estética MD — ver detalhes"
       className="h-full min-h-[28rem]"
       front={
         <div className="flex h-full flex-col gap-5 p-6 sm:p-7" data-clinic-scope>
-          <ProductCover
-            mode="diagram"
-            diagram="estetica"
-            label="Estética MD — site institucional Dra. Martina Dona"
-            tone="amber"
-            aspectRatio="16/10"
-          />
+          {/* W-assets (2026-05-26): trocado ProductCover mode="diagram" hardcoded
+              por CaseStudyCover que faz dispatch via caseStudy.screenshot.
+              Como estetica-md tem screenshot real ('/work-screenshots/estetica-md-home.avif'),
+              renderiza MockupFrame + next/image. Diagram fica como fallback. */}
+          <CaseStudyCover caseStudy={esteticaCs} aspectRatio="16/10" tilt="subtle" />
           <div className="flex flex-1 flex-col gap-3">
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               Em produção desde Dez/2024
@@ -69,8 +81,11 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
               Site institucional + conversão para Dra. Martina Dona (ozonioterapia, criolipólise,
               drenagem, RF, depilação laser, peeling). Vanilla JS antes do React.
             </p>
+            {/* W-audit (2026-06-10): hint adapta ao input real — "passe o
+                mouse" num celular era microcopy quebrada. null (pré-mount)
+                mantém o copy genérico SSR-safe. */}
             <p className="mt-auto font-mono text-2xs text-(--color-text-3)">
-              Passe o mouse / toque pra ver detalhes →
+              <FlipHintCopy />
             </p>
           </div>
         </div>
@@ -114,11 +129,11 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
               // press feedback 0.98 (única vez que scale é OK = tactile button press).
               'transition-[transform,box-shadow] duration-(--motion-transition) ease-(--ease-smooth)',
               'hover:-translate-y-[2px] active:translate-y-0 active:scale-[0.98]',
-              'focus-visible:-translate-y-[2px] outline-none'
+              'focus-visible:-translate-y-[2px]'
             )}
             style={{
               backgroundColor: 'var(--color-amber)',
-              color: 'var(--color-base)',
+              color: 'var(--color-bg)',
               boxShadow: 'var(--shadow-md), 0 0 24px oklch(82% 0.18 75 / 0.5)',
             }}
           >

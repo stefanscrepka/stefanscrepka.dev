@@ -42,7 +42,7 @@ export function FeaturedWorkSection() {
         >
           Três produtos.
           <br />
-          Três posturas.
+          Três problemas resolvidos.
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Content Engine resolve volume + variedade com multi-agente. NexaCore entrega produto
@@ -51,30 +51,32 @@ export function FeaturedWorkSection() {
         </p>
       </header>
 
-      <FeaturedWorkReveal>
-        {/* W-mob2 #2: mobile gap-8 (era 12) reduz scroll fatigue entre 3 cards
-            de 600vh+. Desktop mantém 16/20 generoso. */}
-        <div className="flex flex-col gap-8 sm:gap-16 lg:gap-20">
-          {/* Hero tile FULL-BLEED — Content Engine flagship */}
-          <HeroTile caseStudy={contentEngine} sequenceIndex={1} totalCount={3} />
+      {/* W-audit (2026-06-10): HeroTile e a row de half-tiles agora são
+          children DIRETOS do reveal — antes um <div> wrapper era filho único
+          e o stagger de 80ms nunca acontecia (tudo entrava em bloco). O layout
+          flex/gap migrou pra className do container Motion.
+          W-mob2 #2: mobile gap-8 (era 12) reduz scroll fatigue entre 3 cards
+          de 600vh+. Desktop mantém 16/20 generoso. */}
+      <FeaturedWorkReveal className="flex flex-col gap-8 sm:gap-16 lg:gap-20">
+        {/* Hero tile FULL-BLEED — Content Engine flagship */}
+        <HeroTile caseStudy={contentEngine} sequenceIndex={1} totalCount={3} />
 
-          {/* Half-tiles ESPELHADOS — gap-10 generoso (mobile gap-6) */}
-          <div className="grid gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-12">
-            <HalfTile
-              caseStudy={nexacore}
-              sequenceIndex={2}
-              totalCount={3}
-              direction="text-left"
-              aspectRatio="4/3"
-            />
-            <HalfTile
-              caseStudy={stjApp}
-              sequenceIndex={3}
-              totalCount={3}
-              direction="text-right"
-              aspectRatio="16/9"
-            />
-          </div>
+        {/* Half-tiles ESPELHADOS — gap-10 generoso (mobile gap-6) */}
+        <div className="grid gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-12">
+          <HalfTile
+            caseStudy={nexacore}
+            sequenceIndex={2}
+            totalCount={3}
+            direction="text-left"
+            aspectRatio="4/3"
+          />
+          <HalfTile
+            caseStudy={stjApp}
+            sequenceIndex={3}
+            totalCount={3}
+            direction="text-right"
+            aspectRatio="16/9"
+          />
         </div>
       </FeaturedWorkReveal>
     </section>
@@ -104,7 +106,11 @@ function SequenceLabel({ index, total, label }: { index: number; total: number; 
    ============================================================ */
 
 const TILE_SHELL = [
-  'group/tile relative isolate overflow-hidden rounded-2xl outline-none',
+  // W-audit (2026-06-10): outline-none → outline-hidden. O foco aqui é
+  // indicado por border+glow (abaixo), que somem em forced-colors (Windows
+  // High Contrast); outline-hidden preserva um outline transparente que o
+  // sistema torna visível nesse modo.
+  'group/tile relative isolate overflow-hidden rounded-2xl outline-hidden',
   'border border-(--color-hairline) glass-panel',
   // Stack 2-layer at rest: ambient md shadow + inset bisel (Vercel/Linear edge lift).
   // Bisel = 1px highlight stroke + top edge luminance, applied via single token.
@@ -192,7 +198,6 @@ function HeroTile({
   return (
     <Link
       href={`/work/${caseStudy.slug}`}
-      data-reveal
       className={cn(
         TILE_SHELL,
         // W-mob2 #4: padding mobile p-4 (era p-5) reduz interior crunch em 343px net width.
@@ -201,14 +206,21 @@ function HeroTile({
       )}
     >
       {/* Cover LEFT 62% — tilt cinema, respira mais.
-          W-perf #10: priority no HeroTile (primeiro cover above-the-fold) —
-          frequentemente LCP element em mobile com hero video gated. */}
+          F3.6 (2026-06-11): `eager` substitui o `preload` (cujo <link> no head
+          competia com o hero-poster/LCP).
+          HONESTIDADE (F3-review): HOJE este flagship é o Content Engine, que tem
+          screenshot=null → CaseStudyCover renderiza um DIAGRAMA SVG inline (sem
+          next/image, sem atributo loading). Então `eager` fica DORMENTE aqui —
+          não há requisição de imagem pra adiantar. A prop está certa e só
+          ativa quando o screenshot REAL do Content Engine chegar (Phase 2 /
+          STEFAN-TODO #1): aí o cover vira <img> e `eager` evita o lazy pop-in
+          sem furar a fila do LCP. Mantida pro handoff, não removida. */}
       <div className="relative">
         <CaseStudyCover
           caseStudy={caseStudy}
           aspectRatio="16/10"
           tilt="cinema"
-          priority
+          eager
           className="relative z-10"
         />
       </div>
@@ -335,7 +347,6 @@ function HalfTile({
   return (
     <Link
       href={`/work/${caseStudy.slug}`}
-      data-reveal
       className={cn(TILE_SHELL, 'flex flex-col gap-6 p-4 sm:p-7')}
     >
       {textFirst ? (

@@ -5,18 +5,22 @@ import { Children, isValidElement, type ReactNode, useRef } from 'react';
 import { EASES } from '@/lib/animation/eases';
 
 // Pattern A — Stagger Featured Work.
-// W-motion #2: ANTES todos os children entravam x:-24 (esquerda → direita).
-// Em half-tiles ESPELHADOS (NexaCore text-left, STJ text-right), a entrada
-// uniforme violava Disney Staging — direção precisa espelhar layout.
-// AGORA: HeroTile entra y:24 (de baixo, vertical statement). Os 2 children
-// seguintes (que viram half-tiles row) entram x:-24 e x:+24 — alinha com
-// espelhamento layout. Disney Arc + Secondary Action.
+// W-audit (2026-06-10): comentário corrigido pra refletir o que EXISTE —
+// ambos os children (HeroTile e a row de half-tiles) entram y:24 como
+// statement vertical em linha única (decisão W-motion #2 final); o
+// espelhamento dos half-tiles é só de layout, não de motion.
 //
 // Container faz reveal global uma vez (useInView once: true), filhos animam
 // em sequencia 80ms stagger ease-dramatic.
 
 interface FeaturedWorkRevealProps {
   children: ReactNode;
+  /** Classes de layout do container (flex/gap) — aplicadas no m.div raiz.
+      W-audit (2026-06-10): antes o layout vivia num <div> intermediário que
+      virava FILHO ÚNICO deste reveal — o stagger de 80ms nunca existiu na
+      tela (tiles entravam em bloco monolítico). Agora os tiles são children
+      diretos e o container recebe o layout via esta prop. */
+  className?: string;
 }
 
 const FALLBACK_VARIANT = {
@@ -31,13 +35,14 @@ const VARIANTS_BY_INDEX = [
   FALLBACK_VARIANT,
 ];
 
-export function FeaturedWorkReveal({ children }: FeaturedWorkRevealProps) {
+export function FeaturedWorkReveal({ children, className }: FeaturedWorkRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '0px 0px -120px 0px' });
 
   return (
     <m.div
       ref={ref}
+      className={className}
       initial="hidden"
       animate={inView ? 'visible' : 'hidden'}
       variants={{
