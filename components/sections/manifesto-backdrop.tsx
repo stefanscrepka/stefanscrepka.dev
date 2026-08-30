@@ -1,8 +1,18 @@
+'use client';
+
+import { useRef } from 'react';
+import { usePausedOffscreen } from '@/hooks/use-paused-offscreen';
+
 // Backdrop visual atrás do manifesto — light leak vertical estilo Huly beam +
 // grain SVG amplificado. Pattern: 4/13 prints do Stefan usam light beam vertical.
-// CSS-only (zero JS), paused em prefers-reduced-motion via @media query global.
+// Paused em prefers-reduced-motion via @media query global.
+// F3.5 (2026-06-11): beam-drift também pausa fora da viewport (o manifesto
+// vive no fim da home; o loop de 20s rodava desde o load em toda a página).
 
 export function ManifestoBackdrop() {
+  const beamRef = useRef<HTMLDivElement>(null);
+  usePausedOffscreen(beamRef);
+
   return (
     <div
       data-slot="manifesto-backdrop"
@@ -11,6 +21,7 @@ export function ManifestoBackdrop() {
     >
       {/* Light beam vertical — gradient lime emissive blur */}
       <div
+        ref={beamRef}
         className="absolute left-1/2 top-0 h-full w-[40vw] -translate-x-1/2 blur-3xl opacity-60"
         style={{
           background:

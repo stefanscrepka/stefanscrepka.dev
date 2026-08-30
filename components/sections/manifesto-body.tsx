@@ -75,16 +75,25 @@ export function ManifestoBody({
         </footer>
       </blockquote>
 
-      {/* ATO 2 — Hairlines */}
-      <div aria-hidden="true" className="my-1 flex flex-col gap-1.5">
-        {[60, 80, 100, 70].map((w, i) => (
-          <span
-            key={`break-width-${w}`}
-            className="block h-px bg-(--color-accent)"
-            style={{ width: `${w}px`, opacity: 0.45 - i * 0.08 }}
-          />
-        ))}
-      </div>
+      {/* ATO 2 — Quebra de seção.
+          F4 (2026-08-29): eram QUATRO hairlines empilhadas (60/80/100/70px,
+          opacidade decrescente). A intenção era ornamento; a leitura era
+          skeleton de carregamento — quatro linhas curtas, desalinhadas à
+          direita, com 6px de respiro, é literalmente o desenho de um
+          placeholder de texto. Num site cuja tese é precisão, um ornamento
+          que se lê como estado inacabado custa mais do que entrega.
+          Agora: UMA régua que esvanece. Um skeleton nunca esvanece, então a
+          leitura fica inequívoca — e o vocabulário (hairline + lime a meia
+          força) é o mesmo dos eyebrows da timeline. */}
+      <div
+        aria-hidden="true"
+        className="my-2 h-px w-24"
+        style={{
+          background:
+            'linear-gradient(to right, var(--color-accent) 0%, var(--color-accent) 45%, transparent 100%)',
+          opacity: 0.5,
+        }}
+      />
 
       {/* ATO 3 — Paragraphs */}
       <div

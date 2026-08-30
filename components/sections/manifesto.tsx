@@ -3,11 +3,12 @@
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 import { ManifestoBackdrop } from './manifesto-backdrop';
 import { ManifestoBody } from './manifesto-body';
+import { SignatureStefan } from './signature-stefan-svg';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,7 +23,7 @@ gsap.registerPlugin(ScrollTrigger);
 //   - 0px gap entre reveal e proxima section (NAO ha tela preta)
 //
 // Aqui:
-//   <section id="manifesto" h-[200vh] bg-base relative>
+//   <section id="manifesto" h-[200vh] bg-(--color-bg) relative>
 //     <div sticky top-0 h-screen overflow-hidden>
 //       <ManifestoBackdrop /> + <bg name> + <atmosphere>
 //       <inner manifesto REAL — encolhe scale 1 → 0.4>
@@ -40,8 +41,6 @@ gsap.registerPlugin(ScrollTrigger);
 // pelo bottom no doc flow. ZERO teletransporte, ZERO buraco.
 
 const FINAL_SCALE = 0.4;
-const FRAME_BG = 'color-mix(in oklch, var(--color-surface-deep) 75%, transparent)';
-const FRAME_BORDER = 'color-mix(in oklch, var(--color-accent) 28%, transparent)';
 
 interface ManifestoSectionProps {
   className?: string;
@@ -55,22 +54,6 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
   const atmosphereRef = useRef<HTMLDivElement>(null);
   const sigRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotionSafe();
-  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/signature-stefan.svg')
-      .then((res) => res.text())
-      .then((text) => {
-        if (!cancelled) setSvgMarkup(text);
-      })
-      .catch(() => {
-        if (!cancelled) setSvgMarkup(null);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   // Word-stagger no manifesto natural (entrada do sticky).
   useGSAP(
@@ -104,45 +87,88 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       const atmosphere = atmosphereRef.current;
       const sig = sigRef.current;
       if (!section || !inner || !frame || !name || !atmosphere || !sig) return;
-      if (reduced === null || svgMarkup === null) return;
+      if (reduced === null) return;
+
+      // F3.1 (2026-06-11): elementos do trim-path da assinatura — 3 strokes
+      // de máscara seguindo o ductus (S → "tefan" → flourish) + rect de
+      // segurança do estado final. Ver signature-stefan-svg.tsx.
+      const sigSegs = sig.querySelectorAll<SVGPathElement>('[data-sig-seg]');
+      const sigMaskFill = sig.querySelector<SVGRectElement>('[data-sig-mask-fill]');
 
       if (reduced) {
         gsap.set(inner, { scale: FINAL_SCALE });
-        gsap.set(frame, { backgroundColor: FRAME_BG, borderColor: FRAME_BORDER });
+        // W-perf (2026-05-25): frame agora é overlay opacity em vez de
+        // animar backgroundColor/borderColor (não composited, força paint).
+        gsap.set(frame, { opacity: 1 });
         gsap.set(name, { opacity: 0.08, scale: 1 });
         gsap.set(atmosphere, { opacity: 1 });
-        gsap.set(sig, { opacity: 1, clipPath: 'inset(0 0% 0 0)' });
+        // Markup default já é assinatura completa (dashoffset 0 + rect on).
+        gsap.set(sig, { opacity: 1 });
         return;
       }
 
       // Initial state — manifesto natural visivel, sem frame/bg/signature.
       gsap.set(inner, { scale: 1, opacity: 1, transformOrigin: 'center center' });
-      gsap.set(frame, { backgroundColor: 'transparent', borderColor: 'transparent' });
+      gsap.set(frame, { opacity: 0 });
       gsap.set(name, { opacity: 0, scale: 1.2 });
       gsap.set(atmosphere, { opacity: 0 });
-      gsap.set(sig, { opacity: 0, clipPath: 'inset(0 100% 0 0)' });
+      gsap.set(sig, { opacity: 0 });
+      // attr plugin (não CSS): o CSSPlugin não interpola strokeDashoffset
+      // mid-tween (snap binário no fim — medido em _audit/f3-tween-test.html);
+      // animar o atributo interpola e evita inline-style sobre o markup.
+      gsap.set(sigSegs, { attr: { 'stroke-dashoffset': 1 } });
+      if (sigMaskFill) gsap.set(sigMaskFill, { opacity: 0 });
 
       const tl = gsap.timeline();
 
       // ENTRY (0 → 0.5) — manifesto encolhe + bg layers emergem + sig fade-in.
+      // W-perf (2026-05-25): expo.inOut → power2.out — expo congelava 1ª
+      // metade do scrub e espasmava 2ª (curva agressiva demais pra reveal
+      // cinematográfico). power2.out tem deceleração natural, mais Apple-tier.
       tl.to(name, { opacity: 0.08, scale: 1, ease: 'power2.out', duration: 0.45 }, 0);
       tl.to(atmosphere, { opacity: 1, ease: 'power1.out', duration: 0.15 }, 0);
-      tl.to(inner, { scale: FINAL_SCALE, ease: 'expo.inOut', duration: 0.5 }, 0);
-      tl.to(
-        frame,
-        { backgroundColor: FRAME_BG, borderColor: FRAME_BORDER, ease: 'power2.out', duration: 0.4 },
-        0.05
-      );
+      tl.to(inner, { scale: FINAL_SCALE, ease: 'power2.out', duration: 0.5 }, 0);
+      tl.to(frame, { opacity: 1, ease: 'power2.out', duration: 0.4 }, 0.05);
 
-      // SIGNATURE drawn (0.3 → 0.85) — clip-path reveal esquerda → direita.
-      // NOTA: Lando usa Rive .riv com Trim Path keyframes seguindo o ductus
-      // natural da escrita (curvado, com easing por segmento). Nossa SVG
-      // solida nao suporta isso sem conversao pra stroke-based. Mantemos
-      // clip-path linear como aproximacao.
+      // SIGNATURE drawn (0.3 → 0.87) — F3.1 (2026-06-11): trim-path REAL.
+      // Era clip-path linear (wipe esquerda→direita); agora 3 strokes de
+      // máscara seguem o ductus da escrita com easing por segmento
+      // (equivalente ao Trim Path do Rive que o Lando usa):
+      //   S        power1.inOut — a caneta acelera no meio da curva grande
+      //   "tefan"  power1.out   — letras correntes, desacelera no n
+      //   flourish power2.out   — a volta sob o nome é um golpe rápido e
+      //                           confiante (assinatura real: letras lentas,
+      //                           flourish snap)
+      // Overlap de 0.02 entre segmentos = continuidade de caneta no scrub.
       tl.to(sig, { opacity: 1, ease: 'power1.out', duration: 0.06 }, 0.3);
-      tl.to(sig, { clipPath: 'inset(0 0% 0 0)', ease: 'power2.inOut', duration: 0.55 }, 0.3);
+      if (sigSegs.length === 3) {
+        tl.to(
+          sigSegs[0] as SVGPathElement,
+          { attr: { 'stroke-dashoffset': 0 }, ease: 'power1.inOut', duration: 0.24 },
+          0.3
+        );
+        tl.to(
+          sigSegs[1] as SVGPathElement,
+          { attr: { 'stroke-dashoffset': 0 }, ease: 'power1.out', duration: 0.26 },
+          0.52
+        );
+        tl.to(
+          sigSegs[2] as SVGPathElement,
+          { attr: { 'stroke-dashoffset': 0 }, ease: 'power2.out', duration: 0.09 },
+          0.76
+        );
+        if (sigMaskFill) {
+          // Rede de segurança: fecha a máscara 100% no fim (antialiasing das
+          // pontas dos strokes não deixa resíduo no estado final).
+          tl.to(sigMaskFill, { opacity: 1, duration: 0.02 }, 0.85);
+        }
+      } else {
+        // Fallback defensivo (máscara ausente): wipe antigo.
+        gsap.set(sig, { clipPath: 'inset(0 100% 0 0)' });
+        tl.to(sig, { clipPath: 'inset(0 0% 0 0)', ease: 'power2.inOut', duration: 0.55 }, 0.3);
+      }
 
-      // HOLD signature visible (0.85 → 1.0) — sticky CSS libera naturalmente
+      // HOLD signature visible (0.87 → 1.0) — sticky CSS libera naturalmente
       // depois desse range, inner translata up junto com outer, ContactSection
       // emerge pelo bottom. Sem cascading exit manual.
 
@@ -167,7 +193,7 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
         trigger.kill();
       };
     },
-    { dependencies: [reduced, svgMarkup] }
+    { dependencies: [reduced] }
   );
 
   return (
@@ -175,7 +201,7 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       id="manifesto"
       ref={sectionRef}
       className={cn(
-        'relative isolate bg-(--color-base)',
+        'relative isolate bg-(--color-bg)',
         // Altura define scroll length total. W2.3 (2026-05-23): reduzido de
         // 200vh → 180vh — pin range de 100vh → 80vh. W-mob (2026-05-24):
         // mobile 130vh (pin range 30vh ≈ 2 swipes) preserva reveal cinemático
@@ -238,14 +264,26 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
         />
 
         {/* Inner manifesto + frame — z-20. Manifesto REAL (ATOS 1-5 completos),
-            encolhe scale 1 → 0.4. Frame wrapper bg/border emerge. */}
+            encolhe scale 1 → 0.4. Frame wrapper bg/border emerge via opacity
+            de uma layer pré-renderizada (W-perf 2026-05-25 — antes animava
+            backgroundColor/borderColor que não são composited e forçavam
+            paint inteiro a cada frame de scroll). */}
         <div ref={innerRef} className="container-prose relative z-[20] will-change-transform">
-          <div
-            ref={frameRef}
-            className="relative rounded-3xl border px-6 py-8 sm:px-10 sm:py-12 will-change-transform"
-            style={{ backgroundColor: 'transparent', borderColor: 'transparent' }}
-          >
-            <ManifestoBody enableWordStagger />
+          <div className="relative px-6 py-8 sm:px-10 sm:py-12">
+            {/* Frame overlay: bg surface-deep + border lime alpha, opacity
+                animada via GSAP. Quando opacity 0, manifesto natural visível.
+                Quando opacity 1, frame retangular emerge — efeito Lando reveal. */}
+            <div
+              ref={frameRef}
+              aria-hidden="true"
+              className={cn(
+                'pointer-events-none absolute inset-0 rounded-3xl border will-change-[opacity]',
+                'border-(--color-accent)/30 bg-(--color-surface-deep)/75'
+              )}
+            />
+            <div className="relative">
+              <ManifestoBody enableWordStagger />
+            </div>
           </div>
         </div>
 
@@ -263,11 +301,9 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
                 'drop-shadow(0 0 28px color-mix(in oklch, var(--color-accent) 40%, transparent)) drop-shadow(0 0 10px color-mix(in oklch, var(--color-accent) 60%, transparent))',
             }}
           >
-            <div
-              className="flex w-full items-center justify-center [&>svg]:h-auto [&>svg]:max-h-[55vh] [&>svg]:w-full"
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: SVG markup local trusted (asset proprio)
-              dangerouslySetInnerHTML={svgMarkup ? { __html: svgMarkup } : undefined}
-            />
+            <div className="flex w-full items-center justify-center [&>svg]:h-auto [&>svg]:max-h-[55vh] [&>svg]:w-full">
+              <SignatureStefan />
+            </div>
           </div>
         </div>
       </div>
