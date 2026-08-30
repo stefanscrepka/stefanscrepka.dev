@@ -6,21 +6,26 @@ import { CASE_STUDIES, CASE_STUDY_SLUGS } from '@/lib/work/data';
 export const metadata: Metadata = {
   title: 'Work',
   description:
-    'Três produtos em produção + projetos menores. Content Engine multi-agente, NexaCore SaaS clínicas, STJ App PWA, Estética MD. Stack honest, escopo real.',
+    'Quatro produtos com escopo real. Content Engine multi-agente, NexaCore SaaS clínicas, STJ App PWA cockpit, Estética MD site institucional. Stack honest, escopo entregue.',
 };
 
 // Index gallery dos 4 case studies + link pra cada page detalhe.
+// F3.3 (2026-06-11): página estática sem loading.tsx — conteúdo inteiro no
+// HTML (CLS 0). Transição de rota = page-fade da raiz (app/layout.tsx).
 export default function WorkIndexPage() {
   return (
     <section className="container-max pt-32 pb-24 sm:pt-36">
       <header className="mb-12 flex flex-col gap-3">
         <p className="eyebrow">/work</p>
         <h1 className="text-4xl font-semibold sm:text-5xl lg:text-6xl !leading-[1.02] !tracking-[-0.03em]">
-          Work
+          Quatro produtos.
+          <br />
+          Escopo real.
         </h1>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
-          Três produtos em produção e projetos menores que mostram amplitude. Cada case documentado
-          com stack real, escopo entregue e o que aprendi no processo.
+          Três SaaS em produção (Content Engine, NexaCore, STJ App) + Estética MD, primeiro produto
+          antes do React. Cada case documentado com stack honest, escopo entregue e o que aprendi no
+          processo.
         </p>
       </header>
 

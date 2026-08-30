@@ -1,30 +1,10 @@
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-// Chrome compartilhado dos case studies: back-link sutil topo-esquerdo. Renderiza
-// abaixo do FloatingDock global (já provido pelo root layout.tsx).
+// Chrome compartilhado dos case studies. W-design (2026-05-26): removido o
+// back-link "Voltar para o trabalho" do layout — era redundante em /work
+// (você já ESTÁ em /work) e duplicado nas case pages (CaseStudyHero já tem
+// "← Outros cases"). TopBarNav global cuida da navegação principal.
 
 export default function WorkLayout({ children }: { children: ReactNode }) {
-  return (
-    <div data-slot="work-layout">
-      <div className="container-max pt-28 pb-4">
-        <Link
-          href="/#work"
-          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-(--color-text-3) outline-none transition-colors hover:text-(--color-accent) focus-visible:text-(--color-accent)"
-        >
-          <svg viewBox="0 0 24 24" fill="none" className="size-3" aria-hidden="true">
-            <path
-              d="M15 6l-6 6 6 6"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Voltar para o trabalho
-        </Link>
-      </div>
-      {children}
-    </div>
-  );
+  return <div data-slot="work-layout">{children}</div>;
 }

@@ -189,11 +189,15 @@ export default function PrivacidadePage() {
           <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
             Dúvida específica?
           </p>
+          {/* F3.7 (2026-06-11): underline SEMPRE (não só no hover) — link dentro
+              de parágrafo não pode se distinguir só por cor (WCAG 1.4.1 /
+              Lighthouse link-in-text-block, único erro que segurava o gate).
+              hover satura o decoration pra dar feedback. */}
           <p className="text-base leading-relaxed text-(--color-text-2)">
             Email com "LGPD" no assunto pra{' '}
             <a
               href="mailto:stefanheinz2006@gmail.com?subject=LGPD"
-              className="text-(--color-accent) underline-offset-4 hover:underline"
+              className="text-(--color-accent) underline underline-offset-4 decoration-(--color-accent)/50 transition-[text-decoration-color] hover:decoration-(--color-accent)"
             >
               stefanheinz2006@gmail.com
             </a>

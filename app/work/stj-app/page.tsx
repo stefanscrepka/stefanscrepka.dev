@@ -6,12 +6,22 @@ import { CaseImpactTriad } from '@/components/work/case-impact-triad';
 import { CaseStudyHero } from '@/components/work/case-study-hero';
 import { ProductCover } from '@/components/work/product-cover';
 import { getCaseStudy } from '@/lib/work/data';
+import { buildBreadcrumbJsonLd, buildCaseStudyJsonLd } from '@/lib/work/json-ld';
 
 const CS = getCaseStudy('stj-app');
 
 export const metadata: Metadata = {
   title: `${CS?.title ?? 'STJ App'} — Case Study`,
-  description: CS?.tagline ?? '',
+  description:
+    'Cockpit operacional PWA pra equipe @linareis.fit. Claude Haiku 4.5 streaming + prompt cache 2 camadas + RAG pgvector + Vision CV validator + 162 testes. Supabase Auth + 2FA TOTP + Inngest workflows.',
+  openGraph: {
+    type: 'article',
+    title: `${CS?.title ?? 'STJ App'} — Case Study · Stefan Heinz Screpka`,
+    description:
+      'PWA cockpit operacional. Claude Haiku 4.5 streaming + prompt cache 2 camadas + RAG pgvector. Supabase Auth + 2FA TOTP. 162 testes runtime.',
+    url: '/work/stj-app',
+  },
+  alternates: { canonical: '/work/stj-app' },
 };
 
 const AUTH_FLOW = [
@@ -38,6 +48,16 @@ export default function STJAppPage() {
 
   return (
     <div className="pb-32">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: structured data SSR
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildCaseStudyJsonLd(CS)) }}
+      />
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: structured data SSR
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbJsonLd(CS)) }}
+      />
       <CaseStudyHero cs={CS} />
 
       {/* W3.2: Problema → Solução → Impacto antes do mergulho técnico. */}
@@ -60,7 +80,7 @@ export default function STJAppPage() {
               tilt="none"
               className="h-full border-0"
             >
-              <div className="flex h-full flex-col items-center justify-center gap-3 bg-(--color-base) p-4 font-mono text-xs text-(--color-text-3)">
+              <div className="flex h-full flex-col items-center justify-center gap-3 bg-(--color-bg) p-4 font-mono text-xs text-(--color-text-3)">
                 <span className="text-[11px] uppercase tracking-widest text-(--color-text-3)">
                   ANTES
                 </span>
