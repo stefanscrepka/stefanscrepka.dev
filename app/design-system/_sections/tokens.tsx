@@ -5,7 +5,7 @@ const COLOR_GROUPS = [
   {
     title: 'Surfaces',
     swatches: [
-      { token: '--color-base', label: 'base' },
+      { token: '--color-bg', label: 'base' },
       { token: '--color-surface', label: 'surface' },
       { token: '--color-surface-elevated', label: 'surface-elevated' },
       { token: '--color-surface-overlay', label: 'surface-overlay' },
@@ -44,13 +44,18 @@ const COLOR_GROUPS = [
       { token: '--color-success', label: 'success' },
       { token: '--color-warning', label: 'warning' },
       { token: '--color-danger', label: 'danger' },
-      { token: '--color-info', label: 'info' },
     ],
   },
 ] as const;
 
+// F4 (2026-08-29): `--text-7xl` e `--color-info` foram REMOVIDOS desta lista.
+// Ambos ja tinham sido removidos do @theme em globals.css por nao terem
+// consumidores, mas continuavam listados aqui — `fontSize: var(--text-7xl)`
+// sem valor faz o span herdar o tamanho do pai, entao a pagina do design
+// system exibia uma linha "text-7xl" renderizada no tamanho do body.
+// Um design system que documenta token inexistente e pior que nao documentar.
+// Guardado por teste: tests/unit/design-system-tokens.test.ts
 const TYPE_SCALE = [
-  { token: '--text-7xl', label: 'text-7xl', sample: 'Ag' },
   { token: '--text-6xl', label: 'text-6xl', sample: 'Heading display' },
   { token: '--text-5xl', label: 'text-5xl', sample: 'Heading display' },
   { token: '--text-4xl', label: 'text-4xl', sample: 'Heading large' },
@@ -134,10 +139,18 @@ export function TokensSection() {
         </p>
         <div className="flex flex-col gap-1 divide-y divide-(--color-hairline)">
           {TYPE_SCALE.map((t) => (
-            <div key={t.token} className="grid grid-cols-[7rem_1fr] items-baseline gap-6 py-4">
+            <div
+              key={t.token}
+              className="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-4 py-4 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6"
+            >
               <span className="font-mono text-[11px] text-(--color-text-3)">{t.label}</span>
+              {/* F4: `1fr` resolve pra minmax(auto,1fr) e `auto` = max-content,
+                  entao o span gigante empurrava o documento pra 596px num
+                  viewport de 390px (medido: +206px de overflow horizontal, e a
+                  nav herdava a largura). minmax(0,1fr) + min-w-0 deixam o
+                  espécime quebrar linha em vez de estourar a pagina. */}
               <span
-                className="text-(--color-text-1) leading-tight tracking-tight"
+                className="min-w-0 break-words text-(--color-text-1) leading-tight tracking-tight"
                 style={{ fontSize: `var(${t.token})` }}
               >
                 {t.sample}
