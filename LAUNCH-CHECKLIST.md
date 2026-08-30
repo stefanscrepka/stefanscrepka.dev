@@ -260,7 +260,7 @@
 - `components/sections/contact.tsx:120-128` · Container `rounded-3xl` (18px) + inputs `rounded-md` (6px) = 3× cartoon. Container `rounded-2xl`.
 - `components/sections/featured-work.tsx:60` · `totalCount={3}` mas site tem 4 cases (Estética MD em Other). Sequence "01/03" mente. Ou `02/04` ou "Selected · 03".
 - `app/playground/page.tsx:23` · `<PlaygroundPage>` Client mas página em si é trivialmente Server. Refatorar pra Server Component + client islands.
-- `components/ui-effects/top-bar-nav.tsx:48-49` · `bg-(--color-base)/85` + `backdrop-blur-md` custa GPU sobre hero video. Trocar por bg sólido.
+- `components/ui-effects/top-bar-nav.tsx:48-49` · `bg-(--color-bg)/85` + `backdrop-blur-md` custa GPU sobre hero video. Trocar por bg sólido.
 
 ### Performance
 
@@ -376,7 +376,7 @@
 
 ### Animation
 - `lib/animation/gsap-lenis-sync.ts:54-87` — sync canônica com `lagSmoothing(0)` + restauração original. **Reference-grade**.
-- `components/hero/split-text-headline.tsx:43-118` — dynamic GSAP via `requestIdleCallback` + `onView` flag. Melhor que 90% das implementações públicas.
+- ~~`components/hero/split-text-headline.tsx`~~ — substituído no audit 2026-06-10 por `components/hero/headline-word-reveal.tsx` (split por palavra no servidor + animação CSS do primeiro paint; matou o replay do GSAP).
 - `components/providers/lenis-provider.tsx:22-46` — bail-out completo em touch + reduced-motion. Mobile nunca paga Lenis (40KB).
 - `components/hero/stats-row.tsx:96-117` — count-up log-scaled duration + imperative `node.textContent` (zero React commits).
 - `components/sections/contact-form.client.tsx:134-220` — success state com spring + word-stagger + sr-only fallback. **Apple-tier emotional closing**.
@@ -409,7 +409,10 @@ import { withSentryConfig } from '@sentry/nextjs';
 async headers() {
   const csp = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://app.cal.com https://embed.cal.com",
+    // blob: obrigatorio — workers do Three.js/troika chamam importScripts(blob:)
+    // que e governado por script-src (fix do audit 2026-06-10; sem isso /playground
+    // loga 12 erros). Fonte de verdade: next.config.ts.
+    "script-src 'self' 'unsafe-inline' blob: https://va.vercel-scripts.com https://vitals.vercel-insights.com https://app.cal.com https://embed.cal.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
