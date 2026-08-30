@@ -23,10 +23,10 @@ interface StatItem {
 
 const HERO_STATS: StatItem[] = [
   { value: 22, label: 'agentes Claude' },
-  { value: 27, label: 'tabelas Drizzle' },
-  { value: 100, suffix: '+', label: 'vitest tests' },
+  { value: 27, label: 'tabelas Postgres' },
+  { value: 100, suffix: '+', label: 'testes runtime' },
   { label: 'prompt cache 2 camadas' },
-  { label: 'stack local GPU' },
+  { label: 'GPU local pro inference' },
   { label: 'LGPD compliance' },
 ];
 
@@ -46,20 +46,15 @@ export function StatsRow({ stats = HERO_STATS, className }: StatsRowProps) {
       )}
     >
       {stats.map((stat, idx) => (
-        <StatEntry key={stat.label} stat={stat} index={idx} />
+        <StatEntry key={stat.label} stat={stat} isLast={idx === stats.length - 1} />
       ))}
     </dl>
   );
 }
 
-function StatEntry({ stat, index }: { stat: StatItem; index: number }) {
+function StatEntry({ stat, isLast }: { stat: StatItem; isLast: boolean }) {
   return (
     <div className="flex items-baseline gap-1.5">
-      {index > 0 ? (
-        <span aria-hidden="true" className="text-(--color-hairline-strong)">
-          ·
-        </span>
-      ) : null}
       <dt className="sr-only">{stat.label}</dt>
       <dd>
         {stat.value !== undefined ? (
@@ -71,6 +66,17 @@ function StatEntry({ stat, index }: { stat: StatItem; index: number }) {
           <span className="text-(--color-text-2)">{stat.label}</span>
         )}
       </dd>
+      {/* F4 (2026-08-29): o separador era LÍDER (`index > 0`, antes do <dt>).
+          Como o container é `flex flex-wrap`, o item que quebrava pra próxima
+          linha levava o `·` junto — e a linha começava com um separador solto
+          ("· 100+ testes runtime", visível no hero mobile a 390px).
+          Agora é TRAILING: nenhuma linha começa com separador; no máximo uma
+          termina com ele, o que se lê como marca de continuação. */}
+      {!isLast ? (
+        <span aria-hidden="true" className="text-(--color-hairline-strong)">
+          ·
+        </span>
+      ) : null}
     </div>
   );
 }
