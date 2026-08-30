@@ -23,26 +23,51 @@ interface DiagramProps {
 
 interface PipelineStage {
   id: string;
-  count?: string;
+  /** "6 agents" nos squads; papel topológico ("input"/"output") nos nós de borda. */
+  meta: string;
+  /** Papel de borda renderiza em text-3 — é classificação, não contagem. */
+  metaMuted?: boolean;
   title: string;
+  /** Segunda linha do rótulo. Existe só onde o nome sozinho perderia informação. */
+  sub?: string;
   emissive?: boolean;
 }
 
+// F4 (2026-08-29): rótulos reescritos porque <text> em SVG NÃO quebra linha nem
+// encolhe. Medido em produção (_audit/f4/svg-text-overflow.mjs, getBBox real):
+//   "Whisper local · audio"  20.78u numa caixa de 12u  = 173% (vazava 4.39u
+//                            de CADA lado, e ainda furava o viewBox à esquerda)
+//   "HITL Telegram"          12.95u                     = 108%
+//   "6 agents" @2.4          11.52u                     =  96% (zero respiro óptico)
+// Geist Mono tem avanço 0.6em, então largura = nchars × 0.6 × fontSize. Com
+// caixa de 12.4u e padding 0.9u de cada lado sobram 10.6u úteis:
+//   título @1.45 → "Inteligência" (12ch) = 10.44u  ✓ o mais largo
+//   meta   @2.10 → "6 agents"      (8ch) = 10.08u  ✓
+//   sub    @1.35 → "áudio local"  (11ch) =  8.91u  ✓ (1.05 dava ~8px na tela,
+//                    abaixo do piso de 11px do design system; 1.35 ≈ 10.7px)
+// Os qualificadores longos viraram segunda linha em vez de sumir: "Whisper local
+// · audio" carrega evidência de engenharia real (transcrição local), não é enfeite.
 const PIPELINE_STAGES: PipelineStage[] = [
-  { id: 'IN', title: 'Whisper local · audio' },
-  { id: 'S0', count: '6', title: 'Onboarding' },
-  { id: 'S1', count: '4', title: 'Inteligência' },
-  { id: 'S2', count: '2', title: 'Estratégia' },
-  { id: 'S3', count: '8', title: 'Criação' },
-  { id: 'S4', count: '4', title: 'Revisão' },
-  { id: 'E-0', title: 'HITL Telegram', emissive: true },
+  { id: 'IN', meta: 'input', metaMuted: true, title: 'Whisper', sub: 'áudio local' },
+  { id: 'S0', meta: '6 agents', title: 'Onboarding' },
+  { id: 'S1', meta: '4 agents', title: 'Inteligência' },
+  { id: 'S2', meta: '2 agents', title: 'Estratégia' },
+  { id: 'S3', meta: '8 agents', title: 'Criação' },
+  { id: 'S4', meta: '4 agents', title: 'Revisão' },
+  { id: 'E-0', meta: 'output', metaMuted: true, title: 'HITL', sub: 'Telegram', emissive: true },
 ];
 
-const STAGE_W = 12;
+const STAGE_W = 12.4;
 const STAGE_H = 22;
-const GAP = 1.4;
+const GAP = 1.1;
 const ROW_Y = 16; // top of stage row
 const X_START = (100 - (PIPELINE_STAGES.length * STAGE_W + (PIPELINE_STAGES.length - 1) * GAP)) / 2;
+// Linhas de base fixas para TODAS as caixas: um spec sheet alinha as linhas
+// entre colunas; centralizar dentro de cada caixa quebraria a leitura em linha.
+const Y_ID = ROW_Y + 6.6;
+const Y_META = ROW_Y + 12.0;
+const Y_TITLE = ROW_Y + 17.0;
+const Y_SUB = ROW_Y + 20.3;
 
 export function SquadsDiagram({ className, label }: DiagramProps) {
   return (
@@ -132,7 +157,7 @@ export function SquadsDiagram({ className, label }: DiagramProps) {
             {/* Stage id (S0, S1, ..., E-0) */}
             <text
               x={x + STAGE_W / 2}
-              y={ROW_Y + 7.5}
+              y={Y_ID}
               textAnchor="middle"
               dominantBaseline="middle"
               fontSize="3.8"
@@ -142,32 +167,44 @@ export function SquadsDiagram({ className, label }: DiagramProps) {
             >
               {stage.id}
             </text>
-            {/* Stage count (6, 4, 2, 8, 4) ou nada */}
-            {stage.count ? (
-              <text
-                x={x + STAGE_W / 2}
-                y={ROW_Y + 13}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="2.4"
-                fontFamily="var(--font-mono)"
-                fill="var(--color-accent)"
-              >
-                {stage.count} agents
-              </text>
-            ) : null}
-            {/* Stage title curto embaixo */}
+            {/* Meta: "N agents" nos squads, papel topológico nas bordas */}
             <text
               x={x + STAGE_W / 2}
-              y={ROW_Y + STAGE_H - 3}
+              y={Y_META}
               textAnchor="middle"
               dominantBaseline="middle"
-              fontSize="1.65"
+              fontSize="2.1"
+              fontFamily="var(--font-mono)"
+              fill={stage.metaMuted ? 'var(--color-text-3)' : 'var(--color-accent)'}
+            >
+              {stage.meta}
+            </text>
+            {/* Título — uma palavra, sempre cabe (ver nota de métricas acima) */}
+            <text
+              x={x + STAGE_W / 2}
+              y={Y_TITLE}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="1.45"
               fontFamily="var(--font-mono)"
               fill={emissive ? 'var(--color-accent)' : 'var(--color-text-2)'}
             >
               {stage.title}
             </text>
+            {/* Qualificador — segunda linha, só onde o nome sozinho perderia info */}
+            {stage.sub ? (
+              <text
+                x={x + STAGE_W / 2}
+                y={Y_SUB}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fontSize="1.35"
+                fontFamily="var(--font-mono)"
+                fill="var(--color-text-3)"
+              >
+                {stage.sub}
+              </text>
+            ) : null}
           </g>
         );
       })}
@@ -257,7 +294,7 @@ export function NexaCoreDiagram({ className, label }: DiagramProps) {
               width="6"
               height="4"
               rx="0.5"
-              fill="var(--color-base)"
+              fill="var(--color-bg)"
               stroke="var(--color-accent)"
               strokeWidth="0.25"
             />
@@ -348,9 +385,9 @@ export function StjAppDiagram({ className, label }: DiagramProps) {
           strokeWidth="0.5"
         />
         {/* Notch */}
-        <rect x="26" y="9" width="6" height="1" rx="0.5" fill="var(--color-base)" />
+        <rect x="26" y="9" width="6" height="1" rx="0.5" fill="var(--color-bg)" />
         {/* Screen content — 3 cache layers + Claude streaming */}
-        <rect x="20" y="12" width="18" height="38" rx="1.2" fill="var(--color-base)" />
+        <rect x="20" y="12" width="18" height="38" rx="1.2" fill="var(--color-bg)" />
 
         {/* Layer 1: Anthropic API cache 1h */}
         <rect
@@ -582,7 +619,7 @@ export function CaronasDiagram({ className, label }: DiagramProps) {
     >
       {label ? <title>{label}</title> : null}
 
-      <rect width="100" height="60" fill="var(--color-base)" />
+      <rect width="100" height="60" fill="var(--color-bg)" />
 
       {/* Terminal window chrome */}
       <rect
@@ -674,7 +711,7 @@ export function EstruturaCDiagram({ className, label }: DiagramProps) {
     >
       {label ? <title>{label}</title> : null}
 
-      <rect width="100" height="60" fill="var(--color-base)" />
+      <rect width="100" height="60" fill="var(--color-bg)" />
 
       {/* IDE-style file tab */}
       <rect x="5" y="5" width="22" height="4" rx="0.5" fill="var(--color-surface-overlay)" />
@@ -940,7 +977,7 @@ export function EsteticaDiagram({ className, label }: DiagramProps) {
           fontSize="1.5"
           fontFamily="var(--font-mono)"
           fontWeight="600"
-          fill="var(--color-base)"
+          fill="var(--color-bg)"
         >
           Agendar consulta
         </text>
