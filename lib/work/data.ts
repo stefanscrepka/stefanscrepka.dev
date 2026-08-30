@@ -69,8 +69,8 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     title: 'Content Engine',
     tagline: 'Sistema multi-agente autônomo · 22 agentes Claude SDK em 5 squads',
     description:
-      'Substitui agência de 4-6 pessoas. Aprovação humana ≤10 min/dia via Telegram. Cron 03h-07h30. Stack local GPU RTX 3070 subsidiando custo.',
-    status: 'Em desenvolvimento ativo · cron operacional',
+      'Substitui agência de 4-6 pessoas. Aprovação humana ≤10 min/dia via Telegram. Cron 03h–07h30. Stack local GPU RTX 3070 subsidiando custo.',
+    status: 'Operacional · cron 24/7 · em iteração',
     stack: [
       'Claude Agent SDK · Opus 4.7 + Sonnet 4.6 + Haiku 4.5',
       '22 agentes em 5 squads + E-0 HITL',
@@ -145,8 +145,16 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       },
       { label: 'Agendar call 15min →', href: '/#contato', variant: 'outline' },
     ],
-    screenshot: null,
-    heroAsset: null,
+    // W-assets (2026-05-26): screenshots reais NexaCore — dashboard como primary
+    // (cover do card flagship + MacBookScroll na case page). 1920×1200, AVIF
+    // crf 32 ~32KB. Diagram fica como fallback (não usado em produção mas
+    // mantido pra design-system reference).
+    screenshot: '/work-screenshots/nexacore-dashboard.avif',
+    heroAsset: {
+      src: '/work-screenshots/nexacore-dashboard.avif',
+      type: 'image',
+      aspect: '16/10',
+    },
     diagram: 'nexacore',
     accent: 'lime',
     shortLine: 'B2B SaaS clínicas estéticas · Next 14 + Clerk + WhatsApp + 61 componentes design.',
@@ -192,11 +200,16 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       },
       { label: 'Post-mortem técnico →', href: '#post-mortem', variant: 'outline' },
     ],
-    screenshot: '/work-screenshots/stj-app-desktop.avif',
+    // W-assets (2026-05-26): substituído tela-de-login (stj-app-desktop.avif)
+    // pelo home page LOGADO mostrando produto em uso — tasks reais (rodar
+    // /daily-content + brief visual, streak buffer, manhã/tarde). Captura 4K
+    // (3840×2160) → AVIF 2880px wide. Linear-grade: chrome próprio da app
+    // (topbar stj), sem URL bar do browser exposto.
+    screenshot: '/work-screenshots/stj-app-home.avif',
     heroAsset: {
-      src: '/work-screenshots/stj-app-desktop.avif',
+      src: '/work-screenshots/stj-app-home.avif',
       type: 'image',
-      aspect: '16/10',
+      aspect: '16/9',
     },
     diagram: 'stj',
     accent: 'lime',
@@ -249,7 +262,9 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     heroAsset: {
       src: '/work-screenshots/estetica-md-home.avif',
       type: 'image',
-      aspect: '16/10',
+      // W-fix (2026-05-26): aspect 16/10 → 3/2. A captura nativa é 3/2 (Dra.
+      // foto + certificado) e estava esticada/cortada ao forçar 16/10.
+      aspect: '3/2',
     },
     diagram: 'estetica',
     accent: 'amber',
