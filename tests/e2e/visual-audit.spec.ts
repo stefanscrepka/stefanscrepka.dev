@@ -25,7 +25,11 @@ for (const viewport of VIEWPORTS) {
 
     for (const route of ROUTES) {
       test(`${route.name}`, async ({ page }) => {
-        await page.goto(route.path, { waitUntil: 'networkidle' });
+        // F3 (2026-06-11): 'load' em vez de 'networkidle' — /playground nunca
+        // aquieta a rede (script do Vercel Analytics 404a fora do runtime
+        // Vercel e fica em retry; assets do Three streamam). O timeout fixo
+        // abaixo já cobre o settle visual pro screenshot.
+        await page.goto(route.path, { waitUntil: 'load' });
         // Aguarda mais que 1500ms — hero CTAs tem delay 0.6s + duration 0.35s, subhead delay 0.4s.
         await page.waitForTimeout(2000);
         await page.screenshot({

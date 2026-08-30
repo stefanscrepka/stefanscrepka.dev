@@ -4,8 +4,9 @@ test.describe('home', () => {
   test('renders headline + subhead with editorial accent', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/Stefan/);
-    // Headline h1 contém "multi-agente" (SplitText pode wrappear em divs durante anim;
-    // toContainText é estável independente de opacity/animação).
+    // Headline h1 contém "multi-agente" (headline-word-reveal splita por
+    // palavra em <span> no servidor; toContainText é estável independente
+    // de opacity/animação).
     await expect(page.getByRole('heading', { level: 1 })).toContainText('multi-agente');
     // Subhead técnica (no hero — Footer também tem essa string, então pegue a primeira).
     await expect(page.getByText(/AI Product Engineer/i).first()).toBeVisible();
