@@ -62,3 +62,20 @@ screenshots-2026-05-21/
 /_prompts/videos-gerados/
 /brand-book.html
 /brand-book.pdf
+
+# audit sensorial (screenshots + scripts Playwright da sessão de auditoria)
+/_audit/
+
+# ferramentas locais do agente. Fora do git por tres motivos:
+#   - .claude/settings.local.json guarda uma API key (STARK_21ST_KEY)
+#   - .claude/skills/rive traz 45 MB de node_modules com binarios (.node/.wasm)
+#   - .agents/repos sao 94 MB de repos de terceiros com 12 .git aninhados
+# Nada disso e o site. Se quiser versionar as skills um dia, basta trocar
+# /.claude/ por /.claude/settings.local.json + /.claude/skills/*/node_modules/
+/.agents/
+/.claude/
+
+# capturas de scratch soltas na raiz (os assets reais vivem em public/work-screenshots/)
+/stj-app.vercel.app_*.png
+/striveos.shop_*.png
+/pricing.html
