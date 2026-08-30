@@ -100,7 +100,7 @@ const SECTIONS: Section[] = [
     eyebrow: 'Infraestrutura',
     title: 'Stack local GPU — subsidiando custo',
     body: [
-      'Imagens e embeddings rodam em GPU local (RTX 4070 Ti). Stable Diffusion XL pra hero images, BGE-M3 pros embeddings do pgvector RAG. Custo marginal: 0 — energia já paga.',
+      'Imagens e embeddings rodam em GPU local (RTX 3070). Stable Diffusion XL pra hero images, BGE-M3 pros embeddings do pgvector RAG. Custo marginal: 0 — energia já paga.',
       'Claude SDK chama API só quando precisa de raciocínio (writing, validação semântica, decisões). Embeddings, imagens, OCR, vision tasks light → local. Resultado: cost-per-piece cai ~62% vs full-API.',
     ],
     highlights: [
@@ -121,9 +121,41 @@ const SECTIONS: Section[] = [
   },
 ];
 
+// W-seo (2026-05-25): HowTo JSON-LD a partir dos SECTIONS — Google renderiza
+// step-by-step rich snippet no SERP pra páginas marcadas como HowTo. Maior
+// ROI rich snippet do site porque /process JÁ é estruturado como tutorial.
+// W-seo helper: filtra a section "closing" (resumo, não é step).
+function buildHowToJsonLd() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://stefanscrepka.dev';
+  const steps = SECTIONS.filter((s) => s.id !== 'closing');
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    '@id': `${baseUrl}/process#howto`,
+    name: 'Como construo IA multi-agente em produção',
+    description:
+      'Método de cinco etapas pra rodar IA multi-agente em produção sem virar buraco de dinheiro: anti-slop validator, prompt cache 2 camadas, HITL Telegram, cron noturno e stack local GPU.',
+    inLanguage: 'pt-BR',
+    totalTime: 'PT8M',
+    author: { '@id': `${baseUrl}/#person` },
+    step: steps.map((section, idx) => ({
+      '@type': 'HowToStep',
+      position: idx + 1,
+      name: section.title,
+      text: section.body.join(' '),
+      url: `${baseUrl}/process#${section.id}`,
+    })),
+  };
+}
+
 export default function ProcessPage() {
   return (
     <section className="section-pad-y" data-slot="process">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: structured data SSR
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildHowToJsonLd()) }}
+      />
       <div className="container-narrow">
         <header className="mb-14 flex flex-col gap-4 sm:mb-20">
           <p className="eyebrow">PROCESS</p>
@@ -134,7 +166,7 @@ export default function ProcessPage() {
               '!tracking-[-0.025em] !leading-[1.02] text-balance'
             )}
           >
-            Como construo · método multi-agente.
+            Como construo — método multi-agente.
           </h1>
           <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
             Seis decisões de engenharia que tornam multi-agente um sistema previsível em vez de uma
@@ -211,16 +243,24 @@ export default function ProcessPage() {
           <div className="flex items-center gap-6">
             <Link
               href="/"
-              className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) outline-none transition-colors hover:text-(--color-text-1) focus-visible:text-(--color-text-1)"
+              className={cn(
+                'rounded-md font-mono text-2xs uppercase tracking-widest text-(--color-text-3) outline-none transition-colors',
+                // F4 (2026-08-29): 16.5px de altura → WCAG 2.2 SC 2.5.8 (24px).
+                'py-2 -my-2',
+                'hover:text-(--color-text-1) focus-visible:text-(--color-text-1)',
+                // W-a11y (2026-05-25): focus-visible ring (antes só color shift).
+                'focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-bg)'
+              )}
             >
               ← Voltar
             </Link>
             <Link
               href="/#contato"
               className={cn(
-                'inline-flex items-center gap-2 font-mono text-sm text-(--color-accent)',
+                'inline-flex items-center gap-2 rounded-md font-mono text-sm text-(--color-accent) outline-none',
                 'transition-[gap,color] duration-(--motion-transition) ease-(--ease-smooth)',
-                'hover:gap-3 hover:text-(--color-accent-hover) focus-visible:gap-3 outline-none'
+                'hover:gap-3 hover:text-(--color-accent-hover) focus-visible:gap-3',
+                'focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-bg)'
               )}
             >
               Falar comigo

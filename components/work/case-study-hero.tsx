@@ -29,7 +29,12 @@ export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
   return (
     <header
       className={cn(
-        'container-max flex flex-col gap-7 pt-10 pb-16 sm:pt-12 sm:pb-20 lg:pt-14 lg:pb-24',
+        // W-audit (2026-06-10): pt-10/12/14 → pt-24/28/32. A TopBarNav é FIXED
+        // (h-14 md:h-16) e sobrepõe o fluxo — com pt-10 o back-link "← Outros
+        // cases" nascia meio cortado embaixo da nav (frames d4-case-*-hero do
+        // audit). Novo pt = nav (56/64px) + respiro, um degrau abaixo do
+        // pt-32/36 do índice /work (hierarquia coerente).
+        'container-max flex flex-col gap-7 pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-32 lg:pb-24',
         className
       )}
       data-clinic-scope={isAmber ? '' : undefined}
@@ -38,10 +43,17 @@ export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
       <Link
         href="/work"
         className={cn(
-          'group/back inline-flex w-fit items-center gap-2 font-mono text-2xs uppercase tracking-widest',
+          'group/back inline-flex w-fit items-center gap-2 rounded-sm font-mono text-2xs uppercase tracking-widest',
+          // F4 (2026-08-29): alvo tinha 16.5px de altura (WCAG 2.2 SC 2.5.8 pede 24).
+          // py-2 -my-2 cresce a área de toque sem alterar o layout visual.
+          'py-2 -my-2',
           'text-(--color-text-3) outline-none',
           'transition-[gap,color] duration-(--motion-transition) ease-(--ease-smooth)',
-          'hover:gap-3 focus-visible:gap-3'
+          'hover:gap-3 focus-visible:gap-3',
+          // F3-review (2026-06-11): aumento de gap não é indicador de foco
+          // perceptível (WCAG 2.4.7); `outline-none` vence o anel global, então
+          // ring-2 explícito dá o anel que faltava no único back-link das cases.
+          'focus-visible:ring-2 focus-visible:ring-(--color-border-focus) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-bg)'
         )}
         style={{
           // amber scope hover color override sem propagação global
@@ -124,7 +136,7 @@ export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
                   isAmber && isPrimary
                     ? {
                         backgroundColor: accentColor,
-                        color: 'var(--color-base)',
+                        color: 'var(--color-bg)',
                         boxShadow: `var(--shadow-md), ${accentGlow}`,
                       }
                     : undefined

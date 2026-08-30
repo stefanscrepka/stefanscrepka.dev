@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { AnchorLink } from '@/components/shared/anchor-link';
 import { SHMonogram } from '@/components/shared/sh-monogram';
 import { cn } from '@/lib/utils';
+import { FooterBreathingHairline, FooterClosing } from './footer.client';
 import { FooterAboutButton } from './footer-about-button.client';
 
 // Footer cinematic minimal — 3 colunas + bottom row.
@@ -39,7 +40,7 @@ const SOCIAL_LINKS = [
 
 // W-mob2 #11: py-2 mobile dá clickable area ~36px (sm:py-0 mantém visual desktop discreto).
 const linkClass = cn(
-  'inline-flex items-center gap-1.5 py-2 sm:py-0 text-sm text-(--color-text-2) outline-none',
+  'inline-flex items-center gap-1.5 py-2 sm:py-0 text-sm text-(--color-text-2)',
   'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
   'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
 );
@@ -51,7 +52,7 @@ export function Footer() {
       className={cn(
         'relative isolate bg-(--color-surface-deep)',
         // Background deeper que body — token --color-surface-deep cria shelf sutil
-        // sob Contact (-3% L vs --color-base).
+        // sob Contact (-3% L vs --color-bg).
         'border-t border-(--color-hairline)',
         'pt-16 pb-[max(5rem,calc(5rem+env(safe-area-inset-bottom)))] sm:pt-20 sm:pb-[max(6rem,calc(6rem+env(safe-area-inset-bottom)))]',
         'pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]'
@@ -60,16 +61,10 @@ export function Footer() {
       {/* Lime hairline divisor — sinaliza fim do conteúdo (gradient fade nas pontas).
           W-motion #10: animação `hairline-breathe` 4s ease-in-out infinite oscila
           opacity 0.4 → 0.6. Awwwards 2025 trend em footers cinematográficos.
-          Reduced-motion: bloco global em globals.css zera animation-duration. */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-px motion-safe:[animation:hairline-breathe_4s_ease-in-out_infinite]"
-        style={{
-          background:
-            'linear-gradient(to right, transparent 0%, var(--color-accent) 50%, transparent 100%)',
-          opacity: 0.4,
-        }}
-      />
+          Reduced-motion: bloco global em globals.css zera animation-duration.
+          F3.5 (2026-06-11): virou ilha client — pausa fora da viewport via
+          IntersectionObserver (footer.client.tsx). */}
+      <FooterBreathingHairline />
 
       <div className="container-max flex flex-col gap-12 sm:gap-14">
         {/* ROW 1 — 3 colunas (Brand · Nav · Conexão).
@@ -149,15 +144,12 @@ export function Footer() {
             tem o mesmo padrao... funciona 24/7 ou alguem perde dinheiro").
             Substitui copyright generico anterior. */}
         <div className="flex flex-col gap-6 border-t border-(--color-hairline) pt-8 sm:gap-8">
-          {/* Closing statement — frase autoral memoravel */}
+          {/* Closing statement — frase autoral memoravel.
+              F3.9 (2026-06-11): reveal sutil on-scroll (footer.client.tsx) —
+              o peak-end ganha um beat próprio agora que a frase está visível
+              (Fase 1 #2 consertou a cor; este é o refinamento previsto). */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
-            <p
-              className="max-w-2xl text-base leading-snug text-(--color-text-1) sm:text-lg"
-              style={{ letterSpacing: '-0.015em' }}
-            >
-              Se não funciona 24/7, não conta.{' '}
-              <span className="text-(--color-text-3)">— stefan</span>
-            </p>
+            <FooterClosing />
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) shrink-0">
               ponta grossa · 2026
             </p>
@@ -171,7 +163,7 @@ export function Footer() {
             <Link
               href="/privacidade"
               className={cn(
-                'inline-flex items-center gap-1 py-2 sm:py-0 outline-none transition-colors',
+                'inline-flex items-center gap-1 py-2 sm:-my-2 transition-colors',
                 'duration-(--motion-fast) ease-(--ease-standard)',
                 'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
               )}
@@ -183,7 +175,7 @@ export function Footer() {
               target="_blank"
               rel="noreferrer"
               className={cn(
-                'inline-flex items-center gap-1 py-2 sm:py-0 outline-none transition-colors',
+                'inline-flex items-center gap-1 py-2 sm:-my-2 transition-colors',
                 'duration-(--motion-fast) ease-(--ease-standard)',
                 'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
               )}

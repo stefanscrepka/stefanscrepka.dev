@@ -19,7 +19,7 @@ export function FooterAboutButton() {
         window.dispatchEvent(new HashChangeEvent('hashchange'));
       }}
       className={cn(
-        'inline-flex items-center gap-1 py-2 sm:py-0 outline-none transition-colors',
+        'inline-flex items-center gap-1 py-2 sm:-my-2 transition-colors',
         'duration-(--motion-fast) ease-(--ease-standard)',
         'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
       )}
