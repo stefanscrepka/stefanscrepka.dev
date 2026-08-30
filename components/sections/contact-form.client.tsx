@@ -210,7 +210,7 @@ export function ContactForm() {
           onClick={handleSendAnother}
           className={cn(
             'self-start font-mono text-xs uppercase tracking-widest text-(--color-accent)',
-            'outline-none underline-offset-4 transition-colors hover:underline focus-visible:underline'
+            'underline-offset-4 transition-colors hover:underline focus-visible:underline'
           )}
         >
           Enviar outra mensagem →
@@ -250,6 +250,10 @@ export function ContactForm() {
               {...register('nome')}
               placeholder="Como posso te chamar?"
               autoComplete="name"
+              autoCapitalize="words"
+              autoCorrect="off"
+              spellCheck={false}
+              enterKeyHint="next"
               aria-invalid={!!errors.nome}
               aria-describedby={errors.nome ? `${formId}-nome-error` : undefined}
               className="h-12 text-base"
@@ -269,7 +273,11 @@ export function ContactForm() {
               {...register('email')}
               placeholder="Pra onde respondo"
               autoComplete="email"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
               inputMode="email"
+              enterKeyHint="next"
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? `${formId}-email-error` : undefined}
               className="h-12 text-base"
@@ -338,11 +346,7 @@ export function ContactForm() {
           })}
         </div>
         {errors.prefere ? (
-          <p
-            id={`${formId}-prefere-error`}
-            role="alert"
-            className="font-mono text-xs text-(--color-danger)"
-          >
+          <p id={`${formId}-prefere-error`} className="font-mono text-xs text-(--color-danger)">
             {errors.prefere.message}
           </p>
         ) : null}
@@ -357,6 +361,8 @@ export function ContactForm() {
             {...register('mensagem')}
             placeholder="Conta o problema. Eu respondo se faz sentido."
             rows={5}
+            autoCapitalize="sentences"
+            enterKeyHint="send"
             aria-invalid={!!errors.mensagem}
             aria-describedby={errors.mensagem ? `${formId}-mensagem-error` : undefined}
             className="min-h-32 text-base leading-relaxed"
@@ -383,7 +389,7 @@ export function ContactForm() {
             'active:scale-100'
           )}
         >
-          {isPending ? 'Enviando…' : 'Enviar →'}
+          {isPending ? 'Enviando…' : 'Enviar mensagem →'}
         </Button>
 
         <div className="flex flex-col gap-1">
@@ -403,7 +409,7 @@ export function ContactForm() {
             Ao enviar, você aceita a{' '}
             <a
               href="/privacidade"
-              className="text-(--color-accent) underline-offset-4 hover:underline"
+              className="text-(--color-accent) underline underline-offset-4 decoration-(--color-accent)/50 transition-[text-decoration-color] hover:decoration-(--color-accent)"
             >
               política de privacidade
             </a>
@@ -433,8 +439,11 @@ function Field({ label, error, input, errorId, fieldId }: FieldProps) {
         {label}
       </Label>
       {input}
+      {/* W-a11y (2026-05-25): role="alert" removido (aria-describedby no
+          input já liga o erro semanticamente). Antes os dois simultâneos
+          causavam anúncio duplo no screen reader. */}
       {error ? (
-        <p id={errorId} role="alert" className="font-mono text-xs text-(--color-danger)">
+        <p id={errorId} className="font-mono text-xs text-(--color-danger)">
           {error}
         </p>
       ) : null}

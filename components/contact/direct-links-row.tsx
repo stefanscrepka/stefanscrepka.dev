@@ -93,7 +93,7 @@ export function DirectLinksRow() {
                 aria-hidden="true"
                 className={cn(
                   'inline-flex size-9 items-center justify-center rounded-md',
-                  'border border-(--color-hairline-strong) bg-(--color-base)',
+                  'border border-(--color-hairline-strong) bg-(--color-bg)',
                   'text-(--color-text-2) transition-colors duration-(--motion-fast)',
                   'group-hover/link:border-(--color-accent) group-hover/link:text-(--color-accent)',
                   'group-focus-visible/link:border-(--color-accent) group-focus-visible/link:text-(--color-accent)'
