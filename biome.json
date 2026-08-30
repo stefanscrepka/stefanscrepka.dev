@@ -24,7 +24,10 @@
       "!playwright-report",
       "!public",
       "!pnpm-lock.yaml",
-      "!app/globals.css"
+      "!app/globals.css",
+      "!.agents",
+      "!_audit",
+      "!.claude"
     ]
   },
   "linter": {
