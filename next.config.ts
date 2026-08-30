@@ -35,9 +35,19 @@ const nextConfig: NextConfig = {
       '@icons-pack/react-simple-icons',
       'radix-ui',
     ],
+    // W-audit (2026-06-10): habilita <ViewTransition> (React) pra crossfade
+    // de rota — antes a navegação era corte seco. Uso em app/layout.tsx +
+    // CSS ::view-transition-* em globals.css. Guia:
+    // node_modules/next/dist/docs/01-app/02-guides/view-transitions.md
+    viewTransition: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],
+    // W-audit (2026-06-10): Next 16 valida `quality` contra esta allowlist
+    // (default [75]). CaseStudyCover usa quality={95} (screenshots de UI com
+    // texto fino) — sem registrar, dev loga warning por imagem e versões
+    // futuras rejeitam a URL otimizada.
+    qualities: [75, 95],
     remotePatterns: [],
   },
   async headers() {
@@ -48,25 +58,43 @@ const nextConfig: NextConfig = {
     // node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md
     // (requer dynamic rendering — perde prerender estático).
     //
+    // 'unsafe-eval' SÓ em development — React DevTools usa eval() pra
+    // reconstruir callstacks. Em produção, React nunca usa eval (drop em
+    // build) então o CSP fica strict.
+    //
     // Hosts permitidos:
     //   - script-src: vercel-scripts (Analytics + Speed Insights), cal.com embed
     //   - connect-src: Sentry ingest, Vercel vitals, Cal.com API + websocket
     //   - frame-src: Cal.com modal iframe
-    const csp = [
+    const isDev = process.env.NODE_ENV !== 'production';
+    const scriptSrcExtras = isDev ? " 'unsafe-eval'" : '';
+    const connectSrcExtras = isDev ? ' ws://localhost:* http://localhost:*' : '';
+    const cspDirectives = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://vitals.vercel-insights.com https://app.cal.com https://embed.cal.com",
+      // blob: é necessário pros web workers do Three.js/drei (troika-text):
+      // eles nascem como worker blob: e chamam importScripts(blob:) — o load
+      // de script DENTRO do worker é governado por script-src (não worker-src).
+      // Sem isso, /playground logava 12 erros "importScripts failed" (audit
+      // 2026-06-10). Com 'unsafe-inline' já presente, blob: não amplia a
+      // superfície de forma relevante.
+      `script-src 'self' 'unsafe-inline' blob:${scriptSrcExtras} https://va.vercel-scripts.com https://vitals.vercel-insights.com https://app.cal.com https://embed.cal.com`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
-      "connect-src 'self' https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://app.cal.com https://api.cal.com wss://app.cal.com",
+      `connect-src 'self' https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://app.cal.com https://api.cal.com wss://app.cal.com${connectSrcExtras}`,
       'frame-src https://app.cal.com https://embed.cal.com',
       "worker-src 'self' blob:",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
       "frame-ancestors 'none'",
-      'upgrade-insecure-requests',
-    ].join('; ');
+    ];
+    // upgrade-insecure-requests SÓ em prod (em dev, forçaria http→https
+    // em localhost e quebraria recursos sobre HTTP).
+    if (!isDev) {
+      cspDirectives.push('upgrade-insecure-requests');
+    }
+    const csp = cspDirectives.join('; ');
 
     return [
       {

@@ -1,52 +1,77 @@
 import type { MetadataRoute } from 'next';
 
+// W-seo (2026-05-25): dates reais por rota em vez de new Date() global.
+// Google desconfia de "tudo mudou hoje" — quando todas as URLs têm o mesmo
+// lastModified atualizado a cada build, o sinal vira ruído. Datas const aqui
+// devem refletir mudanças materiais de conteúdo da rota (atualizar manualmente
+// quando rewriting copy/structure).
+const ROUTE_DATES = {
+  home: '2026-05-25',
+  work: '2026-05-25',
+  contentEngine: '2026-05-25',
+  nexacore: '2026-05-25',
+  stjApp: '2026-05-25',
+  esteticaMd: '2026-05-24',
+  playground: '2026-05-23',
+  process: '2026-05-25',
+  privacidade: '2026-05-25',
+} as const;
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://stefanscrepka.dev';
-  const now = new Date();
 
   return [
-    { url: `${base}/`, lastModified: now, changeFrequency: 'monthly', priority: 1 },
-    { url: `${base}/work`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    {
+      url: `${base}/`,
+      lastModified: ROUTE_DATES.home,
+      changeFrequency: 'weekly',
+      priority: 1,
+    },
+    {
+      url: `${base}/work`,
+      lastModified: ROUTE_DATES.work,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
     {
       url: `${base}/work/content-engine`,
-      lastModified: now,
+      lastModified: ROUTE_DATES.contentEngine,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${base}/work/nexacore`,
-      lastModified: now,
+      lastModified: ROUTE_DATES.nexacore,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${base}/work/stj-app`,
-      lastModified: now,
+      lastModified: ROUTE_DATES.stjApp,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
       url: `${base}/work/estetica-md`,
-      lastModified: now,
-      changeFrequency: 'monthly',
+      lastModified: ROUTE_DATES.esteticaMd,
+      changeFrequency: 'yearly',
       priority: 0.7,
     },
     {
       url: `${base}/playground`,
-      lastModified: now,
+      lastModified: ROUTE_DATES.playground,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
-    // W-seo #5: rotas adicionadas (estavam ausentes do sitemap).
     {
       url: `${base}/process`,
-      lastModified: now,
+      lastModified: ROUTE_DATES.process,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${base}/privacidade`,
-      lastModified: now,
+      lastModified: ROUTE_DATES.privacidade,
       changeFrequency: 'yearly',
       priority: 0.3,
     },

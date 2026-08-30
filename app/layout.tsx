@@ -4,6 +4,7 @@ import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import type { Metadata, Viewport } from 'next';
 import localFont from 'next/font/local';
+import { ViewTransition } from 'react';
 import { AboutThisSiteGate } from '@/components/contact/about-this-site-gate.client';
 import { LenisProvider } from '@/components/providers/lenis-provider';
 import { MotionProvider } from '@/components/providers/motion-provider';
@@ -49,6 +50,12 @@ export const navItems: TopBarNavItem[] = [
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://stefanscrepka.dev';
 
+// W-deploy (2026-05-25): Vercel Analytics + Speed Insights só montados em
+// prod. Em dev (localhost), os scripts /_vercel/insights/script.js +
+// /_vercel/speed-insights/script.js retornam 404 (servidos só pelo runtime
+// Vercel deployado), poluindo o console. Em prod montam normalmente.
+const IS_PROD = process.env.NODE_ENV === 'production';
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
@@ -56,7 +63,7 @@ export const metadata: Metadata = {
     template: '%s · Stefan Heinz Screpka',
   },
   description:
-    'Construo IA multi-agente em produção — e o produto inteiro ao redor dela. Claude SDK + Next 16 + TypeScript. Três produtos rodando.',
+    'Construo IA multi-agente em produção — e o produto inteiro ao redor dela. 22 agentes Claude SDK aprovados via Telegram. Três produtos rodando.',
   authors: [{ name: 'Stefan Heinz Screpka' }],
   creator: 'Stefan Heinz Screpka',
   openGraph: {
@@ -76,6 +83,14 @@ export const metadata: Metadata = {
       'x-default': baseUrl,
     },
   },
+  // W-mob/PWA (2026-05-25): apple-mobile-web-app-* metadados. Sem isso, Add-to
+  // -Home-Screen no iOS abre dentro do Safari shell em vez de modo standalone.
+  // Status bar dark translucent combina com theme oklch(13%) do site.
+  appleWebApp: {
+    capable: true,
+    title: 'Stefan Screpka',
+    statusBarStyle: 'black-translucent',
+  },
 };
 
 export const viewport: Viewport = {
@@ -86,8 +101,9 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
 };
 
-// W-seo #3: @id permite ligação cross-schema (case study CreativeWork.creator
-// aponta pra esse Person via URI canônico).
+// W-seo #3: @id permite ligação cross-schema (case study SoftwareApplication.creator
+// aponta pra esse Person via URI canônico). W-seo (2026-05-25): adicionado
+// image (avatar usado pelo Knowledge Panel) + Cal.com em sameAs.
 const personJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -96,6 +112,8 @@ const personJsonLd = {
   jobTitle: 'AI Product Engineer',
   url: baseUrl,
   email: 'stefanheinz2006@gmail.com',
+  telephone: '+55-42-99859-2522',
+  image: `${baseUrl}/avatar-stefan.avif`,
   description:
     'AI Product Engineer brasileiro. Multi-agent IA com Claude SDK + product engineering full-stack. Três produtos em produção: Content Engine, NexaCore SaaS, STJ App.',
   address: {
@@ -107,6 +125,8 @@ const personJsonLd = {
   sameAs: [
     'https://github.com/stefanscrepka',
     'https://www.linkedin.com/in/stefan-heinz-screpka-323ab9242/',
+    'https://cal.com/stefanscrepka',
+    'https://wa.me/5542998592522',
   ],
   knowsAbout: [
     'AI',
@@ -144,6 +164,21 @@ const personJsonLd = {
   ],
 };
 
+// W-seo (2026-05-25): WebSite schema com publisher cross-link pro Person.
+// Permite o Google entender o site como entidade própria (separa "obra"
+// de "autor") + abre porta pra SearchAction futuro se adicionar busca.
+const websiteJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${baseUrl}/#website`,
+  url: baseUrl,
+  name: 'Stefan Heinz Screpka',
+  description:
+    'Portfolio de Stefan Heinz Screpka — AI Product Engineer. Três produtos em produção: Content Engine (multi-agente Claude SDK), NexaCore (B2B multi-tenant), STJ App (PWA cockpit).',
+  inLanguage: 'pt-BR',
+  publisher: { '@id': `${baseUrl}/#person` },
+};
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
@@ -152,21 +187,19 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       suppressHydrationWarning
     >
       <head>
-        {/* W-perf #12: preload AVIF poster (LCP candidate em mobile). type=image/avif
-            ajuda browser a casar com o uso real do video poster. */}
-        <link
-          rel="preload"
-          as="image"
-          type="image/avif"
-          href="/bg/hero-poster.avif"
-          fetchPriority="high"
-        />
-        {/* W-perf (2026-05-25): preconnect Cal.com — modal first-open paga
-            200-500ms de TLS+DNS+TTFB. Antecipa esse custo enquanto user navega.
-            crossOrigin necessário pra o handshake TLS contar pro iframe. */}
+        {/* W-audit (2026-06-10): preload do hero-poster MOVIDO pra
+            components/sections/hero.tsx (React 19 iça <link> de RSC pro head).
+            Aqui no root layout, TODAS as rotas internas pré-carregavam um
+            asset que só a home usa — warning "preloaded but not used" no
+            console de cada página + ~47 KB desperdiçados por navegação. */}
+        {/* W-perf (2026-05-25 revert): preconnect Cal.com causava Lighthouse
+            "unused preconnect" penalty porque o iframe só carrega quando user
+            abre o modal (decisão deferred). dns-prefetch only é mais barato
+            (apenas resolução DNS, sem TLS handshake idle) e ainda economiza
+            ~50-100ms no first modal open vs nada.
+            crossOrigin é deliberadamente omitido em dns-prefetch (não aplica). */}
         <link rel="dns-prefetch" href="https://cal.com" />
-        <link rel="preconnect" href="https://cal.com" crossOrigin="" />
-        <link rel="preconnect" href="https://app.cal.com" crossOrigin="" />
+        <link rel="dns-prefetch" href="https://app.cal.com" />
         {/* Pre-hydration FOUC gate — seta atributo ANTES de paint inicial.
             Script roda síncrono em <head>, antes do body renderizar. CSS rule
             em globals.css `html[data-pre-hydration] .anim-pre-hidden { opacity: 0 }`
@@ -181,6 +214,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           type="application/ld+json"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: structured data SSR
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: structured data SSR
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
         {/* Easter egg console — dev abre DevTools, entra no clube. ASCII SH + contato.
             Print direto no console com %c CSS styled. Production only (NODE_ENV) pra
@@ -210,7 +248,20 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <CalModalProvider>
               <TopBarNav items={navItems} />
               <main id="main" className="relative">
-                {children}
+                {/* W-audit (2026-06-10): crossfade de rota via View Transitions.
+                    Antes a navegação era corte seco. Só o conteúdo do <main>
+                    participa do grupo "page-fade" (CSS em globals.css) — nav e
+                    footer ficam fora e persistem estáveis. Reduced-motion:
+                    kill explícito em globals.css.
+                    F3.3 (2026-06-11): os loading.tsx de /work e /process foram
+                    removidos — em páginas estáticas o Suspense boundary servia
+                    o conteúdo num <div hidden> revelado por JS (CLS 0.534). Sem
+                    eles, o conteúdo estático vem inteiro no HTML (CLS 0) e este
+                    page-fade segura a navegação soft sem flash branco (a página
+                    anterior fica visível até o conteúdo novo resolver — instante
+                    num estático — e então faz crossfade). É a única transição
+                    de página. */}
+                <ViewTransition default="page-fade">{children}</ViewTransition>
               </main>
               <Footer />
             </CalModalProvider>
@@ -218,8 +269,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </MotionProvider>
         <AboutThisSiteGate />
         <GrainOverlay />
-        <Analytics />
-        <SpeedInsights />
+        {IS_PROD ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
       </body>
     </html>
   );
