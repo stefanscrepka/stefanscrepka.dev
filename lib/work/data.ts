@@ -280,3 +280,25 @@ export function getCaseStudy(slug: string): CaseStudy | null {
   }
   return null;
 }
+
+/* ============================================================
+   Squads do Content Engine — FONTE ÚNICA.
+   O nome dos 5 squads aparecia duplicado em três lugares
+   (squads-status-line.tsx, o diagrama do pipeline e a cópia dos cases).
+   Duplicata de dado é como a contradição "22 vs 24 agentes" nasce; aqui
+   fica um lugar só.
+
+   ⚠️ Deliberadamente SEM contagem por squad. O diagrama do pipeline
+   (components/work/diagrams.tsx) declara 6/4/2/8/4, que soma **24** — mas o
+   rodapé do próprio diagrama e outros sete pontos do site afirmam **22
+   agentes**. Um dos dois números está errado e isso é decisão do Stefan, não
+   minha. Enquanto não se resolver, nada novo é construído em cima da
+   contagem por squad. Ver ROADMAP.md → Fase 4 → "Pendente de decisão".
+   ============================================================ */
+export const CONTENT_ENGINE_SQUADS = [
+  { id: 's0', code: 'S0', name: 'Onboarding' },
+  { id: 's1', code: 'S1', name: 'Inteligência' },
+  { id: 's2', code: 'S2', name: 'Estratégia' },
+  { id: 's3', code: 'S3', name: 'Criação' },
+  { id: 's4', code: 'S4', name: 'Revisão' },
+] as const;

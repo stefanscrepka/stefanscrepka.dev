@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 import { cn } from '@/lib/utils';
 
 // Status line dos squads do Content Engine — pulsa cada step em sequencia
@@ -10,12 +11,10 @@ import { cn } from '@/lib/utils';
 // Estilo: mono uppercase tracking-widest text-2xs + lime glow no step ativo.
 // 750ms cada step, total loop ~5s. Reduced-motion: snap, todos lime sutil.
 
+// F4: os 5 squads vêm da fonte única em lib/work/data.ts; E-0 é o passo de
+// saída do pipeline (aprovação humana), não um squad — por isso fica aqui.
 const STEPS = [
-  { id: 's0', label: 'S0 Onboarding' },
-  { id: 's1', label: 'S1 Inteligência' },
-  { id: 's2', label: 'S2 Estratégia' },
-  { id: 's3', label: 'S3 Criação' },
-  { id: 's4', label: 'S4 Revisão' },
+  ...CONTENT_ENGINE_SQUADS.map((s) => ({ id: s.id, label: `${s.code} ${s.name}` })),
   { id: 'e0', label: 'E-0 HITL Telegram' },
 ];
 
