@@ -1,4 +1,5 @@
 import { type TechId, TechLogo } from '@/components/shared/tech-logo';
+import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 import { cn } from '@/lib/utils';
 import { BentoRevealGrid } from './bento-skills.client';
 
@@ -60,7 +61,10 @@ const CELLS: BentoSkillsCell[] = [
       'vision',
       'streaming SSE',
     ],
-    note: 'Claude Agent SDK orquestra squads especializados (Onboarding · Inteligência · Estratégia · Criação · Revisão). Substitui agência inteira.',
+    // F4: o parêntese listava os mesmos 5 squads que agora aparecem como linha
+    // estruturada logo abaixo do stat. Dizer duas vezes na mesma célula não
+    // informa mais — só ocupa. A nota fica com o que a lista NÃO diz.
+    note: 'Claude Agent SDK orquestra os squads em cron noturno e entrega pra aprovação humana. Substitui agência inteira.',
   },
   {
     size: 'small',
@@ -181,7 +185,12 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
           aria-hidden="true"
           className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)"
         >
-          {cell.size === 'xl' ? '◆◆◆' : cell.size === 'wide' ? '═══' : '◆'}
+          {/* F4 (2026-08-29): era ◆◆◆ / ═══ / ◆ conforme o tamanho da célula.
+              É um sistema — mas ilegível: em 11px, ◆◆◆ lê como "•••" e ═══ como
+              "===", e ninguém deduz "três losangos = extra-large". Ornamento que
+              varia por um motivo imperceptível é ruído fingindo ser sinal.
+              Uma marca só, igual nas quatro células. */}
+          ◆
         </span>
       </header>
 
@@ -201,6 +210,26 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
               {cell.countSuffix}
             </p>
           ) : null}
+          {/* F4 (2026-08-29): a célula é obrigada a ter a altura de três células
+              empilhadas da coluna direita, e o stat sozinho boiava no meio com
+              ~200px de vazio acima e abaixo — lia como inacabado (o próprio
+              código chamava de "Wave 1 stub").
+              Os NOMES dos 5 squads são dado já verificado e consistente em todo
+              o site, então preenchem o espaço com substância em vez de enfeite.
+              A CONTAGEM por squad ficou de fora de propósito: o diagrama declara
+              6/4/2/8/4 = 24, contra os 22 afirmados em outros sete pontos.
+              Ver lib/work/data.ts → CONTENT_ENGINE_SQUADS. */}
+          <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5">
+            {CONTENT_ENGINE_SQUADS.map((squad) => (
+              <li
+                key={squad.id}
+                className="flex items-baseline gap-1.5 font-mono text-2xs uppercase tracking-widest"
+              >
+                <span className="text-(--color-accent)">{squad.code}</span>
+                <span className="text-(--color-text-3)">{squad.name}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       ) : null}
 
