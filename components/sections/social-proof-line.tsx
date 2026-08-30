@@ -34,7 +34,7 @@ const PROOF_LINES: ProofLineItem[] = [
     href: '/work/nexacore',
     highlight: 'B2B em produção',
     body: 'multi-tenant clínicas estéticas',
-    product: 'NexaCore · striveos.shop',
+    product: 'NexaCore',
   },
   {
     href: '/work/stj-app',
@@ -98,8 +98,11 @@ export function SocialProofLine() {
             <Link
               href={line.href}
               className={cn(
-                'group/proof flex h-full flex-col gap-1.5 rounded-md outline-none',
-                'transition-colors duration-(--motion-fast) ease-(--ease-standard)'
+                'group/proof flex h-full flex-col gap-1.5 rounded-md outline-hidden',
+                'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
+                // W-a11y (2026-05-25): focus-visible ring lime — antes só
+                // mudava cor (falha WCAG 1.4.11 Non-text Contrast 3:1).
+                'focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-bg)'
               )}
             >
               {/* Headline = highlight number/claim em sans semibold lime */}

@@ -113,10 +113,12 @@ export function PlaygroundTeaser() {
       </m.div>
 
       <p className="mt-10 text-center font-mono text-2xs uppercase tracking-widest text-(--color-text-3) sm:mt-12">
+        {/* W-audit (2026-06-10): py-3 -my-3 infla a área de toque pra ~42px
+            (link media 17px de altura no audit mobile). */}
         <Link
           href="/playground"
           className={cn(
-            'inline-flex items-center gap-2 outline-none',
+            'inline-flex items-center gap-2 py-3 -my-3',
             'text-(--color-text-3) transition-colors duration-(--motion-fast)',
             'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
           )}
@@ -138,7 +140,7 @@ function TeaserCardLink({ card }: { card: TeaserCard }) {
     <Link
       href={card.href}
       className={cn(
-        'group/teaser relative isolate flex flex-col gap-4 overflow-hidden rounded-2xl p-5 outline-none',
+        'group/teaser relative isolate flex flex-col gap-4 overflow-hidden rounded-2xl p-5 outline-hidden',
         'border border-(--color-hairline) glass-panel',
         'shadow-[var(--shadow-md),var(--shadow-inset-bisel)]',
         'transition-[transform,border-color,box-shadow] duration-(--motion-page) ease-(--ease-smooth)',
@@ -406,7 +408,7 @@ function ParensPreview() {
             y={frame.y - 2}
             fontSize="9"
             fontFamily="var(--font-mono)"
-            fill="var(--color-base)"
+            fill="var(--color-bg)"
             textAnchor="middle"
             fontWeight="600"
           >

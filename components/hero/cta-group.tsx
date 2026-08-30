@@ -59,12 +59,18 @@ export function CTAGroup({ className }: CTAGroupProps) {
         variants={{ hidden: itemInitial, visible: itemAnimate }}
         transition={{ duration: 0.35, ease: EASES_BACK_OUT }}
       >
+        {/* W-hero (2026-05-25): secondary CTA precisava emergir do radial lime
+            sobre o video. variant="outline" puro ficava fraco visualmente —
+            border-hairline (30% L) + bg-transparent quase desaparecia.
+            Overrides: border mais opaca + bg surface alpha que destaca contra
+            o atmosphere. Mantém variant pra hover lime continuar funcionando. */}
         <Button
           size="lg"
           variant="outline"
           type="button"
           onClick={openModal}
           aria-haspopup="dialog"
+          className="border-(--color-text-3) bg-(--color-surface)/60 backdrop-blur-sm"
         >
           Agendar 15min →
         </Button>

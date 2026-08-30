@@ -87,7 +87,7 @@ export function PartnerMarquee({ className }: PartnerMarqueeProps) {
       className={cn(
         'group/partner relative w-full overflow-hidden',
         'hairline-top hairline-bottom py-5',
-        'bg-(--color-base)',
+        'bg-(--color-bg)',
         className
       )}
       style={{
