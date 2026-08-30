@@ -142,7 +142,7 @@ function DiagramOverview() {
             r="5"
             stroke="var(--color-accent)"
             strokeWidth="1.5"
-            fill="var(--color-base)"
+            fill="var(--color-bg)"
           />
         </g>
       ))}
@@ -176,7 +176,7 @@ function DiagramDots({ count, label }: { count: number; label: string }) {
             r="8"
             stroke="var(--color-accent)"
             strokeWidth="1.5"
-            fill="var(--color-base)"
+            fill="var(--color-bg)"
           />
           <text
             x={x}
@@ -204,7 +204,7 @@ function DiagramHITL() {
         r="8"
         stroke="var(--color-accent)"
         strokeWidth="1.5"
-        fill="var(--color-base)"
+        fill="var(--color-bg)"
       />
       <path d="M 50 60 Q 60 50 70 60" stroke="var(--color-accent)" strokeWidth="1.5" fill="none" />
       <text
@@ -242,7 +242,7 @@ function DiagramHITL() {
         rx="4"
         stroke="var(--color-accent)"
         strokeWidth="1.5"
-        fill="var(--color-base)"
+        fill="var(--color-bg)"
       />
       <text
         x="275"

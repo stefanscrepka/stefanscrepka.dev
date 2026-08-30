@@ -8,10 +8,19 @@ import { cn } from '@/lib/utils';
 //   - Border radius 18px (var(--radius-2xl))
 //   - 3-layer cinema shadow (var(--shadow-cinema))
 //   - Inset highlight 1px rgba(255,255,255,0.06)
-//   - Frame opcional: 'browser' (3 dots topo) | 'device' (notch) | 'none'
+//   - Frame opcional:
+//       'browser' — 3 dots macOS-style topo (use quando print é puro viewport
+//                   sem chrome próprio, ex: NexaCore dashboard)
+//       'device'  — notch pill centro topo (mobile/PWA)
+//       'bare'    — sem chrome, só radius+shadow+glow. Linear/Stripe style.
+//                   Use quando o print JÁ tem chrome próprio na UI capturada
+//                   (ex: STJ-app que tem topbar `stj | Home Tasks Aprovações...`)
+//       'none'    — alias legado de 'bare' (mantido pra compat)
 //   - Tilt opcional sutil: rotateX(2deg) rotateY(-1deg)
 //   - Glow opcional: 'lime' | 'amber' | 'none'
-//   - next/image com sizes + priority opcional
+//   - next/image com sizes + preload opcional (case pages: o mockup acima do
+//     fold costuma SER o LCP — lá o <link rel=preload> é o hint correto,
+//     diferente do HeroTile da home, ver F3.6 em case-study-cover.tsx)
 //   - alt obrigatório (acessibilidade)
 //
 // Para wrappar children custom (diagrams SVG, MacBookScroll content, FlipCards),
@@ -22,7 +31,7 @@ interface ProductMockupProps {
   alt: string;
   width: number;
   height: number;
-  frame?: 'browser' | 'device' | 'none' | undefined;
+  frame?: 'browser' | 'device' | 'bare' | 'none' | undefined;
   tilted?: boolean | undefined;
   glow?: 'lime' | 'amber' | 'none' | undefined;
   priority?: boolean | undefined;
@@ -47,7 +56,8 @@ export function ProductMockup({
         alt={alt}
         width={width}
         height={height}
-        priority={priority}
+        // W-audit (2026-06-10): `priority` deprecado no Next 16 → `preload`.
+        preload={priority}
         sizes="(min-width: 1024px) 50vw, 100vw"
         className="h-full w-full object-cover"
       />
@@ -68,7 +78,7 @@ export function ProductMockup({
 
 interface MockupFrameProps {
   children: ReactNode;
-  frame?: 'browser' | 'device' | 'none' | undefined;
+  frame?: 'browser' | 'device' | 'bare' | 'none' | undefined;
   tilted?: boolean | undefined;
   glow?: 'lime' | 'amber' | 'none' | undefined;
   className?: string | undefined;
@@ -118,7 +128,10 @@ export function MockupFrame({
     >
       <div
         className={cn(
-          'relative w-full overflow-hidden',
+          // W-fix (2026-05-26): h-full pra propagar altura do parent (aspect-
+          // ratio) pros nested divs. Sem isso, <Image fill> colapsa em 0×0
+          // porque o ancestral relative+overflow-hidden não tem altura.
+          'relative h-full w-full overflow-hidden',
           'rounded-2xl',
           'transition-transform duration-(--motion-modal) ease-(--ease-smooth)'
         )}
@@ -224,7 +237,7 @@ function DeviceNotch() {
     <div
       aria-hidden="true"
       className="pointer-events-none absolute left-1/2 top-1.5 z-10 h-1 w-16 -translate-x-1/2 rounded-full"
-      style={{ backgroundColor: 'var(--color-base)' }}
+      style={{ backgroundColor: 'var(--color-bg)' }}
     />
   );
 }

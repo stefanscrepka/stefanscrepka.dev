@@ -164,7 +164,7 @@ export function ScrollPinnedHorizontal({
           className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-20"
           style={{
             background:
-              'linear-gradient(to bottom, var(--color-base) 0%, color-mix(in oklch, var(--color-base) 60%, transparent) 60%, transparent 100%)',
+              'linear-gradient(to bottom, var(--color-bg) 0%, color-mix(in oklch, var(--color-bg) 60%, transparent) 60%, transparent 100%)',
           }}
         />
 

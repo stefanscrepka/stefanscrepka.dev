@@ -22,10 +22,17 @@ interface CaseStudyCoverProps {
   tilt?: 'none' | 'subtle' | 'cinema' | undefined;
   /** Habilita hover lift. Default false (parent usually é Link). */
   interactive?: boolean;
-  /** Marca como `priority` no Next/Image. Use no PRIMEIRO cover above-the-fold
-   *  (FeaturedWork HeroTile) — pode ser o LCP element em mobile com hero video
-   *  gated. Default false. */
-  priority?: boolean;
+  /** F3.6 (2026-06-11): carrega eager (sem lazy) MAS sem <link rel=preload>.
+   *  Aplica `loading="eager"` ao next/image SÓ no PATH 1 (screenshot real) —
+   *  o fetch começa no parse do HTML sem competir na fila do preload scanner
+   *  com o hero-poster (candidato a LCP). A doc bundled do next/image recomenda
+   *  loading="eager"/fetchPriority em vez de preload na maioria dos casos.
+   *  NOTA (F3-review): no PATH 2 (screenshot=null → diagrama SVG inline) esta
+   *  prop é inócua — não há <img> pra adiantar. Default false (lazy). */
+  eager?: boolean;
+  /** Override `sizes` para o next/image. Default assume tile a 50vw (half tile
+   *  ou /work grid 2-col). Override pra hero full-width ou 3-col grid. */
+  sizes?: string;
   className?: string | undefined;
 }
 
@@ -42,7 +49,8 @@ export function CaseStudyCover({
   aspectRatio = '16/10',
   tilt = 'subtle',
   interactive: _interactive = false,
-  priority = false,
+  eager = false,
+  sizes,
   className,
 }: CaseStudyCoverProps) {
   // ─────────────────────────────────────────────────────────────────────
@@ -59,9 +67,18 @@ export function CaseStudyCover({
           src={caseStudy.screenshot}
           alt={`${caseStudy.title} — captura de tela do produto em produção`}
           fill
-          sizes="(min-width: 1024px) 50vw, 100vw"
+          sizes={sizes ?? '(min-width: 1024px) 50vw, 100vw'}
+          // W-fix (2026-05-26): quality 95 (era default 75). UI screenshots
+          // têm muito high-frequency detail (texto, bordas, ícones). q75 cria
+          // ringing visível em texto pequeno = aparência "pixelizada". q95
+          // mantém legibilidade premium sem custo significativo de peso.
+          quality={95}
           className="object-cover"
-          priority={priority}
+          // F3.6 (2026-06-11): era preload (paridade com o priority antigo).
+          // O <link rel=preload> no head disputava banda com o hero-poster
+          // durante a janela crítica do LCP; eager mantém o fetch cedo (sem
+          // lazy pop-in) com prioridade natural de <img> no documento.
+          loading={eager ? 'eager' : undefined}
         />
       </MockupFrame>
     );

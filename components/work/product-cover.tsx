@@ -109,7 +109,6 @@ export function ProductCover(props: ProductCoverProps) {
           fill
           sizes="(min-width: 1024px) 50vw, 100vw"
           className="object-cover"
-          priority={false}
         />
       </MockupFrame>
     );
@@ -138,7 +137,7 @@ export function ProductCover(props: ProductCoverProps) {
       <div
         className={cn(
           'flex h-full w-full items-center justify-center p-3 sm:p-4',
-          'bg-(--color-base)'
+          'bg-(--color-bg)'
         )}
       >
         <DiagramComponent label={label} className="h-full w-full" />

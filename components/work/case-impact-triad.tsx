@@ -21,19 +21,22 @@ export function CaseImpactTriad({ cs, className }: CaseImpactTriadProps) {
   const isAmber = cs.accent === 'amber';
   const accentColor = isAmber ? 'var(--color-amber)' : 'var(--color-accent)';
 
+  // W-copy (2026-05-25): eyebrows trocados de "PROBLEMA / SOLUÇÃO / IMPACTO"
+  // (framework genérico) pra voz autoral Stefan-style — concreto, primeira
+  // pessoa, anti-corporate.
   const cells = [
     {
-      eyebrow: 'PROBLEMA',
+      eyebrow: 'O QUE QUEBRAVA',
       body: cs.problem,
       tone: 'danger' as const,
     },
     {
-      eyebrow: 'SOLUÇÃO',
+      eyebrow: 'O QUE EU FIZ',
       body: cs.tagline,
       tone: 'neutral' as const,
     },
     {
-      eyebrow: 'IMPACTO',
+      eyebrow: 'O QUE MUDOU',
       body: cs.impact.context,
       metric: cs.impact.metric,
       tone: 'accent' as const,
