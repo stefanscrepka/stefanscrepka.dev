@@ -421,6 +421,45 @@ apontamentos acionáveis aplicados ou documentados.
     o `<link rel=preload>` do poster. Atualizada pra afirmar o estado correto (nenhum
     preload em lugar nenhum), com a medição registrada no comentário.
 
+### Refinamento de composição (2ª rodada)
+
+14. ✅ **Vazio interno no par de half-tiles** — os dois tiles espelhados recebiam
+    aspect ratios DIFERENTES (`4/3` e `16/9`), gerando capas de 468px vs 350px numa
+    linha de grid de altura igual. Como o CTA é `mt-auto`, os 118px de diferença
+    viravam um buraco dentro do tile mais curto. Os dois screenshots são nativamente
+    **16:10** (1920×1200 e 3840×2400), ou seja, ambos os ratios anteriores CORTAVAM
+    a imagem — NexaCore perdia ~17% das laterais, STJ ~11% do topo/base.
+    **Fix**: `16/10` nos dois. Resolve recorte, consistência do par e vazio de uma
+    vez. Capas iguais (390px), tile 78px mais curto, CTAs alinhados.
+
+15. ✅ **Célula "IA AGENTIC" do bento (último stub admitido em código)** — o stat
+    "22" boiava sozinho no meio de uma célula obrigada a ter a altura de três células
+    empilhadas. Agora carrega a linha dos 5 squads (`S0 ONBOARDING · S1 INTELIGÊNCIA
+    · …`), que é dado já verificado e consistente. A nota abaixo foi reescrita porque
+    listava os mesmos cinco nomes entre parênteses — dizer duas vezes na mesma célula
+    não informa mais.
+    Junto: **fonte única** pros nomes dos squads em `lib/work/data.ts`
+    (`CONTENT_ENGINE_SQUADS`), que antes viviam duplicados em três arquivos —
+    duplicata de dado é exatamente como a contradição "22 vs 24" nasce.
+
+16. ✅ **Ornamento do bento** — era `◆◆◆` / `═══` / `◆` conforme o tamanho da célula.
+    É um sistema, mas ilegível: a 11px, `◆◆◆` lê como "•••" e `═══` como "===", e
+    ninguém deduz "três losangos = extra-large". Ornamento que varia por um motivo
+    imperceptível é ruído fingindo ser sinal. Uma marca só nas quatro células.
+
+### 📝 Verificado e NÃO alterado — 2ª rodada (olhei e o problema não existia)
+
+- **Foto do contato "fora do grid"** — é `lg:flex-row` + `gap-12` partindo do trilho
+  do container. Correto; minha leitura anterior veio de frame parcial.
+- **Monograma SH do contato "cortado feito polígono aleatório"** — visto na seção
+  INTEIRA (screenshot de elemento, não de viewport), lê como marca-d'água legível.
+  O tint oliva que medi no vão entre LinkedIn e GitHub é a sobreposição intencional.
+- **Assinatura do manifesto "atravessando o corpo do texto"** — ela só desenha no
+  estado de SAÍDA, quando o card já encolheu; no estado de entrada os `dashoffset`
+  são 1,1,1. Não cruza nada que alguém esteja lendo.
+- **Tabs do playground "espremidas no terço esquerdo"** — ocupam 32% de 1408px, mas
+  tab à esquerda com régua full-width é o padrão convencional. Não é defeito.
+
 ### 📝 Verificado e NÃO alterado (a medição contradisse a suspeita)
 
 - **`nexacore-calendar.avif` como LCP lazy** — o Next emite esse warning durante a suíte
@@ -436,6 +475,36 @@ apontamentos acionáveis aplicados ou documentados.
 - **2 falhas em `product-screenshots.spec.ts`** — a spec aponta pra um caminho local
   duplicado (`site_estetica_md-main/site_estetica_md-main/index.html`); a pasta real não
   tem o nível repetido. Falha ambiental pré-existente, spec já excluída do CI.
+
+### 🔴 Pendente de decisão SUA (achados de claim↔evidência — não toquei de propósito)
+
+Os dois itens abaixo são dado/posicionamento seu. Corrigir qualquer um deles exigiria
+eu escolher um número ou reescrever uma afirmação — então parei e deixei documentado.
+
+1. **`22` vs `24` agentes — o diagrama contradiz o próprio rodapé.**
+   `components/work/diagrams.tsx` declara a composição dos squads como
+   `S0=6 · S1=4 · S2=2 · S3=8 · S4=4`, que soma **24**. Mas o rodapé do MESMO SVG diz
+   "22 AGENTES · 5 SQUADS", e outros sete pontos do site também afirmam 22:
+   hero subhead, stats row, bento (`count: 22`), timeline, social-proof-line,
+   featured-work e content-engine-panels.
+   Está visível no tile principal da home — a peça de maior tráfego do site.
+   **Decisão necessária**: ou um dos counts por squad está errado, ou o total é 24.
+   Enquanto não resolver, `lib/work/data.ts → CONTENT_ENGINE_SQUADS` guarda só os
+   NOMES dos squads (consistentes em todo lugar), deliberadamente sem contagem, e a
+   célula do bento não constrói nada em cima do número por squad.
+
+2. **Status bars de INFRA se apresentam como monitoramento vivo, mas são estáticas.**
+   `StatusBar` (bento-skills.tsx) renderiza, para "Vercel deploy", "Coolify VPS",
+   "Sentry errors" e "Langfuse traces": um ponto verde com `animate-ping` (o sinal
+   universal de "ao vivo"), uma barra de atividade animada e a palavra **"ok"**.
+   Nada disso lê estado real — os nomes são hardcoded e o "ok" é literal no JSX.
+   Num site que removeu o watermark do Veo de verdade em vez de mascarar, que tirou
+   o stub do "22" e que mantém um modal "Sobre este site" de créditos honestos, um
+   widget que simula telemetria é a mesma categoria de problema.
+   **Opções**: (a) deixar como está e assumir que é ilustrativo; (b) tirar o ping +
+   o "ok" e manter só os nomes como chips (vira "as superfícies de observabilidade
+   que eu rodo", que é verdade); (c) ligar em dado real. Não apliquei nenhuma —
+   é a sua voz.
 
 **Validação global da Fase 4**:
 - Suíte nova `_audit/f4/validate.mjs` — **6/6 PASS**
