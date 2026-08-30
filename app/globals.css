@@ -8,7 +8,7 @@
 
 @theme {
   /* === Surfaces === */
-  --color-base: oklch(13% 0.005 130);
+  --color-bg: oklch(13% 0.005 130);
   --color-surface-deep: oklch(10% 0.005 130);
   --color-surface: oklch(18% 0.008 130);
   --color-surface-elevated: oklch(22% 0.010 130);
@@ -380,6 +380,89 @@
   padding-block: clamp(4rem, 8vw, 12rem);
 }
 
+/* ============================================================
+   F4 (2026-08-29): mascara da midia do hero — RESPONSIVA.
+   Causa-raiz medida: a mascara antiga (`transparent 0 → 0.85 55% → 1 75%`)
+   deixava o video/poster em brilho MAXIMO exatamente na faixa onde vivem
+   subhead, CTAs e stats (desktop 67–91.5% da section; mobile 56.7–85%).
+   O comentario do componente dizia o oposto ("CTAs emergem contra fundo
+   majoritariamente dark") — intencao e implementacao discordavam.
+   Medicao (_audit/f4/logs/media-contrast.json + probe-hero-geom):
+     subhead desktop  L_fundo p90 = 0.069  →  contraste 3.78:1  (min 4.5)
+     subhead mobile   L_fundo p90 = 0.184  →  contraste 1.86:1  (min 4.5)
+   Mobile e o pior porque o <source media> desliga o video (<768px) e sobra
+   so o poster AVIF, que e um frame claro.
+   Nova curva: a midia PICA na faixa do headline (texto grande, ja passa
+   contraste com folga: p05 4.7:1) e cai antes do bloco de texto pequeno.
+   Os stops diferem por viewport porque os layouts diferem.
+   ============================================================ */
+/* ============================================================
+   F4 (2026-08-29): contrato de alinhamento do TracingBeam.
+   O trilho (tracing-beam.tsx), o padding do conteudo e os marcadores do
+   timeline (timeline.client.tsx) mantinham TRES copias das mesmas constantes
+   (`left-3 sm:left-4 md:left-6`, `pl-10 sm:pl-12 md:pl-14`,
+   `-left-[1.875rem] sm:-left-[2rem] md:-left-[2.125rem]`). Elas dessincronizaram:
+   medido em producao, o centro de cada marcador caia 11–13px a DIREITA da
+   linha do feixe em todo breakpoint — a linha atravessava a borda esquerda do
+   anel em vez do centro.
+   Agora ha uma fonte unica: `--beam-x` (posicao do trilho) e `--beam-pad`
+   (recuo do conteudo). O marcador deriva sua posicao das duas, entao nao ha
+   como sair de sincronia de novo.
+   `+1px` = a linha do SVG mora em x=1 de um viewBox de 20 unidades
+   renderizado com width=20 (M 1 0 V H).
+   ============================================================ */
+[data-slot='tracing-beam'] {
+  --beam-x: 0.75rem;
+  --beam-pad: 2.5rem;
+  /* centro do trilho, no espaco de coordenadas do wrapper de conteudo */
+  --beam-line: calc(var(--beam-x) + 1px);
+}
+
+@media (min-width: 30rem) {
+  [data-slot='tracing-beam'] {
+    --beam-x: 1rem;
+    --beam-pad: 3rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  [data-slot='tracing-beam'] {
+    --beam-x: 1.5rem;
+    --beam-pad: 3.5rem;
+  }
+}
+
+@utility hero-media-mask {
+  --hero-mask: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.30) 20%,
+    rgba(0, 0, 0, 0.88) 40%,
+    rgba(0, 0, 0, 1) 52%,
+    rgba(0, 0, 0, 0.86) 62%,
+    rgba(0, 0, 0, 0.34) 74%,
+    rgba(0, 0, 0, 0.16) 86%,
+    rgba(0, 0, 0, 0.10) 100%
+  );
+  mask-image: var(--hero-mask);
+  -webkit-mask-image: var(--hero-mask);
+
+  /* Mobile: o bloco de texto comeca em 56.7% (vs 67% no desktop), entao a
+     queda precisa comecar antes e ser mais funda — nao ha video, so poster. */
+  @media (max-width: 767px) {
+    --hero-mask: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.26) 16%,
+      rgba(0, 0, 0, 0.82) 34%,
+      rgba(0, 0, 0, 0.92) 46%,
+      rgba(0, 0, 0, 0.30) 57%,
+      rgba(0, 0, 0, 0.12) 68%,
+      rgba(0, 0, 0, 0.08) 100%
+    );
+  }
+}
+
 @utility glass-panel {
   background-color: oklch(20% 0.010 130 / 0.55);
   backdrop-filter: blur(12px) saturate(1.2);
@@ -415,17 +498,10 @@
   box-shadow: var(--shadow-inset-bisel);
 }
 
-/* Focus ring sólido double-layer (signature shadcn premium).
-   Outer: 4px lime accent · Inner: 2px base color (separator). Use em vez de
-   outline pra elementos com border-radius custom. */
-@utility focus-ring {
-  &:focus-visible {
-    outline: none;
-    box-shadow:
-      0 0 0 2px var(--color-base),
-      0 0 0 4px var(--color-accent);
-  }
-}
+/* F3.4 (2026-06-11): @utility focus-ring removido — zero consumidores no
+   código (a regra global *:focus-visible cobre tudo). Se voltar, lembrar do
+   fallback de outline transparente pra forced-colors (mesma razão do
+   TILE_SHELL usar outline-hidden). */
 
 @utility skip-link {
   position: fixed;
@@ -495,7 +571,7 @@
   }
 
   body {
-    background-color: var(--color-base);
+    background-color: var(--color-bg);
     color: var(--color-text-1);
     font-family: var(--font-body);
     font-feature-settings: 'ss01' 1, 'calt' 1, 'liga' 1, 'kern' 1;
@@ -592,5 +668,143 @@ html[data-pre-hydration] .anim-pre-hidden {
 @media (prefers-reduced-motion: reduce) {
   html[data-pre-hydration] .anim-pre-hidden {
     opacity: 1 !important;
+  }
+}
+
+/* ============================================================
+   W-audit (2026-06-10): Headline reveal por palavra — zero JS.
+   Substitui o GSAP SplitText do hero. O pipeline antigo (SSR pinta →
+   requestIdleCallback esconde → re-anima) produzia replay visível:
+   o título aparecia completo, sumia ~1s depois e tocava de novo.
+   Aqui cada palavra é um <span> server-rendered com --word-i; a animação
+   parte do PRIMEIRO paint (antes da hidratação), então não existe estado
+   "visível antes de esconder". Espelha o tween anterior: 600ms,
+   stagger 55ms, y -0.18em, ease enter.
+   opacity inicial 0.01 (não 0): Chrome registra o paint dos glifos no
+   primeiro frame e o LCP permanece no FCP em vez de migrar pro fim do
+   stagger — visualmente indistinguível de 0 sobre fundo escuro.
+   Reduced-motion: media query global (acima) zera a duração → estático.
+   ============================================================ */
+
+.headline-word {
+  display: inline-block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .headline-word {
+    animation: headline-word-in 600ms var(--ease-enter) both;
+    animation-delay: calc(var(--word-i, 0) * 55ms);
+  }
+}
+
+@keyframes headline-word-in {
+  from {
+    opacity: 0.01;
+    transform: translateY(-0.18em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   W-audit (2026-06-10): View Transitions — crossfade de rota.
+   experimental.viewTransition em next.config.ts + <ViewTransition
+   default="page-fade"> em app/layout.tsx (envolve o conteúdo do <main>;
+   nav e footer ficam fora do grupo e persistem sem animar).
+   Antes: troca de página era corte seco (<180ms, medido em frames
+   d3-pagetransition do audit). Fade-out rápido + fade-in com leve rise
+   dá continuidade sem roubar tempo de navegação.
+   ============================================================ */
+
+::view-transition-old(.page-fade) {
+  animation: vt-page-out 180ms var(--ease-exit) both;
+}
+
+::view-transition-new(.page-fade) {
+  animation: vt-page-in 280ms var(--ease-enter) both;
+}
+
+@keyframes vt-page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   F3.3 (2026-06-11, revisto): a tentativa de suavizar o handoff
+   skeleton→conteúdo com ViewTransition dedicada foi DESCARTADA — a causa-raiz
+   era pior do que o double-fade. Os loading.tsx (criados no audit) forçavam um
+   Suspense boundary que, em páginas 100% estáticas (/work, /process, cases),
+   fazia o React servir o skeleton (curto) + o conteúdo num <div hidden> e
+   revelá-lo via script $RC pós-parse → o footer despencava ~1500px ao trocar
+   o skeleton pelo conteúdo: CLS 0.534 (Lighthouse perf 0.71). Medido em
+   _audit/f3-cls-* + confirmado removendo os loading.tsx (CLS → 0 em todas).
+   Como são páginas estáticas (carga instantânea no hard load) e o page-fade
+   da raiz já segura a navegação soft sem flash branco (verificado: 0 frames
+   em branco, _audit/f3-softnav.mjs), os loading.tsx foram REMOVIDOS — fix de
+   causa-raiz, não cosmético. Sem skeleton, não há double-fade nem handoff a
+   suavizar. O page-fade da raiz (Fase 1 #6) é a única transição de página.
+   ============================================================ */
+
+/* Reduced-motion: pseudo-elementos ::view-transition-* não são cobertos
+   pelo kill global * acima — regra explícita (recomendação da doc Next). */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ============================================================
+   F3.2 (2026-06-11): Bento Skills — efeitos de hover 100% CSS.
+   O BentoCell virou Server Component (dieta de hidratação): o estado React
+   de hover saiu e o PerimeterTrace (stroke-dashoffset 1 → 0) agora roda em
+   transition disparada por :hover/:focus-within do card. Mesmos timings do
+   tween Motion anterior (600ms dramatic no traço, 180ms standard na opacity).
+   Reduced-motion: o kill global zera transition-duration (aparece instantâneo,
+   mesmo resultado do gate JS antigo).
+   ============================================================ */
+
+[data-slot='bento-cell'] [data-bento-trace] rect {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 600ms var(--ease-dramatic),
+    opacity 180ms var(--ease-standard);
+}
+
+[data-slot='bento-cell']:hover [data-bento-trace] rect,
+[data-slot='bento-cell']:focus-within [data-bento-trace] rect {
+  stroke-dashoffset: 0;
+  opacity: 1;
+}
+
+/* Barras do StatusBar (INFRA cell) — antes era <style> inline por célula com
+   gate JS de reduced-motion; o kill global encerra a animação no frame "to"
+   (scaleY 1 ≈ estático em 80%, intenção original preservada). */
+@keyframes progress-pulse {
+  from {
+    transform: scaleY(0.6);
+    opacity: 0.35;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 0.85;
   }
 }
