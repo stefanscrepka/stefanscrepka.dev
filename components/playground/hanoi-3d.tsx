@@ -1,7 +1,7 @@
 'use client';
 
-import { OrbitControls, Text } from '@react-three/drei';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
@@ -27,6 +27,60 @@ const MAX_DISCS_DESKTOP = 8;
 const MAX_DISCS_MOBILE = 5;
 
 const LIME = new THREE.Color('#D2FF00');
+// F4 (2026-08-29): rótulos dos pegs NÃO usam mais o <Text> do drei (troika).
+//
+// Bug medido, reproduzido em Chrome real (não é artefato de headless): o Hanoi
+// 3D nunca aparecia. O <canvas> montava e era dimensionado (1341×446), mas a
+// subárvore inteira ficava com `display: none !important` (é assim que o React
+// esconde uma árvore suspensa) e o skeleton "CARREGANDO THREE.JS…" ficava
+// para sempre. Provado por bissecção: sem o <Text> a cena renderiza; com ele,
+// trava — com woff2 local, com ttf local e sem prop `font`.
+//
+// Causa original: sem `font`, troika@0.52 resolve a fonte via
+// unicode-font-resolver, que faz fetch em cdn.jsdelivr.net dentro do worker;
+// jsdelivr não está no `connect-src` (next.config.ts) → TypeError: Failed to
+// fetch → a promise do Suspense nunca resolve. Apontar pra uma fonte local
+// matou o erro de CSP, mas o troika continuou suspendendo — então a dependência
+// inteira saiu deste caminho.
+//
+// Solução: sprite com textura de canvas 2D. Sem worker, sem fetch, sem
+// superfície de CSP, ~20 linhas. `<sprite>` sempre encara a câmera, então o
+// rótulo continua legível enquanto o usuário orbita — que era justamente o
+// motivo de usar texto 3D aqui.
+function PegLabel({ position, text }: { position: [number, number, number]; text: string }) {
+  const texture = useMemo(() => {
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    // usa a MESMA família mono do resto do site (token --font-mono)
+    const mono =
+      getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim() ||
+      'ui-monospace, monospace';
+    ctx.clearRect(0, 0, size, size);
+    ctx.font = `600 ${Math.round(size * 0.68)}px ${mono}`;
+    ctx.fillStyle = `#${LIME.getHexString()}`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, size / 2, size / 2 + size * 0.03);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.anisotropy = 4;
+    tex.needsUpdate = true;
+    return tex;
+  }, [text]);
+
+  useEffect(() => () => texture?.dispose(), [texture]);
+  if (!texture) return null;
+
+  return (
+    <sprite position={position} scale={[0.55, 0.55, 1]}>
+      <spriteMaterial map={texture} transparent depthWrite={false} />
+    </sprite>
+  );
+}
+
 const PEG_COLOR = new THREE.Color('#3a4035');
 const FLOOR_COLOR = new THREE.Color('#0F1310');
 
@@ -139,19 +193,18 @@ export function Hanoi3D() {
     [maxDiscs]
   );
 
-  // W-perf (2026-05-25): frameloop="demand" quando pausado evita RAF 60fps
-  // sem propósito (syncMeshPositions no-op repetido). Quando playing=true,
-  // volta pra 'always' pra animação rolar fluida. Reduced também = demand
-  // (snap aplicado em useEffect dispara invalidate via SceneContent).
-  const shouldAnimate = playing && reduced === false;
-
   return (
     <div className="flex flex-col gap-5">
-      <div className="relative h-[24rem] w-full overflow-hidden rounded-xl border border-(--color-hairline) bg-(--color-base) sm:h-[28rem]">
+      <div className="relative h-[24rem] w-full overflow-hidden rounded-xl border border-(--color-hairline) bg-(--color-bg) sm:h-[28rem]">
+        {/* W-perf revert (2026-05-25): frameloop="demand" condicional causava
+            race condition no mount — useEffect que chamaria invalidate roda
+            APÓS Canvas paint inicial, deixando discs em posições erradas
+            (Y=0 todos) até o segundo frame. RAF "always" custa CPU mas é o
+            comportamento garantido. OrbitControls damping também depende
+            disso pra desaceleração suave após drag. */}
         <Canvas
           dpr={[1, 1.75]}
           camera={{ position: [3.5, 4.2, 6.5], fov: 38 }}
-          frameloop={shouldAnimate ? 'always' : 'demand'}
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
           style={{ background: 'transparent' }}
         >
@@ -212,11 +265,6 @@ function SceneContent({
   // Refs pros meshes dos discos (id 1..n).
   const discMeshes = useRef<Array<THREE.Mesh | null>>([]);
 
-  // W-perf (2026-05-25): Canvas roda em frameloop="demand" quando pausado.
-  // Invalidate manual após mudanças de state externas (handleStep, N change,
-  // reset, reduced snap) pra triggerar 1 frame de repaint via useFrame.
-  const { invalidate } = useThree();
-
   // Snap todos os discos pras posições atuais (chamado quando reduced=true).
   useEffect(() => {
     if (!reduced) return;
@@ -227,15 +275,7 @@ function SceneContent({
     }
     moveIndexRef.current = moves.length;
     onMoveAdvance(moves.length);
-    invalidate();
-  }, [reduced, moves, discsRef, moveIndexRef, onMoveAdvance, invalidate]);
-
-  // Trigger repaint sempre que state externo muda (handleStep, N change,
-  // pause). Em frameloop="demand", o useFrame só roda após invalidate.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: playing/n são triggers explícitos — corpo não lê os valores mas mudança de identidade deve re-disparar o effect.
-  useEffect(() => {
-    invalidate();
-  }, [playing, n, invalidate]);
+  }, [reduced, moves, discsRef, moveIndexRef, onMoveAdvance]);
 
   useFrame((_, delta) => {
     if (!playing || reduced) {
@@ -327,16 +367,10 @@ function SceneContent({
               <cylinderGeometry args={[PEG_RADIUS, PEG_RADIUS, PEG_HEIGHT, 24]} />
               <meshStandardMaterial color={PEG_COLOR} roughness={0.6} metalness={0.1} />
             </mesh>
-            <Text
-              position={[x, -0.35, 0]}
-              fontSize={0.42}
-              color={LIME}
-              anchorX="center"
-              anchorY="middle"
-              fontWeight={600}
-            >
-              {label}
-            </Text>
+            {/* y=-0.35 (posição herdada do <Text>) ficava ABAIXO do plano do
+                chão (y=-0.05) e o rótulo era ocluído. Agora fica acima do
+                piso e adiantado no eixo z, lendo como etiqueta na base do peg. */}
+            <PegLabel position={[x, 0.24, 1.55]} text={label} />
           </group>
         );
       })}
