@@ -35,7 +35,7 @@ O tom emocional é técnico, escuro, agressivo, “builder sério”. Funciona p
 
 1. Positivo: existe skip link real em `app/layout.tsx`: `<a href="#main" className="skip-link">Pular para o conteúdo</a>`. Isso é básico, mas muita landing “premium” ignora.
 2. Positivo: foco global existe em `app/globals.css`: `*:focus-visible { outline: 3px solid var(--color-border-focus); outline-offset: 2px; }`.
-3. Negativo: `--color-text-3` tem contraste estimado de **4.15:1** sobre `--color-base` e **3.88:1** sobre `--color-surface`; ele é usado em textos pequenos como `.eyebrow`, `.text-2xs`, labels mono e detalhes. Isso falha AA para texto normal pequeno.
+3. Negativo: `--color-text-3` tem contraste estimado de **4.15:1** sobre `--color-bg` e **3.88:1** sobre `--color-surface`; ele é usado em textos pequenos como `.eyebrow`, `.text-2xs`, labels mono e detalhes. Isso falha AA para texto normal pequeno.
 
 **Recomendações cirúrgicas**
 
@@ -614,7 +614,7 @@ ia             │ 9.0/10 │ 10%  │ 0.90         │
 │ Projetos / Cases       │ 8.0/10 │ 8%   │ 0.64         │
 🎯 Veredicto Executivo
 
-Portfolio com DNA editorial cinematográfico raro no tier portfólio brasileiro — paleta lime-on-13%L cirúrgica, tipografia Geist+PP Editorial com micro-features (ss01/calt/text-balance/optical-sizing), arquitetura motion em 8 camadas e implementação fiel do scroll-jacking Lando (200vh outer + sticky inner) que 90% dos sites tentam imitar com GSAP pin: true e quebram. Maior força: storytelling técnico anti-jargão ("Não vendo 'ajudo empresas a inovar'. Vendo entrega que paga conta") amarrado pela leitmotif "funciona 24/7 ou alguém perde dinheiro" do hero ao footer. Maior fraqueza: dívida WCAG acumulada em microcopy — --color-text-3 (oklch 55% L) em text-2xs (11px) na home inteira fica em ~4.2:1 contra --color-base (oklch 13% L), abaixo do AA de 4.5:1 pra texto normal. Não é o tipo de erro que invalida — é o tipo que separa "muito bom" de "estado da arte".
+Portfolio com DNA editorial cinematográfico raro no tier portfólio brasileiro — paleta lime-on-13%L cirúrgica, tipografia Geist+PP Editorial com micro-features (ss01/calt/text-balance/optical-sizing), arquitetura motion em 8 camadas e implementação fiel do scroll-jacking Lando (200vh outer + sticky inner) que 90% dos sites tentam imitar com GSAP pin: true e quebram. Maior força: storytelling técnico anti-jargão ("Não vendo 'ajudo empresas a inovar'. Vendo entrega que paga conta") amarrado pela leitmotif "funciona 24/7 ou alguém perde dinheiro" do hero ao footer. Maior fraqueza: dívida WCAG acumulada em microcopy — --color-text-3 (oklch 55% L) em text-2xs (11px) na home inteira fica em ~4.2:1 contra --color-bg (oklch 13% L), abaixo do AA de 4.5:1 pra texto normal. Não é o tipo de erro que invalida — é o tipo que separa "muito bom" de "estado da arte".
 
 📊 Notas por Dimensão
 
@@ -625,7 +625,7 @@ Portfolio com DNA editorial cinematográfico raro no tier portfólio brasileiro 
 
 Portfolio com DNA editorial cinematográfico raro no tier portfólio brL cirúrgica, tipografia Geist+PP Editorial com micro-features(ss01/calt/text-balance/optical-sizing), arquitetura motion em 8 camadas e implementação fiel do scroll-jacking Lando (200vh outer + sticky inner) que 90% dos sites
 tentam imitar com GSAP pin: true e quebram. Maior força: storytellingndo 'ajudo empresas a inovar'. Vendo entrega que paga conta") amarradopela leitmotif "funciona 24/7 ou alguém perde dinheiro" do hero ao footer. Maior fraqueza: dívida WCAG acumulada em microcopy — --color-text-3 (oklch 55% L) em text-2xs
-(11px) na home inteira fica em ~4.2:1 contra --color-base (oklch 13%  texto normal. Não é o tipo de erro que invalida — é o tipo que separa"muito bom" de "estado da arte".
+(11px) na home inteira fica em ~4.2:1 contra --color-bg (oklch 13%  texto normal. Não é o tipo de erro que invalida — é o tipo que separa"muito bom" de "estado da arte".
 
 📊 Notas por Dimensão
 
@@ -659,7 +659,7 @@ tentam imitar com GSAP pin: true e quebram. Maior força: storytellingndo 'ajudo
 1. Acessibilidade & WCAG 2.2 — 7.0/10
 
 Evidências:
-- --color-text-3 = oklch(55% 0.005 130) sobre --color-base = oklch(13 55 vs 13 dá Y 0.229 vs 0.016, contrast ratio ≈ 4.25:1). Usado em@utility eyebrow a 11px (globals.css:278-286) que aparece em quase toda section — featured-work.tsx:35, bento-skills.tsx:83, other-work.tsx:28, contact.tsx:77, footer footer.tsx:80,153. WCAG 2.2 AA exige 4.5:1 pra texto < 18px — falha sistemática.
+- --color-text-3 = oklch(55% 0.005 130) sobre --color-bg = oklch(13 55 vs 13 dá Y 0.229 vs 0.016, contrast ratio ≈ 4.25:1). Usado em@utility eyebrow a 11px (globals.css:278-286) que aparece em quase toda section — featured-work.tsx:35, bento-skills.tsx:83, other-work.tsx:28, contact.tsx:77, footer footer.tsx:80,153. WCAG 2.2 AA exige 4.5:1 pra texto < 18px — falha sistemática.
 - components/sections/manifesto.tsx:200-208: <h2 ref={nameRef}>STEFAN HEINZ SCREPKA</h2> decorativa gigante NÃO está marcada aria-hidden. O wrapper externo é aria-hidden="true" (linha 194), mas o <h2> ainda entra no document outline pra screen readers via querySelectorAll heading navigation no AT (ex: NVDA H key). Conflita
 com <h2> real de cada section.
 - Boas práticas presentes: skip link (globals.css:389-411), focus-ring 3px lime universal (globals.css:437-441), @media (prefers-reduced-motion: reduce) global
@@ -734,7 +734,7 @@ Compilando o veredicto agora.
 
 🎯 Veredicto Executivo
 
-Portfolio com DNA editorial cinematográfico raro no tier portfólio brasileiro — paleta lime-on-13%L cirúrgica, tipografia Geist+PP Editorial com micro-features (ss01/calt/text-balance/optical-sizing), arquitetura motion em 8 camadas e implementação fiel do scroll-jacking Lando (200vh outer + sticky inner) que 90% dos sites tentam imitar com GSAP pin: true e quebram. Maior força: storytelling técnico anti-jargão ("Não vendo 'ajudo empresas a inovar'. Vendo entrega que paga conta") amarrado pela leitmotif "funciona 24/7 ou alguém perde dinheiro" do hero ao footer. Maior fraqueza: dívida WCAG acumulada em microcopy — --color-text-3 (oklch 55% L) em text-2xs (11px) na home inteira fica em ~4.2:1 contra --color-base (oklch 13% L), abaixo do AA de 4.5:1 pra texto normal. Não é o tipo de erro que invalida — é o tipo que separa "muito bom" de "estado da arte".
+Portfolio com DNA editorial cinematográfico raro no tier portfólio brasileiro — paleta lime-on-13%L cirúrgica, tipografia Geist+PP Editorial com micro-features (ss01/calt/text-balance/optical-sizing), arquitetura motion em 8 camadas e implementação fiel do scroll-jacking Lando (200vh outer + sticky inner) que 90% dos sites tentam imitar com GSAP pin: true e quebram. Maior força: storytelling técnico anti-jargão ("Não vendo 'ajudo empresas a inovar'. Vendo entrega que paga conta") amarrado pela leitmotif "funciona 24/7 ou alguém perde dinheiro" do hero ao footer. Maior fraqueza: dívida WCAG acumulada em microcopy — --color-text-3 (oklch 55% L) em text-2xs (11px) na home inteira fica em ~4.2:1 contra --color-bg (oklch 13% L), abaixo do AA de 4.5:1 pra texto normal. Não é o tipo de erro que invalida — é o tipo que separa "muito bom" de "estado da arte".
 
 📊 Notas por Dimensão
 esign          │ 9.0/10 │ 12%  │ 1.08         │
@@ -756,7 +756,7 @@ esign          │ 9.0/10 │ 12%  │ 1.08         │
 1. Acessibilidade & WCAG 2.2 — 7.0/10
 
 Evidências:
-- --color-text-3 = oklch(55% 0.005 130) sobre --color-base = oklch(13 55 vs 13 dá Y 0.229 vs 0.016, contrast ratio ≈ 4.25:1). Usado em@utility eyebrow a 11px (globals.css:278-286) que aparece em quase toda section — featured-work.tsx:35, bento-skills.tsx:83, other-work.tsx:28, contact.tsx:77, footer footer.tsx:80,153. WCAG 2.2 AA exige 4.5:1 pra texto < 18px — falha sistemática.
+- --color-text-3 = oklch(55% 0.005 130) sobre --color-bg = oklch(13 55 vs 13 dá Y 0.229 vs 0.016, contrast ratio ≈ 4.25:1). Usado em@utility eyebrow a 11px (globals.css:278-286) que aparece em quase toda section — featured-work.tsx:35, bento-skills.tsx:83, other-work.tsx:28, contact.tsx:77, footer footer.tsx:80,153. WCAG 2.2 AA exige 4.5:1 pra texto < 18px — falha sistemática.
 - components/sections/manifesto.tsx:200-208: <h2 ref={nameRef}>STEFANa gigante NÃO está marcada aria-hidden. O wrapper externo éaria-hidden="true" (linha 194), mas o <h2> ainda entra no document outline pra screen readers via querySelectorAll heading navigation no AT (ex: NVDA H key). Conflita com <h2> real de cada section.
 - Boas práticas presentes: skip link (globals.css:389-411), focus-ring 3px lime universal (globals.css:437-441), @media (prefers-reduced-motion: reduce) global (globals.css:482-491), pre-hydration FOUC gate (globals.css:502-510), JSON-LD Person schema SSR (layout.tsx:75-128), honeypot + aria-live + aria-busy + aria-invalid no form (contact-form.client.tsx:206-214, 311-318, 360-369), <dl><dt class="sr-only"> em StatsRow (stats-row.tsx:65).
 

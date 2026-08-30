@@ -161,7 +161,7 @@ O **monograma SH** é a marca. Construção single-glyph onde S e H se fundem po
 
 **Spec:**
 - Container quadrado com cantos sutilmente arredondados (padrão iOS/Android app icon)
-- Background: `--color-base` (`oklch(13%)`)
+- Background: `--color-bg` (`oklch(13%)`)
 - Mark centralizado, 60% da largura do container
 - Signal point lime mantido
 
@@ -227,7 +227,7 @@ Idêntico ao Primary. Use quando precisar enfatizar que é a versão fill (vs ou
 
 | Papel | Token | OKLCH | HEX | Quando usar |
 |---|---|---|---|---|
-| **Dominante (60%)** | `--color-base` | `oklch(13% 0.005 130)` | `#0F1212` | Background principal, dark surfaces |
+| **Dominante (60%)** | `--color-bg` | `oklch(13% 0.005 130)` | `#0F1212` | Background principal, dark surfaces |
 | **Secundária (30%)** | `--color-text-1` | `oklch(98% 0.005 130)` | `#F8F9F8` | Foreground principal, texto, mark |
 | **Acento (10%)** | `--color-accent` (Lime A) | `oklch(94% 0.22 124)` | `#D2FF00` | CTAs, hover states, signal point, links ativos |
 | Suporte | `--color-text-2` | `oklch(75% 0.005 130)` | `#B7B9B7` | Texto secundário, body reading |
@@ -253,7 +253,7 @@ Idêntico ao Primary. Use quando precisar enfatizar que é a versão fill (vs ou
 ![Dark background — business card mockup](Logos-Stefan/Dark-background.png)
 
 **Spec:**
-- Background: `--color-base` (`#0F1212`)
+- Background: `--color-bg` (`#0F1212`)
 - Mark: `--color-text-1` (`#F8F9F8`)
 - Wordmark: `--color-text-1`
 - Tagline: `--color-text-3`
@@ -265,8 +265,8 @@ Idêntico ao Primary. Use quando precisar enfatizar que é a versão fill (vs ou
 
 **Spec:**
 - Background: off-white (`#F8F9F8`) ou warm white (`#F5F2EC` aceitável)
-- Mark: `--color-base` (`#0F1212`)
-- Wordmark: `--color-base`
+- Mark: `--color-bg` (`#0F1212`)
+- Wordmark: `--color-bg`
 - Signal point: lime preservado (mesmo `#D2FF00`)
 
 ### 3.5 Acessibilidade
@@ -455,7 +455,7 @@ O glifo `✺` (Heavy Eight Teardrop-Spoked Asterisk, U+2735) é **decoração or
 
 **Spec:**
 - Container fixed top, altura 56px (mobile) / 64px (desktop)
-- Background: `--color-base` com 85% opacity + `backdrop-blur-md`
+- Background: `--color-bg` com 85% opacity + `backdrop-blur-md`
 - Border-bottom: `--color-hairline-strong`
 - Z-index: 50
 - Layout 3-up: brand (esquerda) · nav (centro) · spacer (direita)

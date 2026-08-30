@@ -758,7 +758,7 @@ Mantendo total coerência com `globals.css`, **sem inventar novos tokens**:
 
 | Papel | Token (já existe) | OKLCH | HEX aproximado | HSL aprox |
 |---|---|---|---|---|
-| **Dominante (60%)** | `--color-base` | `oklch(13% 0.005 130)` | `#0F1212` | `hsl(130 5% 7%)` |
+| **Dominante (60%)** | `--color-bg` | `oklch(13% 0.005 130)` | `#0F1212` | `hsl(130 5% 7%)` |
 | **Secundária (30%)** | `--color-text-1` | `oklch(98% 0.005 130)` | `#F8F9F8` | `hsl(130 5% 97%)` |
 | **Acento (10%)** | `--color-accent` (Lime A) | `oklch(94% 0.22 124)` | `#D2FF00` *(já confirmado no easter egg, `app/layout.tsx:168`)* | `hsl(72 100% 50%)` |
 | Suporte (eyebrow text) | `--color-text-2` | `oklch(75% 0.005 130)` | `#B7B9B7` | — |
@@ -814,10 +814,10 @@ A landing já segue essas regras (skip-link em lime, focus ring em lime, hover s
 
 | Combinação | Razão de contraste | WCAG |
 |---|---|---|
-| `--color-text-1` sobre `--color-base` | ~16.5:1 | AAA texto pequeno |
-| `--color-text-2` sobre `--color-base` | ~7.9:1 | AAA texto pequeno |
-| `--color-text-3` sobre `--color-base` | ~4.7:1 | AA texto pequeno (recém calibrado pra isso, `globals.css:46`) |
-| `--color-accent` sobre `--color-base` | ~13.2:1 | AAA |
+| `--color-text-1` sobre `--color-bg` | ~16.5:1 | AAA texto pequeno |
+| `--color-text-2` sobre `--color-bg` | ~7.9:1 | AAA texto pequeno |
+| `--color-text-3` sobre `--color-bg` | ~4.7:1 | AA texto pequeno (recém calibrado pra isso, `globals.css:46`) |
+| `--color-accent` sobre `--color-bg` | ~13.2:1 | AAA |
 | `--color-text-on-accent` sobre `--color-accent` | ~13.2:1 | AAA |
 
 **Implicação para a logo:** todas as combinações canônicas passam WCAG AAA. **Não há tradeoff de acessibilidade.**
