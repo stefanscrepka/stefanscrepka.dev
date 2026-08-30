@@ -1,6 +1,6 @@
 import { type TechId, TechLogo } from '@/components/shared/tech-logo';
-import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 import { cn } from '@/lib/utils';
+import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 import { BentoRevealGrid } from './bento-skills.client';
 
 // Section 9 — Stack confirmado em formato Bento Grid asimétrico.

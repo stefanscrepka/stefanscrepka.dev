@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 import { cn } from '@/lib/utils';
+import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 
 // Status line dos squads do Content Engine — pulsa cada step em sequencia
 // (S0 → S1 → S2 → S3 → S4 → E-0 HITL) em loop. Vive embaixo dos highlights
