@@ -61,21 +61,30 @@ export function FeaturedWorkSection() {
         {/* Hero tile FULL-BLEED — Content Engine flagship */}
         <HeroTile caseStudy={contentEngine} sequenceIndex={1} totalCount={3} />
 
-        {/* Half-tiles ESPELHADOS — gap-10 generoso (mobile gap-6) */}
+        {/* Half-tiles ESPELHADOS — gap-10 generoso (mobile gap-6).
+            F4 (2026-08-29): os dois usam 16/10, que é a proporção NATIVA dos
+            dois screenshots (nexacore-dashboard 1920×1200 e stj-app-home
+            3840×2400 = 1.600). Antes eram 4/3 e 16/9 — nenhum batia com a
+            imagem, então ambos cortavam (NexaCore perdia ~17% das laterais,
+            STJ ~11% do topo/base) e, por serem diferentes, as capas ficavam
+            com 468px vs 350px de altura. Como o CTA é `mt-auto`, essa
+            diferença de 118px virava um buraco visível dentro do tile mais
+            curto. Uma proporção só resolve recorte, consistência do par
+            espelhado e o vazio ao mesmo tempo. */}
         <div className="grid gap-6 sm:gap-10 lg:grid-cols-2 lg:gap-12">
           <HalfTile
             caseStudy={nexacore}
             sequenceIndex={2}
             totalCount={3}
             direction="text-left"
-            aspectRatio="4/3"
+            aspectRatio="16/10"
           />
           <HalfTile
             caseStudy={stjApp}
             sequenceIndex={3}
             totalCount={3}
             direction="text-right"
-            aspectRatio="16/9"
+            aspectRatio="16/10"
           />
         </div>
       </FeaturedWorkReveal>
