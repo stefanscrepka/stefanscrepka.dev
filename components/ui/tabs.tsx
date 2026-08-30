@@ -40,12 +40,14 @@ export function TabsTrigger({ className, ...props }: ComponentProps<typeof TabsP
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        'relative inline-flex shrink-0 items-center justify-center gap-2 px-3 text-sm font-medium outline-none',
+        // W-audit (2026-06-10): outline-none removido (mascarava o anel global
+        // de globals.css `*:focus-visible`) e o trio focus-visible:outline-*
+        // local também — redundante/conflitante com a regra global, que cobre.
+        'relative inline-flex shrink-0 items-center justify-center gap-2 px-3 text-sm font-medium',
         'text-(--color-text-2)',
         'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
         'hover:text-(--color-text-1)',
         'disabled:pointer-events-none disabled:opacity-50',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-border-focus)',
         // Pill variant
         'group-data-[variant=pill]/tabs-list:h-8 group-data-[variant=pill]/tabs-list:rounded-pill',
         'group-data-[variant=pill]/tabs-list:data-[state=active]:bg-(--color-accent)',
@@ -68,7 +70,10 @@ export function TabsContent({ className, ...props }: ComponentProps<typeof TabsP
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn('outline-none', className)}
+      // W-audit (2026-06-10): outline-none removido — o painel do Radix é
+      // focável (tabIndex=0) e ficava sem indicador de foco; o anel global
+      // *:focus-visible cobre.
+      className={className}
       {...props}
     />
   );

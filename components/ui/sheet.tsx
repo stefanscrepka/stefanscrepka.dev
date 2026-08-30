@@ -79,7 +79,7 @@ export function SheetContent({
         {showCloseButton ? (
           <SheetPrimitive.Close
             data-slot="sheet-close"
-            className="absolute top-4 right-4 inline-flex size-8 items-center justify-center rounded-md text-(--color-text-2) outline-none transition-colors hover:bg-(--color-surface) hover:text-(--color-text-1) focus-visible:ring-2 focus-visible:ring-(--color-border-focus)"
+            className="absolute top-3 right-3 inline-flex size-11 items-center justify-center rounded-md text-(--color-text-2) outline-none transition-colors hover:bg-(--color-surface) hover:text-(--color-text-1) focus-visible:ring-2 focus-visible:ring-(--color-border-focus)"
             aria-label="Fechar"
           >
             <svg

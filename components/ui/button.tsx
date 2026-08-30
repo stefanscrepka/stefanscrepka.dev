@@ -8,9 +8,14 @@ import { cn } from '@/lib/utils';
 const buttonVariants = cva(
   [
     'inline-flex shrink-0 items-center justify-center gap-2',
-    'whitespace-nowrap font-medium outline-none transition-all',
+    // W-audit (2026-06-10): `outline-none` removido — ele mascarava o anel de
+    // foco GLOBAL do design system (globals.css `*:focus-visible { outline:
+    // 3px solid var(--color-border-focus) }`); o utility vence a base layer e
+    // o anel computava "none" em todos os Buttons (medido no audit). As
+    // classes focus-visible:outline-* locais também saíram — redundantes e em
+    // conflito (2px vs 3px) com a regra global, que agora cobre o Button.
+    'whitespace-nowrap font-medium transition-all',
     'disabled:pointer-events-none disabled:opacity-50',
-    'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-border-focus)',
     "[&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
     'aria-busy:cursor-progress',
     // Tactile press feedback universal — scale 0.98 em active (Linear/Vercel pattern).
@@ -41,10 +46,14 @@ const buttonVariants = cva(
         accent: 'rounded-md bg-transparent text-(--color-accent) hover:bg-(--color-accent-subtle)',
       },
       size: {
-        default: 'h-10 px-5 text-sm',
-        sm: 'h-8 px-3 text-xs',
+        // W-mob (2026-05-25): default e icon subidos 40→44px (Apple HIG 44).
+        // sm subido 32→40px (ainda compacto desktop, alcançável em touch).
+        // lg mantém 48px. Visual desktop ~4px maior, imperceptível ao olho
+        // mas crítico pra mobile (Hanoi controls, mini links).
+        default: 'h-11 px-5 text-sm',
+        sm: 'h-10 px-3 text-xs',
         lg: 'h-12 px-7 text-base',
-        icon: 'size-10 p-0',
+        icon: 'size-11 p-0',
       },
     },
     defaultVariants: {
