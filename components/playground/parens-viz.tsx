@@ -110,7 +110,7 @@ export function ParensViz() {
             rows={3}
             className={cn(
               'w-full resize-y rounded-md border border-(--color-hairline-strong)',
-              'bg-(--color-base) px-3 py-2',
+              'bg-(--color-bg) px-3 py-2',
               'font-mono text-sm text-(--color-text-1)',
               'placeholder:text-(--color-text-3)',
               'outline-none transition-colors',
@@ -185,7 +185,7 @@ function StackViz({ stack, balanced, reduced }: StackVizProps) {
     <div
       className={cn(
         'relative flex h-[18rem] flex-col items-stretch justify-end gap-1 overflow-hidden p-3',
-        'rounded-xl border border-(--color-hairline) bg-(--color-base)'
+        'rounded-xl border border-(--color-hairline) bg-(--color-bg)'
       )}
       data-balanced={balanced ? '' : undefined}
     >

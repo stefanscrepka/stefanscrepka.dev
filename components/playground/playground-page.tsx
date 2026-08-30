@@ -80,7 +80,7 @@ export function PlaygroundPage() {
               href="https://github.com/stefanscrepka/estrutura-de-dados"
               target="_blank"
               rel="noreferrer"
-              className="font-mono text-(--color-accent) underline-offset-4 hover:underline"
+              className="font-mono text-(--color-accent) underline underline-offset-4 decoration-(--color-accent)/50 transition-[text-decoration-color] hover:decoration-(--color-accent)"
             >
               estrutura-de-dados
             </a>{' '}

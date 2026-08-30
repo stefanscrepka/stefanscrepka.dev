@@ -59,15 +59,17 @@ export function HanoiControls({
           aria-valuenow={n}
           className={cn(
             'w-full appearance-none bg-(--color-hairline-strong)',
-            'h-1 rounded-full',
+            'h-1.5 rounded-full',
             'outline-none focus-visible:ring-2 focus-visible:ring-(--color-border-focus)',
-            '[&::-webkit-slider-thumb]:size-4',
+            // W-mob (2026-05-25): thumb 16px → 28px. Touch target Apple HIG
+            // mínimo 24px; 28 dá folga sem ficar cartoon.
+            '[&::-webkit-slider-thumb]:size-7',
             '[&::-webkit-slider-thumb]:appearance-none',
             '[&::-webkit-slider-thumb]:rounded-full',
             '[&::-webkit-slider-thumb]:bg-(--color-accent)',
             '[&::-webkit-slider-thumb]:shadow-(--shadow-glow-lime-sm)',
             '[&::-webkit-slider-thumb]:cursor-pointer',
-            '[&::-moz-range-thumb]:size-4',
+            '[&::-moz-range-thumb]:size-7',
             '[&::-moz-range-thumb]:appearance-none',
             '[&::-moz-range-thumb]:border-0',
             '[&::-moz-range-thumb]:rounded-full',
