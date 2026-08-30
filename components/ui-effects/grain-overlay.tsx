@@ -3,6 +3,11 @@ import { cn } from '@/lib/utils';
 // SVG feTurbulence grain overlay, RSC. Fixed position pointer-events-none.
 // 4% opacity padrão. Drift loop 60s via CSS keyframe (kill via reduced-motion global override).
 // mix-blend overlay deixa o grão sentir surface por baixo sem ofuscar conteúdo.
+//
+// F3.5 (2026-06-11): decisão documentada — IntersectionObserver NÃO se aplica
+// aqui (fixed inset-0 = sempre intersectando por definição). O drift é
+// transform-only (compositor); abas ocultas já não pintam. Se aparecer custo
+// em low-end, o caminho é o LAUNCH-CHECKLIST: bakear PNG 256² tiled.
 
 interface GrainOverlayProps {
   opacity?: number;
