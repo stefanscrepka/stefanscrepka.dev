@@ -1,18 +1,27 @@
 'use client';
 
 import { m } from 'motion/react';
-import { type ReactNode, useState } from 'react';
+import { type KeyboardEvent, type ReactNode, useState } from 'react';
+import { useIsTouch } from '@/hooks/use-is-touch';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
 // Animate UI FlipCard pattern — 3D rotateY (default) ou rotateX.
 // Spring tight (stiffness 280 damping 20). Backface-hidden faces.
-// A11y: <button> wrapper aria-pressed. Enter/Space toggle.
+// A11y: <div role="button" tabIndex={0}> wrapper aria-pressed. Enter/Space toggle.
 // Reduced-motion: crossfade opacity entre faces sem rotation.
-// Mobile: click ou tap (hover-only seria broken).
+//
+// W-mob/a11y (2026-05-25):
+//   1. Trocado <button> wrapper por <div role="button" tabIndex={0}> pra evitar
+//      HTML inválido (back face contém <a> e <button>, nested interactive).
+//   2. trigger="auto" detecta touch via useIsTouch: touch → click toggle,
+//      desktop → hover. Antes trigger="hover" deixava Estética MD literalmente
+//      unreachable em mobile (onClick=undefined).
+//   3. onKeyDown manual pra Enter/Space funcionar como botão real (div com
+//      role="button" precisa de keyboard handler explícito).
 
 type FlipAxis = 'y' | 'x';
-type TriggerMode = 'hover' | 'click';
+type TriggerMode = 'hover' | 'click' | 'auto';
 
 interface FlipCardProps {
   front: ReactNode;
@@ -34,15 +43,28 @@ export function FlipCard({
   front,
   back,
   axis = 'y',
-  trigger = 'hover',
+  trigger = 'auto',
   tone = 'lime',
   className,
   ariaLabel = 'Virar card',
 }: FlipCardProps) {
   const [flipped, setFlipped] = useState(false);
   const reduced = useReducedMotionSafe();
+  const isTouch = useIsTouch();
+
+  // Trigger resolvido em runtime: auto → touch usa click, desktop usa hover.
+  const effectiveTrigger: 'hover' | 'click' =
+    trigger === 'auto' ? (isTouch === true ? 'click' : 'hover') : trigger;
 
   const toggle = () => setFlipped((prev) => !prev);
+
+  // Keyboard a11y: Enter/Space toggleia (div com role=button precisa explicito).
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      toggle();
+    }
+  };
 
   const rotation = flipped ? 180 : 0;
   const rotateAxis = axis === 'y' ? { rotateY: rotation } : { rotateX: rotation };
@@ -50,19 +72,23 @@ export function FlipCard({
   // Reduced-motion: simple opacity crossfade
   if (reduced) {
     return (
-      <button
-        type="button"
+      // biome-ignore lint/a11y/useSemanticElements: <button> não pode envolver <a>/<button> (nested interactive). Back face do FlipCard tem CTAs — usar <div role="button"> com keyboard handler manual evita HTML inválido.
+      <div
+        role="button"
+        tabIndex={0}
         onClick={toggle}
+        onKeyDown={handleKeyDown}
         aria-pressed={flipped}
         aria-label={ariaLabel}
         data-slot="flip-card"
         data-tone={tone}
         className={cn(
-          'group/flip relative isolate block w-full rounded-2xl text-left',
+          'group/flip relative isolate block w-full cursor-pointer rounded-2xl text-left',
           'border border-(--color-hairline-strong) bg-(--color-surface)',
           'transition-shadow duration-(--motion-fast)',
           'hover:shadow-(--shadow-lg) focus-visible:shadow-(--shadow-lg)',
-          'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-border-focus)',
+          // F3-residuo (2026-06-11): trio outline local removido — anel global
+          // 3px de globals.css cobre (mesma razão do fix no button.tsx).
           className
         )}
         style={{ boxShadow: `0 0 32px ${TONE_GLOW[tone]}` }}
@@ -84,16 +110,19 @@ export function FlipCard({
         >
           {back}
         </div>
-      </button>
+      </div>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={trigger === 'click' ? toggle : undefined}
-      onMouseEnter={trigger === 'hover' ? () => setFlipped(true) : undefined}
-      onMouseLeave={trigger === 'hover' ? () => setFlipped(false) : undefined}
+    // biome-ignore lint/a11y/useSemanticElements: <button> não pode envolver <a>/<button> (nested interactive). Back face do FlipCard tem CTAs — usar <div role="button"> com keyboard handler manual evita HTML inválido.
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={effectiveTrigger === 'click' ? toggle : undefined}
+      onKeyDown={handleKeyDown}
+      onMouseEnter={effectiveTrigger === 'hover' ? () => setFlipped(true) : undefined}
+      onMouseLeave={effectiveTrigger === 'hover' ? () => setFlipped(false) : undefined}
       onFocus={() => setFlipped(true)}
       onBlur={() => setFlipped(false)}
       aria-pressed={flipped}
@@ -101,9 +130,8 @@ export function FlipCard({
       data-slot="flip-card"
       data-tone={tone}
       className={cn(
-        'group/flip relative isolate block w-full rounded-2xl text-left',
+        'group/flip relative isolate block w-full cursor-pointer rounded-2xl text-left',
         '[perspective:1200px]',
-        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--color-border-focus)',
         className
       )}
     >
@@ -160,6 +188,6 @@ export function FlipCard({
           {back}
         </div>
       </m.div>
-    </button>
+    </div>
   );
 }

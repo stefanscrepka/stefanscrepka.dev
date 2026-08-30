@@ -53,7 +53,7 @@ export function TopBarNav({ items, className }: TopBarNavProps) {
       data-slot="top-bar-nav"
       className={cn(
         'fixed inset-x-0 top-0 z-50 w-full',
-        'border-b border-(--color-hairline-strong) bg-(--color-base)/85 backdrop-blur-md',
+        'border-b border-(--color-hairline-strong) bg-(--color-bg)/85 backdrop-blur-md',
         'h-14 md:h-16',
         'pt-[env(safe-area-inset-top)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]',
         className
@@ -85,7 +85,7 @@ function NavLogo() {
       className={cn(
         'group inline-flex items-center gap-3 rounded-md outline-none',
         'transition-colors',
-        'focus-visible:ring-2 focus-visible:ring-(--color-border-focus) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-base)'
+        'focus-visible:ring-2 focus-visible:ring-(--color-border-focus) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-bg)'
       )}
     >
       <span className="text-(--color-accent) transition-colors group-hover:text-(--color-accent-hover)">
@@ -147,12 +147,19 @@ function NavLinks({ items }: { items: TopBarNavItem[] }) {
               ease: EASES.standard,
             }}
             className={cn(
-              'relative inline-flex h-9 items-center px-3 text-sm font-medium outline-none',
+              'relative inline-flex h-9 items-center rounded-md px-3 text-sm font-medium outline-none',
               'transition-colors',
               isActive
                 ? 'text-(--color-text-1)'
                 : 'text-(--color-text-2) hover:text-(--color-text-1)',
-              'focus-visible:text-(--color-text-1)'
+              // F3-review (2026-06-11): a troca text-2→text-1 sozinha NÃO é
+              // indicador de foco de teclado (WCAG 2.4.7 — e zero mudança no
+              // link ativo, já text-1). O `outline-none` (utilities) vence o
+              // anel global `*:focus-visible` (base layer), então herdar não
+              // funciona aqui. Anel ring-2 explícito, igual ao NavLogo + trigger
+              // mobile deste arquivo (linhas 88/193).
+              'focus-visible:text-(--color-text-1)',
+              'focus-visible:ring-2 focus-visible:ring-(--color-border-focus) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-bg)'
             )}
           >
             {item.label}

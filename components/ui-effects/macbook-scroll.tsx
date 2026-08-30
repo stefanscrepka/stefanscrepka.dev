@@ -32,10 +32,14 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
   });
 
   // Desktop scale ranges — mobile path nem renderiza estes hooks (early return)
-  const scaleX = useTransform(scrollYProgress, [0, 0.3], [1.2, 1.5]);
-  const scaleY = useTransform(scrollYProgress, [0, 0.3], [0.6, 1.5]);
+  // W-design (2026-05-26): rotateX REMOVIDO — antes começava em Math.PI (lid
+  // fechada apontando pra baixo, invisível em scrollYProgress=0). Resultava
+  // em screenshot estático (Playwright/preview) mostrando moldura vazia até o
+  // user scrollar 50% do range. Agora lid SEMPRE aberta; apenas o scale dá
+  // o "reveal" effect. Apple Pro Display ad-style preservado via scaling.
+  const scaleX = useTransform(scrollYProgress, [0, 0.3], [0.85, 1.5]);
+  const scaleY = useTransform(scrollYProgress, [0, 0.3], [0.85, 1.5]);
   const translateY = useTransform(scrollYProgress, [0, 1], [0, 500]);
-  const rotateX = useTransform(scrollYProgress, [0, 0.5], [Math.PI, 0]);
   const titleOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   // Mobile/touch: layout estático compacto. Aspect-ratio 16/10 mimica a tela do
@@ -51,7 +55,7 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
         <div
           className={cn(
             'relative mx-auto w-full max-w-[860px] rounded-xl border-2 border-(--color-hairline-strong)',
-            'bg-(--color-base) p-2 shadow-(--shadow-cinema)'
+            'bg-(--color-bg) p-2 shadow-(--shadow-cinema)'
           )}
         >
           <div
@@ -85,13 +89,13 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
         ) : null}
 
         <div className="flex flex-col items-center" style={{ perspective: '800px' }}>
-          {/* Lid — contains the screen */}
+          {/* Lid — contains the screen. Always-open (rotateX=0) pra static
+              snapshots ficarem visualmente complete; scaling cuida do reveal. */}
           <m.div
             style={
               reduced
                 ? { transformOrigin: 'bottom', transformStyle: 'preserve-3d' }
                 : {
-                    rotateX,
                     transformOrigin: 'bottom',
                     transformStyle: 'preserve-3d',
                     scaleX,
@@ -101,7 +105,7 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
             }
             className={cn(
               'relative w-[90vw] max-w-[860px] origin-bottom rounded-t-xl',
-              'border-2 border-(--color-hairline-strong) bg-(--color-base)',
+              'border-2 border-(--color-hairline-strong) bg-(--color-bg)',
               'p-2 shadow-(--shadow-cinema)'
             )}
           >
@@ -116,7 +120,7 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
             {/* Notch */}
             <div
               aria-hidden="true"
-              className="absolute top-0 left-1/2 h-3 w-16 -translate-x-1/2 rounded-b-md bg-(--color-base)"
+              className="absolute top-0 left-1/2 h-3 w-16 -translate-x-1/2 rounded-b-md bg-(--color-bg)"
             />
           </m.div>
 
@@ -126,11 +130,11 @@ export function MacBookScroll({ title, badge, screen, className }: MacBookScroll
             className={cn(
               'relative w-[92vw] max-w-[880px] h-6',
               'rounded-b-2xl border-2 border-t-0 border-(--color-hairline-strong)',
-              'bg-gradient-to-b from-(--color-surface) to-(--color-base)',
+              'bg-gradient-to-b from-(--color-surface) to-(--color-bg)',
               'shadow-(--shadow-cinema)'
             )}
           >
-            <div className="absolute top-1/2 left-1/2 h-1 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--color-base)" />
+            <div className="absolute top-1/2 left-1/2 h-1 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--color-bg)" />
           </div>
         </div>
 

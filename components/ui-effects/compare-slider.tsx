@@ -113,7 +113,7 @@ export function CompareSlider({
         {after}
         <span
           aria-hidden="true"
-          className="absolute right-3 bottom-3 rounded-pill border border-(--color-hairline-strong) bg-(--color-base)/80 px-2 py-1 font-mono text-2xs uppercase tracking-wider text-(--color-text-2) backdrop-blur"
+          className="absolute right-3 bottom-3 rounded-pill border border-(--color-hairline-strong) bg-(--color-bg)/80 px-2 py-1 font-mono text-2xs uppercase tracking-wider text-(--color-text-2) backdrop-blur"
         >
           {afterLabel}
         </span>
@@ -129,7 +129,7 @@ export function CompareSlider({
         {before}
         <span
           aria-hidden="true"
-          className="absolute left-3 bottom-3 rounded-pill border border-(--color-hairline-strong) bg-(--color-base)/80 px-2 py-1 font-mono text-2xs uppercase tracking-wider text-(--color-text-2) backdrop-blur"
+          className="absolute left-3 bottom-3 rounded-pill border border-(--color-hairline-strong) bg-(--color-bg)/80 px-2 py-1 font-mono text-2xs uppercase tracking-wider text-(--color-text-2) backdrop-blur"
         >
           {beforeLabel}
         </span>
