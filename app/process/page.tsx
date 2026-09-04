@@ -12,13 +12,13 @@ import { cn } from '@/lib/utils';
 // 17–19px com leading 1.6. Hairlines lime entre seções pra ritmo editorial.
 
 export const metadata: Metadata = {
-  title: 'Process — método multi-agente',
+  title: 'Process · método multi-agente',
   description:
-    'Como construo IA multi-agente em produção: anti-slop validator com 14 regex PT-BR, prompt cache 2 camadas, HITL via Telegram, cron 03h–07h30 e stack local GPU.',
+    'Como construo IA multi-agente em produção: anti-slop em cascata com 28 regex pt-BR, prompt cache com dois TTLs, aprovação em três botões no Telegram, cron das 03h às 07h30 e inference local numa RTX 3070.',
   openGraph: {
     title: 'Process · Stefan Heinz Screpka',
     description:
-      'Método multi-agente em produção — anti-slop, prompt cache 2 camadas, HITL Telegram, cron e stack local GPU.',
+      'Método multi-agente em produção: anti-slop, prompt cache, aprovação no Telegram, cron e inference local.',
   },
   robots: { index: true, follow: true },
   alternates: { canonical: '/process' },
@@ -38,75 +38,75 @@ const SECTIONS: Section[] = [
     id: 'anti-slop',
     index: '01',
     eyebrow: 'Qualidade',
-    title: 'Anti-slop validator — 14 regex PT-BR',
+    title: 'Anti-slop em cascata',
     body: [
-      'LLM gera conteúdo que parece bom até alguém ler em voz alta. "É importante destacar que…", "no cenário atual…", "estamos diante de…" — padrões de slop que o leitor identifica em três segundos e desconfia da marca toda.',
-      'Cada draft passa por 14 regex PT-BR antes de subir pra revisão humana. Quem falha volta pra reescrita com o motivo apontado. Não é heurística — é gate. Conteúdo que não passa não chega no Telegram.',
+      'LLM gera texto que parece bom até alguém ler em voz alta. "No mundo atual", "além disso", "vale destacar": o leitor identifica em três segundos e desconfia da marca inteira.',
+      'Cada draft passa por três estágios antes de subir pra revisão humana. Primeiro, 28 regex pt-BR: 14 clássicas de 2024 e 2025, e 14 que surgiram em 2026, quando os modelos aprenderam a evitar as clássicas. Depois, uma medida de surprisal rodando local. Por fim, um juiz LLM. Quem falha volta pra reescrita com o motivo apontado.',
     ],
     highlights: [
-      'Padrões banidos: hedge ("vale destacar"), buzzwords vazias, voz passiva crônica',
-      'Custo: 0 — roda em string match, sem chamada de API extra',
-      'Métrica: 100% dos drafts publicados passaram pelo validator',
+      'Além das regex: travessão, cadência uniforme, emoji e falta de especificidade também reprovam',
+      'O validator do Editor-Chefe usa as 14 clássicas; o auditor R-15 usa as 28',
+      'Os padrões estão em apps/runtime/src/anti-slop/ai-tells.ts, e a lista aparece no case',
     ],
   },
   {
     id: 'prompt-cache',
     index: '02',
-    eyebrow: 'Performance',
-    title: 'Prompt cache 2 camadas',
+    eyebrow: 'Custo',
+    title: 'Prompt cache com dois TTLs',
     body: [
-      'Cada chamada Claude tem o mesmo system prompt + brand voice + 4-5 exemplos de tom. ~3.5k tokens de contexto que NÃO mudam entre runs.',
-      'Camada 1: cache_control "ephemeral" no system prompt — TTL 5min, hit rate ~85% nos cron jobs. Camada 2: cached examples no user message — hit rate ~60%. Custo de input reduzido em ~70% vs zero-cache.',
+      'Cada chamada carrega o mesmo system prompt, a mesma voz da marca e as mesmas ferramentas. Isso é prefixo cacheável, e o cache da Anthropic cobra 10% do preço de input na leitura.',
+      'O runtime marca o prefixo em duas superfícies (system e tools) e escolhe entre dois TTLs, 5 minutos ou 1 hora, com uma guarda de tamanho mínimo por modelo. E vem desligado por padrão: um agente que roda uma vez por dia nunca colheria o desconto, só pagaria o prêmio de escrita. Cache que não mede é fé.',
     ],
     highlights: [
-      'Hit rate medido via Langfuse trace span "anthropic.cache_read_input_tokens"',
-      'Invalidação manual quando brand voice muda (script CLI)',
-      'Reduz latência p95 de ~4.2s pra ~1.8s em chamadas cacheadas',
+      'packages/agent-runtime/src/caching.ts: no máximo 4 breakpoints por chamada',
+      'Tokens de cache contados por TTL no custo de cada execução (Langfuse)',
+      'AGENT_CACHE_ENABLED decide por ambiente; o default é false, com o motivo escrito no código',
     ],
   },
   {
     id: 'hitl-telegram',
     index: '03',
     eyebrow: 'Aprovação',
-    title: 'HITL via Telegram — ≤10 min/dia',
+    title: 'Três botões no Telegram',
     body: [
-      'Aprovação humana é gargalo se o fluxo é "abre dashboard, lê draft, clica aprovar". Movi pro Telegram — chega notificação, abre no celular, lê em 30s, responde "ok" ou "reescreve por X".',
-      'Bot Telegram + Evolution API. Cada draft vira uma mensagem com botões inline (Aprovar / Rejeitar / Reescrever). Decisão fica persistida no Postgres com timestamp e justificativa. Audit trail completo sem fricção.',
+      'Aprovação humana vira gargalo quando o fluxo é "abre o painel, lê o draft, clica". Aqui o pacote do dia chega no celular: aprovar, refinar ou rejeitar, e um texto livre quando é refinar.',
+      'A decisão fica persistida com quem decidiu, quando e por quê, e um índice único garante que cada pacote só recebe uma decisão. O mesmo fluxo existe no Studio, pra quem prefere a tela grande.',
     ],
     highlights: [
-      'Volume real: 40-60 drafts/dia → 8-10 min total de aprovação',
-      'Reescrita: bot pede motivo + reenvia pro agent corrigir',
-      'Sem dashboard novo — Telegram é a UI; backend é só webhook + queue',
+      'Bot em grammY; comando /pending lista o que espera decisão',
+      'Refinar abre um texto livre com 5 minutos pra responder',
+      'Sem dashboard novo pra aprender: o Telegram é a interface',
     ],
   },
   {
     id: 'cron',
     index: '04',
     eyebrow: 'Orquestração',
-    title: 'Cron 03h–07h30 · janela noturna',
+    title: 'Cron das 03h às 07h30',
     body: [
-      'Geração roda quando humano não está olhando. Cron dispara 5 squads sequenciais entre 03h e 07h30 BRT. Quando acordo às 8h, fila de aprovação já está cheia, agentes já processaram tudo, custo de inferência foi diluído pela noite.',
-      'BullMQ + Redis pra coordenar dependências entre squads (squad S2 precisa do output de S1). Sentry captura falhas, retry automático com backoff exponencial. Se tudo quebrar, alerta no Telegram às 7h45.',
+      'A geração roda enquanto ninguém está olhando. No fuso de São Paulo: inteligência às 03h00, estratégia às 05h30, criação às 06h00, revisão às 07h15, Editor-Chefe às 07h30. Quando o dono acorda, o pacote está pronto; a publicação sai às 09h.',
+      'São 16 jobs no node-cron, com noOverlap e um kill switch por ambiente. Um watchdog de hora em hora aponta o que travou; um watcher por minuto acompanha renders e publicações.',
     ],
     highlights: [
-      'Janela escolhida: API menos congestionada + sem competição com horário de pico',
-      'Output médio noturno: 50-80 drafts, 30-50 imagens, 10-15 vídeos',
-      'Custo previsível — orçamento batido com tolerância ±8%',
+      'C-12 (shot list) roda no domingo às 18h; C-13 (curadoria) a cada upload',
+      'Captura de performance às 06h, 14h, 20h e 23h; o analista P-20 fecha o dia às 23h',
+      'Tudo em apps/runtime/src/env.ts, com o timezone explícito',
     ],
   },
   {
     id: 'stack-local',
     index: '05',
     eyebrow: 'Infraestrutura',
-    title: 'Stack local GPU — subsidiando custo',
+    title: 'Inference local numa RTX 3070',
     body: [
-      'Imagens e embeddings rodam em GPU local (RTX 3070). Stable Diffusion XL pra hero images, BGE-M3 pros embeddings do pgvector RAG. Custo marginal: 0 — energia já paga.',
-      'Claude SDK chama API só quando precisa de raciocínio (writing, validação semântica, decisões). Embeddings, imagens, OCR, vision tasks light → local. Resultado: cost-per-piece cai ~62% vs full-API.',
+      'Claude entra onde precisa de raciocínio. O resto roda na GPU da mesa: embeddings com bge-m3 no Ollama, classificação em massa com Qwen 3.5 9B, imagem com SD 3.5 no ComfyUI e transcrição com faster-whisper em CUDA.',
+      'Um semáforo garante um modelo por vez na GPU, e cada carga tem fallback pra API quando a placa está ocupada. O custo marginal de uma imagem local é energia.',
     ],
     highlights: [
-      'SDXL turbo: ~8s por imagem 1024x1024',
-      'BGE-M3 embedding service: latência p95 ~120ms',
-      'Fallback automático pra API quando GPU está saturada',
+      'SD 3.5 Medium: cerca de 25 s por imagem na RTX 3070',
+      'Treino de LoRA por marca com Kohya, na mesma placa',
+      'Chaves e hosts por ambiente: OLLAMA_HOST, COMFYUI_API_URL, FASTER_WHISPER_DEVICE',
     ],
   },
   {
@@ -115,7 +115,7 @@ const SECTIONS: Section[] = [
     eyebrow: 'Resumo',
     title: 'Disciplina, não milagre',
     body: [
-      'Nada acima é "AI breakthrough". É engenharia: gate de qualidade que recusa, cache que mede, aprovação que cabe no celular, cron que respeita orçamento, GPU local pra diluir custo. Cada peça defendida com métrica.',
+      'Nada acima é "AI breakthrough". É engenharia: um gate de qualidade que recusa, um cache que mede antes de ligar, uma aprovação que cabe no celular, um cron que respeita o fuso e uma GPU que dilui custo. Cada peça com o arquivo onde ela vive.',
       'É assim que multi-agente sobrevive em produção sem virar buraco de dinheiro ou pesadelo de moderação. Se vai trabalhar comigo, é esse o padrão.',
     ],
   },
@@ -134,7 +134,7 @@ function buildHowToJsonLd() {
     '@id': `${baseUrl}/process#howto`,
     name: 'Como construo IA multi-agente em produção',
     description:
-      'Método de cinco etapas pra rodar IA multi-agente em produção sem virar buraco de dinheiro: anti-slop validator, prompt cache 2 camadas, HITL Telegram, cron noturno e stack local GPU.',
+      'Método de cinco etapas pra rodar IA multi-agente em produção sem virar buraco de dinheiro: anti-slop em cascata, prompt cache medido, aprovação no Telegram, cron no fuso certo e inference local.',
     inLanguage: 'pt-BR',
     totalTime: 'PT8M',
     author: { '@id': `${baseUrl}/#person` },
@@ -166,7 +166,7 @@ export default function ProcessPage() {
               '!tracking-[-0.025em] !leading-[1.02] text-balance'
             )}
           >
-            Como construo — método multi-agente.
+            Como construo. O método multi-agente.
           </h1>
           <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
             Seis decisões de engenharia que tornam multi-agente um sistema previsível em vez de uma
