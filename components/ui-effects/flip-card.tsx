@@ -28,16 +28,14 @@ interface FlipCardProps {
   back: ReactNode;
   axis?: FlipAxis;
   trigger?: TriggerMode;
-  /** Tom do glow halo no card */
+  /** Tom do card (amber só no Estética MD) — vira data-tone pro CSS. */
   tone?: 'lime' | 'amber';
   className?: string;
   ariaLabel?: string;
 }
 
-const TONE_GLOW = {
-  lime: 'var(--color-accent-glow)',
-  amber: 'oklch(82% 0.18 75 / 0.15)',
-} as const;
+// F6 (2026-09-04): os halos de 32px (TONE_GLOW) saíram das três faces —
+// eram a fumaça amber/lime em volta do card. Sombra neutra só.
 
 export function FlipCard({
   front,
@@ -91,13 +89,14 @@ export function FlipCard({
           // 3px de globals.css cobre (mesma razão do fix no button.tsx).
           className
         )}
-        style={{ boxShadow: `0 0 32px ${TONE_GLOW[tone]}` }}
       >
         {/* W3.x (2026-05-23): inert atribuído junto com aria-hidden — Lighthouse
             aria-hidden-focus audit exige que focáveis dentro de aria-hidden
             sejam removidos do tab order. inert faz isso nativamente. */}
         <div
-          className={cn('relative', flipped ? 'sr-only' : '')}
+          // F5 (2026-09-02): h-full pela mesma razão da face frontal do modo
+          // animado — o card precisa preencher a coluna do grid do Other Work.
+          className={cn('relative', flipped ? 'sr-only' : 'h-full')}
           aria-hidden={flipped}
           inert={flipped || undefined}
         >
@@ -150,17 +149,24 @@ export function FlipCard({
         className="relative h-full w-full"
         style={{ transformStyle: 'preserve-3d' }}
       >
-        {/* Front face — inert quando virado (sai do tab order). */}
+        {/* Front face — inert quando virado (sai do tab order).
+            F5 (2026-09-02): `h-full` — a face frontal tinha altura de conteúdo
+            enquanto o wrapper era `h-full`; no grid do Other Work (coluna
+            1.85fr ao lado de dois mini-cards empilhados) o card ficava ~300px
+            mais baixo que a coluna vizinha, abrindo um buraco no canto
+            inferior esquerdo (frame 06 do filme F5). O conteúdo da face já usa
+            `flex h-full flex-col` + `mt-auto`, então a altura extra vai pro
+            respiro entre a descrição e o hint, não pra um vazio no fim. */}
         <div
           className={cn(
-            'relative rounded-2xl',
+            'relative h-full rounded-2xl',
             'border border-(--color-hairline-strong) bg-(--color-surface)',
             'shadow-(--shadow-md)'
           )}
           style={{
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
-            boxShadow: `var(--shadow-md), 0 0 32px ${TONE_GLOW[tone]}`,
+            boxShadow: 'var(--shadow-md)',
           }}
           aria-hidden={flipped}
           inert={flipped || undefined}
@@ -180,7 +186,7 @@ export function FlipCard({
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
             transform: axis === 'y' ? 'rotateY(180deg)' : 'rotateX(180deg)',
-            boxShadow: `var(--shadow-md), 0 0 32px ${TONE_GLOW[tone]}`,
+            boxShadow: 'var(--shadow-md)',
           }}
           aria-hidden={!flipped}
           inert={!flipped || undefined}

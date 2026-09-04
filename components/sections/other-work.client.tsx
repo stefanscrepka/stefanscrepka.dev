@@ -10,8 +10,8 @@ import { cn } from '@/lib/utils';
 import { CASE_STUDIES } from '@/lib/work/data';
 
 // Client islands para OtherWorkSection — FlipCard amber + reveal stagger.
-// AMBER scope: `data-clinic-scope` opcional pra css overrides futuros, mas aqui o
-// amber vive APENAS dentro deste FlipCard via tone="amber" prop.
+// AMBER scope: o amber vive APENAS dentro deste FlipCard (texto + CTA). Sem
+// halo (F6): o card é hairline + surface, como os vizinhos.
 
 interface OtherWorkRevealProps {
   children: ReactNode;
@@ -35,8 +35,7 @@ export function OtherWorkReveal({ children }: OtherWorkRevealProps) {
 
 // W-audit (2026-06-10): o hint do FlipCard dizia "Toque ou passe o mouse" em
 // QUALQUER device. useIsTouch resolve o input real pós-mount; null durante
-// SSR/primeiro paint mantém o copy genérico (sem hydration mismatch — o texto
-// só muda em re-render client).
+// SSR/primeiro paint mantém o copy genérico (sem hydration mismatch).
 function FlipHintCopy() {
   const isTouch = useIsTouch();
   if (isTouch === true) return <>Toque pra ver detalhes →</>;
@@ -55,16 +54,15 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
       tone="amber"
       trigger="auto"
       axis="y"
-      ariaLabel="Virar card Estética MD — ver detalhes"
+      ariaLabel="Virar card Estética MD, ver detalhes"
       className="h-full min-h-[28rem]"
       front={
-        <div className="flex h-full flex-col gap-5 p-6 sm:p-7" data-clinic-scope>
-          {/* W-assets (2026-05-26): trocado ProductCover mode="diagram" hardcoded
-              por CaseStudyCover que faz dispatch via caseStudy.screenshot.
-              Como estetica-md tem screenshot real ('/work-screenshots/estetica-md-home.avif'),
-              renderiza MockupFrame + next/image. Diagram fica como fallback. */}
-          <CaseStudyCover caseStudy={esteticaCs} aspectRatio="16/10" tilt="subtle" />
-          <div className="flex flex-1 flex-col gap-3">
+        <div className="flex h-full flex-col gap-5 p-5 sm:p-6" data-clinic-scope>
+          {/* F7: uma captura só, no pixel 0 e na moldura de navegador (a seção
+              Tratamentos fica no case). Com duas, a coluna do card ficava mais
+              alta que os dois blocos de código ao lado. */}
+          <CaseStudyCover caseStudy={esteticaCs} browser sizes="(min-width: 1024px) 60vw, 100vw" />
+          <div className="flex flex-col gap-3 lg:flex-1">
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               Em produção desde Dez/2024
             </p>
@@ -75,15 +73,12 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
               className="text-sm leading-relaxed font-semibold"
               style={{ color: 'var(--color-amber)' }}
             >
-              Feito pra clínicas premium — estética, odonto, med spa.
+              Feito pra clínicas premium: estética, odonto, med spa.
             </p>
             <p className="text-sm leading-relaxed text-(--color-text-2)">
               Site institucional + conversão para Dra. Martina Dona (ozonioterapia, criolipólise,
               drenagem, RF, depilação laser, peeling). Vanilla JS antes do React.
             </p>
-            {/* W-audit (2026-06-10): hint adapta ao input real — "passe o
-                mouse" num celular era microcopy quebrada. null (pré-mount)
-                mantém o copy genérico SSR-safe. */}
             <p className="mt-auto font-mono text-2xs text-(--color-text-3)">
               <FlipHintCopy />
             </p>
@@ -91,7 +86,7 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
         </div>
       }
       back={
-        <div className="flex h-full flex-col gap-4 p-6 sm:p-7" data-clinic-scope>
+        <div className="flex h-full flex-col gap-4 p-5 sm:p-6" data-clinic-scope>
           <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
             Stack & detalhes
           </p>
@@ -116,7 +111,7 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
             Shopify.
           </p>
 
-          {/* CTA WhatsApp — amber tone, anchored bottom */}
+          {/* CTA WhatsApp — amber, sem halo. Hover: lift; active: press 0.98. */}
           <a
             href={deeplink}
             target="_blank"
@@ -125,8 +120,6 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
             className={cn(
               'mt-auto inline-flex items-center justify-center gap-2 rounded-pill px-5 py-3',
               'font-semibold text-sm shadow-(--shadow-md)',
-              // Hover: translateY lift (NÃO scale) + glow expand. Active: micro
-              // press feedback 0.98 (única vez que scale é OK = tactile button press).
               'transition-[transform,box-shadow] duration-(--motion-transition) ease-(--ease-smooth)',
               'hover:-translate-y-[2px] active:translate-y-0 active:scale-[0.98]',
               'focus-visible:-translate-y-[2px]'
@@ -134,7 +127,6 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
             style={{
               backgroundColor: 'var(--color-amber)',
               color: 'var(--color-bg)',
-              boxShadow: 'var(--shadow-md), 0 0 24px oklch(82% 0.18 75 / 0.5)',
             }}
           >
             Conversar no WhatsApp →
