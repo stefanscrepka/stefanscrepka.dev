@@ -76,7 +76,7 @@ const SK3D_MODELS: readonly ViewerModel[] = [
     id: 'cad',
     label: 'peça sob medida',
     src: '/models/sk3d-peca-industrial.glb',
-    note: 'Peça de CAD pra uma fabricante de painéis: 66,6 × 27,9 × 33,7 mm, com a marca em relevo, modelada e impressa sob encomenda.',
+    note: 'Peça de CAD sob encomenda pra um cliente industrial: 66,6 × 27,9 × 33,7 mm, com a marca em relevo, modelada e impressa.',
     description:
       'Modelo 3D interativo de uma peça mecânica sob medida, com um cilindro e um suporte',
   },

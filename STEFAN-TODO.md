@@ -13,7 +13,7 @@
 
 > Assinatura de volta ao scroll (sobre o ductus novo), Contact no fluxo normal como em 25/05, hero em duas colunas com o turno de hoje, card 3D com o LEVITA v4 + o hub da STARK + a peça de CAD (bola, patch, foto do Vasco e Correnteza fora), cursor de mira, e-mail copiável, pausa que também para a marquee, coordenada no rodapé. Acervo inteiro varrido (2.240 itens; fila em `_audit/f8/research-acervo-digest.md`). Commits em série na `f5/polish`, enviados.
 
-1. **Peça de CAD**: cliente segue anonimizado. Nomear é com você.
+1. ~~**Peça de CAD**~~ — não é decisão: o nome do cliente **não pode** ir pro site sem autorização por escrito. Está nos seus próprios arquivos (`Estudo-STARK/red-team/04-juridico-e-negocio.md` J1: LPI art. 195 XI; `Referencias-logo/acervo/logos-clientes-DEV/LEIA-ME.md`). Como só existem duas fábricas de painéis em Ponta Grossa, até "fabricante de painéis" identifica; a nota do viewer virou "cliente industrial".
 2. **Escudos de clube**: o card diz "estudo pessoal". A memória do projeto registra a dúvida da Lei Pelé art. 87 pra venda; mostrar não é vender.
 3. **Hub da STARK**: a coreografia foi medida do vídeo de referência do cliente; a legenda não diz "conceito original". Se quiser, escrevo isso no card.
 4. **Cursor de mira**: se incomodar, é um componente só (`components/ui-effects/target-cursor.client.tsx`), montado no `app/layout.tsx`.
