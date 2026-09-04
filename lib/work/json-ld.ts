@@ -1,7 +1,7 @@
 import type { CaseStudy } from './data';
 
 // W-seo (2026-05-25): JSON-LD helpers pros case studies.
-//   - SoftwareApplication: Content Engine, NexaCore, STJ App (3 produtos software)
+//   - SoftwareApplication: Content Engine, Caluna, STARK (3 produtos software)
 //   - CreativeWork: Estética MD (site institucional pra cliente externo)
 //   - BreadcrumbList: navegação Home › Work › Case
 //
@@ -15,8 +15,8 @@ const PERSON_ID = `${BASE_URL}/#person`;
 // Map de slugs pra applicationCategory mais específico (vs default).
 const APPLICATION_CATEGORY: Record<string, string> = {
   'content-engine': 'BusinessApplication',
-  nexacore: 'BusinessApplication',
-  'stj-app': 'BusinessApplication',
+  caluna: 'BusinessApplication',
+  stark: 'BusinessApplication',
 };
 
 interface SoftwareApplicationJsonLd {
