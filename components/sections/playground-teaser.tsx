@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 // Três cards 3-up (Hanoi 3D · Fibonacci · Parens), cada um preview estático
 // editorial + CTA "Ver completo →" linkando pra /playground#tab.
 //
-// Visual: glass-panel + inset-bisel + hairline + lime hover. Sem competir com
+// Visual: surface + inset-bisel + hairline; hover por borda. Sem competir com
 // FeaturedWork (3 cards bem menores, aspect-square). Reveal stagger Motion 12
 // dramatic ease, on view once.
 
@@ -94,7 +94,7 @@ export function PlaygroundTeaser() {
           pra aprender.
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
-          Algoritmos C da faculdade virando demos interativos. Visualizar é entender — recursão,
+          Algoritmos em C da faculdade virando demos interativos. Visualizar é entender: recursão,
           complexidade, pilha. Cada um vive numa página própria, isolado, sem custo na home.
         </p>
       </header>
@@ -132,7 +132,7 @@ export function PlaygroundTeaser() {
 }
 
 /* ============================================================
-   Card link — aspect-[4/3] glass-panel + preview + microcopy
+   Card link — aspect-[4/3] surface + preview + microcopy
    ============================================================ */
 
 function TeaserCardLink({ card }: { card: TeaserCard }) {
@@ -141,21 +141,24 @@ function TeaserCardLink({ card }: { card: TeaserCard }) {
       href={card.href}
       className={cn(
         'group/teaser relative isolate flex flex-col gap-4 overflow-hidden rounded-2xl p-5 outline-hidden',
-        'border border-(--color-hairline) glass-panel',
-        'shadow-[var(--shadow-md),var(--shadow-inset-bisel)]',
-        'transition-[transform,border-color,box-shadow] duration-(--motion-page) ease-(--ease-smooth)',
-        'hover:-translate-y-[2px] hover:border-(--color-accent)',
-        'hover:shadow-[var(--shadow-lg),var(--shadow-inset-bisel),0_0_36px_var(--color-accent-glow)]',
-        'focus-visible:-translate-y-[2px] focus-visible:border-(--color-accent)',
-        'focus-visible:shadow-[var(--shadow-lg),var(--shadow-inset-bisel),0_0_36px_var(--color-accent-glow)]'
+        'border border-(--color-hairline) bg-(--color-surface)',
+        'shadow-(--shadow-inset-bisel)',
+        // F6 (2026-09-04): sem glass-panel (backdrop-blur sobre fundo chato =
+        // só custo) e sem halo lime de 36px no hover. Elevação por borda.
+        'transition-[transform,border-color] duration-[350ms] ease-(--ease-standard)',
+        'hover:-translate-y-[2px] hover:border-(--color-hairline-alpha-3)',
+        'focus-visible:-translate-y-[2px] focus-visible:border-(--color-accent)'
       )}
     >
-      {/* Preview canvas — aspect-[4/3] surface */}
+      {/* Preview canvas — aspect-[4/3] surface.
+          F5 (2026-09-02): corner-ticks (marcas de registro) no lugar de
+          borda + raio; as marcas acendem em lime no hover/focus do card —
+          o único acento que "faz algo" aqui além do CTA. */}
       <div
         aria-hidden="true"
         className={cn(
-          'relative aspect-[4/3] w-full overflow-hidden rounded-xl',
-          'border border-(--color-hairline)/60 bg-(--color-surface)'
+          'corner-ticks relative aspect-[4/3] w-full bg-(--color-surface)',
+          'group-hover/teaser:[--tick-color:var(--color-accent)] group-focus-visible/teaser:[--tick-color:var(--color-accent)]'
         )}
       >
         <CardPreview kind={card.preview} />

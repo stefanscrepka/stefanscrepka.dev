@@ -32,8 +32,14 @@ const ContactSection = dynamic(() =>
 );
 
 export default function HomePage() {
+  // F5 (2026-09-02): UM filho DOM pro <ViewTransition default="page-fade"> do
+  // layout. Com o fragment de 9 <section>, o React nomeava cada uma
+  // (_t_0_, _t_0__1 … _t_0__8) e tirava 9 snapshots na saída de toda
+  // navegação (medido em _audit/f5/probe-vt2.mjs); com um wrapper, 1. Mesma
+  // forma do work-layout. (Não é o que faz o morph do título funcionar —
+  // ver featured-work.client.tsx.)
   return (
-    <>
+    <div data-slot="home-page">
       <HeroSection />
       <SocialProofLine />
       <FeaturedWorkSection />
@@ -43,6 +49,6 @@ export default function HomePage() {
       <PlaygroundTeaser />
       <ManifestoSection />
       <ContactSection />
-    </>
+    </div>
   );
 }

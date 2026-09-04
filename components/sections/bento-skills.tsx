@@ -1,32 +1,48 @@
 import { type TechId, TechLogo } from '@/components/shared/tech-logo';
 import { cn } from '@/lib/utils';
+import { CE_ONBOARDING_TEMPLATES, ceAgentsOf } from '@/lib/work/content-engine-artifacts';
 import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 import { BentoRevealGrid } from './bento-skills.client';
 
 // Section 9 — Stack confirmado em formato Bento Grid asimétrico.
 // Hierarquia declarada (não tudo importante):
-//   - IA AGENTIC XL (col-span 4 row-span 3, "22" 220px gigante)
+//   - IA AGENTIC XL (col-span 4 row-span 3) — o registro dos agentes (F8)
 //   - RAG/FRONTEND/BACKEND stack vertical à direita (col-span 2 cada)
-//   - INFRA + OBSERVABILITY full-width abaixo (col-span 6) com status bars +
-//     INTEGRAÇÕES chip strip embedded
+//   - INFRA + OBSERVABILITY full-width abaixo (col-span 6) com as superfícies
+//     de runtime + INTEGRAÇÕES chip strip embedded
 //
-// F3.2 (2026-06-11) — dieta de hidratação: BentoCell (e StatusBar/ProgressBar/
-// PerimeterTrace) voltaram a ser Server Components. O que era estado React:
+// F3.2 (2026-06-11) — dieta de hidratação: BentoCell (e PerimeterTrace)
+// são Server Components. O que era estado React:
 //   - hover do PerimeterTrace → CSS :hover/:focus-within (globals.css,
 //     [data-bento-trace]) com os mesmos timings do tween Motion;
-//   - gate JS de reduced-motion no lift/ping → variantes motion-safe/reduce;
-//   - keyframes progressPulse inline (1 <style> por célula) → globals.css.
+//   - gate JS de reduced-motion no lift → variante motion-safe.
 // Só o reveal com stagger continua client (BentoRevealGrid, ilha fina).
+//
+// F5 (2026-09-02) — três mudanças de conteúdo, todas por claim↔evidência:
+//   1. XL: o "22" gigante (um número sem estrutura atrás, e a origem da
+//      pendência 22-vs-24) virou um diagrama de ORQUESTRAÇÃO em 1px — o
+//      sistema em vez da soma: cron → Claude Agent SDK → 5 squads → E-0
+//      (humano). A contagem vira legenda, não monumento. Um único elemento
+//      aceso: o humano no loop (R4 §5.3, padrão Sprrrint "one lit element").
+//   2. small: cada célula acende UM chip (o que sustenta a claim) — o resto
+//      recua pra text-3. Três listas planas viram três células compostas.
+//   3. wide: as "status bars" (ponto verde com ping + barras animadas + "OK")
+//      simulavam telemetria — o site não lê estado nenhum. Num site cuja tese
+//      é "funciona 24/7", um dashboard fingido é a maior dívida de
+//      credibilidade da página (R4 §7.12; ROADMAP F4 "pendente"). Agora a
+//      célula lista as superfícies de runtime e o papel de cada uma —
+//      informação verdadeira na própria cara. Isso também tira o segundo
+//      verde (--color-success) de uma superfície que já tem lime.
 
 export interface BentoSkillsCell {
   size: 'xl' | 'small' | 'wide';
   heading: string;
   techs: TechId[];
   extras?: string[];
+  /** F5: o chip "aceso" da célula — a peça que sustenta a claim do heading. */
+  lead?: string;
   note?: string;
-  feature?: 'count' | 'live';
-  count?: number;
-  countSuffix?: string;
+  feature?: 'orchestration' | 'runtime';
   /** Apenas no INFRA wide cell — chip strip de integrações inline. */
   integrations?: string[];
 }
@@ -37,9 +53,13 @@ const CELL_CLASS_BY_SIZE: Record<BentoSkillsCell['size'], string> = {
   wide: 'col-span-1 sm:col-span-6 lg:col-span-6',
 };
 
+// F5 (2026-09-02): o min-h das células small só existe pra igualar altura
+// quando elas dividem uma linha (sm+). No mobile (coluna única) ele deixava
+// ~90px vazios no rodapé de cada uma das três (medido: 224px de célula pra
+// ~130px de conteúdo) — ~270px de scroll morto. Mobile = altura do conteúdo.
 const MIN_HEIGHT_BY_SIZE: Record<BentoSkillsCell['size'], string> = {
   xl: 'min-h-[420px] lg:min-h-[640px]',
-  small: 'min-h-[14rem]',
+  small: 'sm:min-h-[14rem]',
   wide: 'min-h-[340px]',
 };
 
@@ -47,10 +67,9 @@ const CELLS: BentoSkillsCell[] = [
   {
     size: 'xl',
     heading: 'IA AGENTIC',
-    feature: 'count',
-    count: 22,
-    countSuffix: 'agentes em 5 squads',
+    feature: 'orchestration',
     techs: ['anthropic', 'shiki'],
+    lead: 'Claude Agent SDK',
     extras: [
       'Opus 4.7',
       'Sonnet 4.6',
@@ -61,33 +80,33 @@ const CELLS: BentoSkillsCell[] = [
       'vision',
       'streaming SSE',
     ],
-    // F4: o parêntese listava os mesmos 5 squads que agora aparecem como linha
-    // estruturada logo abaixo do stat. Dizer duas vezes na mesma célula não
-    // informa mais — só ocupa. A nota fica com o que a lista NÃO diz.
-    note: 'Claude Agent SDK orquestra os squads em cron noturno e entrega pra aprovação humana. Substitui agência inteira.',
+    note: 'Cada papel tem prompt versionado, modo scripted pra testar sem LLM e uma tabela própria no Postgres. Substitui uma equipe de quatro a seis pessoas.',
   },
   {
     size: 'small',
     heading: 'RAG + VECTOR',
     techs: ['postgres'],
-    extras: ['pgvector', 'Qdrant', 'BGE-M3', 'Gemini emb-004', 'Ollama local', 're-ranking'],
+    lead: 'pgvector',
+    extras: ['Qdrant', 'BGE-M3', 'Gemini emb-004', 'Ollama local', 're-ranking'],
   },
   {
     size: 'small',
     heading: 'FRONTEND',
     techs: ['nextjs', 'react', 'tailwind', 'three', 'gsap', 'motion'],
-    extras: ['TypeScript strict', 'shadcn/ui', 'r3f + drei'],
+    lead: 'TypeScript strict',
+    extras: ['shadcn/ui', 'r3f + drei'],
   },
   {
     size: 'small',
     heading: 'BACKEND',
     techs: ['typescript', 'postgres', 'drizzle', 'redis'],
-    extras: ['Node 22', 'BullMQ', 'Socket.io', 'Fastify', 'Inngest', 'Server Actions'],
+    lead: 'BullMQ',
+    extras: ['Node 22', 'Socket.io', 'Fastify', 'Inngest', 'Server Actions'],
   },
   {
     size: 'wide',
     heading: 'INFRA + OBSERVABILITY',
-    feature: 'live',
+    feature: 'runtime',
     techs: ['vercel', 'sentry'],
     extras: [
       'Vercel Fluid Compute',
@@ -109,9 +128,18 @@ const CELLS: BentoSkillsCell[] = [
       'Google Cal',
       'Google Drive',
     ],
-    note: 'Vercel gru1 (frontend público) + Coolify VPS rodando Content Engine 24/7 com GPU local.',
+    note: 'Vercel gru1 pro site; Coolify numa VPS pro Content Engine e pra Caluna, com a GPU local por trás.',
   },
 ];
+
+// Superfícies de runtime da célula INFRA — o que cada uma faz, sem simular
+// estado. Substitui as status bars (ver nota F5 no topo do arquivo).
+const RUNTIME_SURFACES = [
+  { name: 'Vercel', role: 'gru1 · este site' },
+  { name: 'Coolify VPS', role: 'Content Engine + Caluna · GPU local' },
+  { name: 'Sentry', role: 'erros + sourcemaps em produção' },
+  { name: 'Langfuse', role: 'traces e custo por chamada LLM' },
+] as const;
 
 export function BentoSkillsSection() {
   return (
@@ -122,7 +150,7 @@ export function BentoSkillsSection() {
           Ferramentas que entram em produção.
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
-          Stack confirmado pelos três produtos rodando. Não é uma lista de cursos — é o que está no{' '}
+          Stack confirmado pelos três produtos rodando. Não é uma lista de cursos: é o que está no{' '}
           <code className="font-mono text-(--color-text-1)">package.json</code> e no{' '}
           <code className="font-mono text-(--color-text-1)">docker-compose.yml</code> agora.
         </p>
@@ -194,44 +222,8 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </span>
       </header>
 
-      {/* Feature visual XL — Wave 1 stub: count textual mono grande.
-          Wave 4 vai substituir por <video> real do Telegram HITL (reusa asset
-          do bento-processos cell 1, conforme plano §D.2). */}
-      {cell.feature === 'count' && cell.count !== undefined ? (
-        <div className="relative flex flex-1 flex-col items-center justify-center gap-3 py-4">
-          <span
-            className="mono-stats font-bold tabular-nums leading-none text-(--color-accent)"
-            style={{ fontSize: 'clamp(4.5rem, 18vw, 9rem)', letterSpacing: '-0.04em' }}
-          >
-            {cell.count}
-          </span>
-          {cell.countSuffix ? (
-            <p className="text-center font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
-              {cell.countSuffix}
-            </p>
-          ) : null}
-          {/* F4 (2026-08-29): a célula é obrigada a ter a altura de três células
-              empilhadas da coluna direita, e o stat sozinho boiava no meio com
-              ~200px de vazio acima e abaixo — lia como inacabado (o próprio
-              código chamava de "Wave 1 stub").
-              Os NOMES dos 5 squads são dado já verificado e consistente em todo
-              o site, então preenchem o espaço com substância em vez de enfeite.
-              A CONTAGEM por squad ficou de fora de propósito: o diagrama declara
-              6/4/2/8/4 = 24, contra os 22 afirmados em outros sete pontos.
-              Ver lib/work/data.ts → CONTENT_ENGINE_SQUADS. */}
-          <ul className="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5">
-            {CONTENT_ENGINE_SQUADS.map((squad) => (
-              <li
-                key={squad.id}
-                className="flex items-baseline gap-1.5 font-mono text-2xs uppercase tracking-widest"
-              >
-                <span className="text-(--color-accent)">{squad.code}</span>
-                <span className="text-(--color-text-3)">{squad.name}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      {/* Feature visual XL — diagrama de orquestração (F5) */}
+      {cell.feature === 'orchestration' ? <AgentsRegistry /> : null}
 
       {/* Tech logos */}
       {cell.techs.length > 0 ? (
@@ -244,10 +236,22 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </ul>
       ) : null}
 
-      {/* Extras chip list — pills mono hairline transparente */}
-      {cell.extras && cell.extras.length > 0 ? (
+      {/* Chips — o `lead` aceso em lime (hairline lime + texto lime), os
+          extras em text-3 sobre hairline. Um elemento aceso por célula. */}
+      {cell.lead || (cell.extras && cell.extras.length > 0) ? (
         <ul className="flex flex-wrap gap-1.5">
-          {cell.extras.map((tag) => (
+          {cell.lead ? (
+            <li
+              className={cn(
+                'rounded-md border border-(--color-accent-emissive) bg-(--color-accent-subtle)',
+                'px-2 py-0.5 font-mono text-2xs text-(--color-accent)'
+              )}
+              style={{ boxShadow: 'inset 0 1px 0 oklch(100% 0 0 / 0.04)' }}
+            >
+              {cell.lead}
+            </li>
+          ) : null}
+          {cell.extras?.map((tag) => (
             <li
               key={tag}
               className={cn(
@@ -255,7 +259,6 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
                 'bg-transparent px-2 py-0.5',
                 'font-mono text-2xs text-(--color-text-3)',
                 'transition-colors duration-(--motion-fast)',
-                'group-hover/cell:border-(--color-accent-emissive)',
                 'group-hover/cell:text-(--color-text-2)'
               )}
               style={{ boxShadow: 'inset 0 1px 0 oklch(100% 0 0 / 0.04)' }}
@@ -266,13 +269,22 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </ul>
       ) : null}
 
-      {/* Status bars LIVE (wide INFRA cell) */}
-      {cell.feature === 'live' ? (
-        <div className="grid gap-2 pt-2 sm:grid-cols-2 lg:grid-cols-4">
-          {['Vercel deploy', 'Coolify VPS', 'Sentry errors', 'Langfuse traces'].map((service) => (
-            <StatusBar key={service} label={service} />
+      {/* Superfícies de runtime (wide INFRA cell) — nome + papel, sem estado
+          simulado. Layout de "registro": hairline entre linhas, mono. */}
+      {cell.feature === 'runtime' ? (
+        <dl className="grid gap-x-6 pt-2 sm:grid-cols-2">
+          {RUNTIME_SURFACES.map((s) => (
+            <div
+              key={s.name}
+              className="flex items-baseline justify-between gap-4 border-t border-(--color-hairline) py-2.5"
+            >
+              <dt className="font-mono text-xs text-(--color-text-1)">{s.name}</dt>
+              <dd className="text-right font-mono text-2xs uppercase tracking-wider text-(--color-text-3)">
+                {s.role}
+              </dd>
+            </div>
           ))}
-        </div>
+        </dl>
       ) : null}
 
       {cell.note ? (
@@ -292,7 +304,17 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
           <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) mb-2">
             ↳ INTEGRAÇÕES
           </p>
-          <ul className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {/* F5 (2026-09-02): no mobile a strip rola na horizontal com a
+              scrollbar escondida — o último chip visível era cortado seco
+              ("Evolution API" pela metade) sem nenhum sinal de que há mais.
+              A máscara esvanece os 2.5rem finais só quando há overflow real
+              (em desktop os chips param antes da borda e nada muda). */}
+          <ul
+            className={cn(
+              'flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+              '[mask-image:linear-gradient(to_right,black_calc(100%-2.5rem),transparent)] sm:[mask-image:none]'
+            )}
+          >
             {cell.integrations.map((name) => (
               <li
                 key={name}
@@ -309,67 +331,69 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
 }
 
 // =================================================================
-// AgentsOrbital REMOVIDO (Wave 1).
+// AgentsRegistry — a equipe, como o Studio a registra (F8, 2026-09-05).
 //
-// Era o SVG orbital com 5 squad cores + 22 agentes satélites rotacionando
-// 60s. Stefan classificou como visual "perdido" / "SVG procedural" — mesmo
-// padrão visual que foi removido em outras seções.
-//
-// Wave 4 vai substituir por <video> real do Telegram HITL (Stefan grava
-// screencap do bot recebendo aprovação). Mesmo asset será reusado no
-// bento-processos cell 1.
-//
-// Por enquanto (Wave 1) a célula IA AGENTIC mostra apenas o count textual
-// grande (ver BentoCell acima, branch cell.feature === 'count').
+// O ledger do cron subiu pro hero (day-rail.tsx); aqui fica o outro registro
+// verdadeiro: os 19 papéis do ciclo diário + os 6 do onboarding, copiados de
+// apps/web/src/lib/agent-roles.ts e packages/prompts/templates
+// (lib/work/content-engine-artifacts.ts), agrupados por squad com o horário
+// em que o cron os acorda. Um único elemento aceso: o Editor-Chefe.
+// RSC puro, zero JS, zero SVG.
 // =================================================================
 
-// Auxiliares: StatusBar + ProgressBar (cell wide INFRA),
-// PerimeterTrace (hover border de TODAS as células). Todos RSC desde F3.2 —
-// reduced-motion via variantes CSS + kill global, animações via globals.css.
+const REGISTRY_GROUPS = [
+  {
+    code: 'S0',
+    name: 'Onboarding',
+    when: 'uma vez por marca',
+    rows: CE_ONBOARDING_TEMPLATES.map((t) => ({ id: t.id, name: t.file.replace(/\.md$/, '') })),
+  },
+  { code: 'S1', name: 'Inteligência', when: '03h00', rows: ceAgentsOf('inteligencia') },
+  { code: 'S2', name: 'Estratégia', when: '05h30', rows: ceAgentsOf('estrategia') },
+  { code: 'S3', name: 'Criação', when: '06h00', rows: ceAgentsOf('criacao') },
+  { code: 'S4', name: 'Revisão', when: '07h15', rows: ceAgentsOf('revisao') },
+  { code: 'E-0', name: 'Direção', when: '07h30', rows: ceAgentsOf('direcao'), lit: true },
+] as const;
 
-function StatusBar({ label }: { label: string }) {
+function AgentsRegistry() {
   return (
-    <div className="flex items-center gap-3 rounded-md border border-(--color-hairline) bg-(--color-bg) px-3 py-2.5">
-      <span className="relative flex size-2 shrink-0 items-center justify-center">
-        <span
-          aria-hidden="true"
-          className="absolute inline-flex size-full rounded-full opacity-50 motion-safe:animate-ping motion-reduce:hidden"
-          style={{ background: 'var(--color-success)' }}
-        />
-        <span
-          aria-hidden="true"
-          className="relative inline-flex size-2 rounded-full"
-          style={{ background: 'var(--color-success)', boxShadow: '0 0 6px var(--color-success)' }}
-        />
-      </span>
-      <span className="flex-1 font-mono text-xs text-(--color-text-1)">{label}</span>
-      <ProgressBar />
-      <span className="font-mono text-2xs uppercase tracking-widest text-(--color-success)">
-        ok
-      </span>
-    </div>
-  );
-}
-
-function ProgressBar() {
-  // Mini progress bar visual — 6 bars dancing. Keyframes progress-pulse em
-  // globals.css; reduced-motion global encerra no frame "to" (estático ~80%).
-  return (
-    <div className="flex items-end gap-0.5 h-3">
-      {[3, 5, 7, 5, 8, 6].map((h, i) => (
-        <span
-          // biome-ignore lint/suspicious/noArrayIndexKey: static decorative bar
-          key={i}
-          aria-hidden="true"
-          className="inline-block w-0.5 bg-(--color-success)"
-          style={{
-            height: `${h * 1.5}px`,
-            opacity: 0.65,
-            animation: `progress-pulse ${1.5 + i * 0.15}s ease-in-out ${i * 0.1}s infinite alternate`,
-          }}
-        />
-      ))}
-    </div>
+    <figure className="relative my-1 w-full">
+      <dl className="grid gap-px overflow-hidden rounded-md border border-(--color-hairline) bg-(--color-hairline) sm:grid-cols-2 lg:grid-cols-3">
+        {REGISTRY_GROUPS.map((g) => (
+          <div key={g.code} className="flex flex-col gap-2 bg-(--color-surface-elevated) px-3 py-3">
+            <dt className="flex items-baseline justify-between gap-2 font-mono text-2xs uppercase tracking-widest">
+              <span
+                className={'lit' in g && g.lit ? 'text-(--color-accent)' : 'text-(--color-text-1)'}
+              >
+                {g.code} · {g.name}
+              </span>
+              <span className="text-(--color-text-3)">{g.when}</span>
+            </dt>
+            <dd className="flex flex-col gap-1 font-mono text-2xs leading-snug">
+              {g.rows.map((r) => (
+                <span key={r.id} className="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-2">
+                  <span className="tabular-nums text-(--color-text-2)">{r.id}</span>
+                  <span className="truncate text-(--color-text-3)">
+                    {'role' in r ? r.role : r.name}
+                  </span>
+                </span>
+              ))}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <figcaption className="mt-3 text-balance font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+        <span className="text-(--color-text-1)">19 agentes</span>&nbsp;· 5 squads&nbsp;· 6 no
+        onboarding&nbsp;· apps/web/src/lib/agent-roles.ts
+      </figcaption>
+      <p className="sr-only">
+        Registro dos agentes do Content Engine por squad:{' '}
+        {CONTENT_ENGINE_SQUADS.map((sq) => `${sq.name} (${sq.agents} agentes, ${sq.when})`).join(
+          ', '
+        )}
+        ; o Editor-Chefe fecha o dia às 07h30.
+      </p>
+    </figure>
   );
 }
 

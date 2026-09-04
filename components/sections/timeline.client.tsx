@@ -34,7 +34,11 @@ interface TimelineRevealProps {
 
 export function TimelineReveal({ items }: TimelineRevealProps) {
   return (
-    <TracingBeam>
+    // F5 (2026-09-02): startDot={false} — o primeiro MarkerDot já marca o
+    // início do trilho; o dot cinza do TracingBeam ficava 20px acima dele e
+    // lia como dois pontos (glitch de precisão). /process,
+    // sem marcadores próprios, continuam com o dot padrão.
+    <TracingBeam startDot={false}>
       {/* W-motion #4: cada marker tem seu próprio whileInView — Disney Timing
           per element, ritmo alinhado ao scroll natural do user. */}
       {/* W-audit (2026-06-10): gaps 8/12/14rem → 5/7/8rem. No filme do scroll
@@ -57,12 +61,17 @@ export function TimelineReveal({ items }: TimelineRevealProps) {
         ))}
       </ol>
 
-      {/* Beam end glow — soft lime blur depois do último marker (não corta seco) */}
+      {/* Beam end glow — soft lime blur depois do último marker (não corta seco).
+          F5 (2026-09-02): este div vive DENTRO do wrapper de conteúdo do
+          TracingBeam, que já tem `paddingLeft: var(--beam-pad)`. Com
+          `marginLeft: var(--beam-line)` o glow caía 56px à direita da linha
+          (medido no filme de scroll, desktop) — lia como mancha solta. Mesma
+          derivação do MarkerDot: linha − recuo do conteúdo. */}
       <div
         aria-hidden="true"
         className="pointer-events-none mt-16 h-32 w-px"
         style={{
-          marginLeft: 'var(--beam-line)',
+          marginLeft: 'calc(var(--beam-line) - var(--beam-pad))',
           background:
             'linear-gradient(to bottom, var(--color-accent) 0%, oklch(94% 0.22 124 / 0.4) 40%, transparent 100%)',
           filter: 'blur(2px)',

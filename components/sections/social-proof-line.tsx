@@ -4,43 +4,42 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
-// Linha de prova social entre Hero e FeaturedWork — ponte narrativa que sinaliza
-// "três produtos em produção" antes do scroll mergulhar nos cases.
-//
-// Estilo midu+landonorris híbrido: mono uppercase tracking-widest + glyph lime
-// que pulsa no hover + hairline-top e hairline-bottom contendo o strip.
-// Cada linha é um <Link> pra anchor da sub-rota (#work mantém visitante na home).
+// Linha de prova entre o Hero e o Featured Work: três produtos, uma frase
+// cada. F7 (2026-09-04): a versão anterior era um empilhado de palavras-chave
+// ("22 agentes Claude SDK · orquestrados em 5 squads, cron 24/7") que lia
+// como ficha técnica de robô. Agora cada linha diz o que o produto FAZ, em
+// português, e o número que sobrou é o que o código confirma (19 agentes,
+// registro em apps/web/src/lib/agent-roles.ts).
 //
 // Reveal: stagger 80ms via IntersectionObserver one-shot. Reduced-motion: snap.
 
 interface ProofLineItem {
   href: string;
-  /** Pré-glyph: número/destaque tabular-nums lime. */
-  highlight: string;
-  /** Body: claim curto sem peso de marketing. */
-  body: string;
-  /** Sufixo discreto pra identificar o produto. */
+  /** A frase. Curta, com verbo. */
+  headline: string;
+  /** Um fato verificável, em mono. */
+  fact: string;
   product: string;
 }
 
 const PROOF_LINES: ProofLineItem[] = [
   {
     href: '/work/content-engine',
-    highlight: '22 agentes Claude SDK',
-    body: 'orquestrados em 5 squads, cron 24/7',
+    headline: 'Uma equipe de agentes escreve, revisa e espera a sua aprovação. Todo dia.',
+    fact: '19 agentes Claude · 5 squads · cron às 03h',
     product: 'Content Engine',
   },
   {
-    href: '/work/nexacore',
-    highlight: 'B2B em produção',
-    body: 'multi-tenant clínicas estéticas',
-    product: 'NexaCore',
+    href: '/work/caluna',
+    headline: 'A secretária de clínica que atende no WhatsApp, agenda e lembra sozinha.',
+    fact: 'Next 14 · Evolution API · 35 modelos Prisma',
+    product: 'Caluna',
   },
   {
-    href: '/work/stj-app',
-    highlight: '162 testes runtime',
-    body: 'PWA cockpit + prompt cache 2 camadas',
-    product: 'STJ App',
+    href: '/work/stark',
+    headline: 'A passagem de turno de uma linha de OSB saiu do Excel e foi pro telão.',
+    fact: 'OEE dígito a dígito · 153 testes',
+    product: 'STARK',
   },
 ];
 
@@ -77,7 +76,7 @@ export function SocialProofLine() {
   return (
     <section
       ref={containerRef}
-      aria-label="Prova social — três produtos em produção"
+      aria-label="Três produtos em produção"
       className={cn(
         'container-max relative z-10',
         'border-t border-b border-(--color-hairline)',
@@ -85,7 +84,7 @@ export function SocialProofLine() {
       )}
       data-slot="social-proof-line"
     >
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6 lg:gap-10">
+      <ul className="grid grid-cols-1 gap-5 sm:grid-cols-3 sm:gap-6 lg:gap-10">
         {PROOF_LINES.map((line, idx) => (
           <li
             key={line.href}
@@ -98,34 +97,25 @@ export function SocialProofLine() {
             <Link
               href={line.href}
               className={cn(
-                'group/proof flex h-full flex-col gap-1.5 rounded-md outline-hidden',
+                'group/proof flex h-full flex-col gap-2 rounded-md outline-hidden',
                 'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
-                // W-a11y (2026-05-25): focus-visible ring lime — antes só
-                // mudava cor (falha WCAG 1.4.11 Non-text Contrast 3:1).
                 'focus-visible:ring-2 focus-visible:ring-(--color-accent) focus-visible:ring-offset-2 focus-visible:ring-offset-(--color-bg)'
               )}
             >
-              {/* Headline = highlight number/claim em sans semibold lime */}
-              <span className="inline-flex items-baseline gap-2 text-sm font-semibold text-(--color-text-1) sm:text-base">
+              <span className="font-mono text-2xs uppercase tracking-wider text-(--color-accent)">
+                {line.product}
+              </span>
+              <span className="text-pretty text-sm font-medium leading-snug text-(--color-text-1) sm:text-base">
+                {line.headline}
+              </span>
+              <span className="mt-auto inline-flex items-center gap-2 pt-1 font-mono text-xs text-(--color-text-3) transition-colors group-hover/proof:text-(--color-text-2)">
+                {line.fact}
                 <span
                   aria-hidden="true"
-                  className={cn(
-                    'inline-block text-(--color-accent)',
-                    'transition-transform duration-(--motion-fast)',
-                    'group-hover/proof:translate-x-0.5 group-focus-visible/proof:translate-x-0.5'
-                  )}
+                  className="inline-block text-(--color-accent) transition-transform duration-(--motion-fast) group-hover/proof:translate-x-0.5 group-focus-visible/proof:translate-x-0.5"
                 >
                   →
                 </span>
-                <span>{line.highlight}</span>
-              </span>
-              {/* Body em mono lowercase, ja sem tracking-widest que quebrava em palavra */}
-              <span className="font-mono text-xs leading-snug text-(--color-text-3) group-hover/proof:text-(--color-text-2)">
-                {line.body}
-              </span>
-              {/* Product = etiqueta lime mono uppercase pequena */}
-              <span className="mt-auto pt-1 font-mono text-2xs uppercase tracking-wider text-(--color-accent)">
-                {line.product}
               </span>
             </Link>
           </li>

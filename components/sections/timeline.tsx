@@ -32,31 +32,35 @@ export interface TimelineMarker {
 
 const MARKERS: TimelineMarker[] = [
   {
-    year: '2021—2023',
+    year: '2021 a 2023',
     place: 'SENAI Ponta Grossa',
-    title: 'Eletrotécnica · fundamento',
+    // F5 (2026-09-02): NBSP antes do "·" — no mobile (390px) o separador
+    // abria linha ("· fundamento", "· três produtos"), mesma classe do fix
+    // F4 #10 na stats row. Preso à palavra anterior, a quebra só acontece
+    // DEPOIS dele.
+    title: 'Eletrotécnica · fundamento',
     body: 'Diagramas elétricos, automação industrial, SolidWorks. Onde aprendi a pensar em sistemas que precisam funcionar 24/7. Tolerância zero pra "deve dar certo".',
     institutions: ['senai'],
   },
   {
     year: '2024',
     place: 'Scheffer Logística · B7Web Fullstack',
-    title: 'Transição · eletromecânica + código',
+    title: 'Transição · eletromecânica + código',
     body: 'Eletromecânica de manhã, programação à noite. Primeiro produto em produção: site Estética MD (Vanilla JS + PHP + ScrollReveal). Provou que entrega importa mais que stack.',
     institutions: ['scheffer', 'b7web'],
   },
   {
     year: '2025',
     place: 'Makita do Brasil · Engenharia de Software Unicesumar',
-    title: 'Profissionalização · três produtos em paralelo',
-    body: 'Stack moderno: Next 15, React 19, TypeScript strict. NexaCore SaaS pra clínicas + STJ App PWA + sites de infoprodutos. Três produtos rodando ao mesmo tempo.',
+    title: 'Profissionalização · três produtos em paralelo',
+    body: 'Stack moderno: Next 15, React 19, TypeScript strict. O SaaS pra clínicas que hoje é a Caluna, o STJ App e sites de infoprodutos. Três produtos rodando ao mesmo tempo.',
     institutions: ['makita', 'unicesumar'],
   },
   {
     year: '2026',
     place: 'Content Engine · AI Product Engineer',
-    title: 'Agora · multi-agente em produção',
-    body: '22 agentes Claude SDK orquestrados em 5 squads. Prompt cache 2 camadas, anti-slop validator com 14 regex PT-BR, aprovação humana via Telegram em ≤10 min/dia. Aqui é o presente.',
+    title: 'Agora · multi-agente em produção',
+    body: '19 agentes Claude em 5 squads, acordados por cron às 03h. Anti-slop com 28 regex pt-BR, inference local numa RTX 3070, aprovação humana em três botões no Telegram. E o STARK leva a mesma disciplina de volta ao chão de fábrica.',
     institutions: ['content-engine'],
     isCurrent: true,
   },
@@ -111,9 +115,15 @@ function MarkerContent({ marker }: { marker: TimelineMarker }) {
             caber "2021—2023" em 1 linha @ 320px. year-editorial substitui
             mono-stats — adiciona lining-nums + ss01 pra glyph editorial
             sem perder tabular alignment. */}
+        {/* F5 (2026-09-02): ano em text-1 (era lime) e peso 600 (era 700, acima
+            do teto da marca). Os quatro anos em lime eram a maior massa de
+            acento do site — 2.17% de pixels cromáticos por viewport, contra
+            0.06% no stepper equivalente do griffin.com (R4 §1.8) — e "lime só
+            quando faz algo": o ano não faz nada; quem sinaliza progresso são o
+            feixe, o marcador que acende e o badge NOW, que continuam lime. */}
         <p
           className={cn(
-            'year-editorial font-bold leading-[0.88] text-(--color-accent)',
+            'year-editorial font-semibold leading-[0.88] text-(--color-text-1)',
             'text-[2.25rem] sm:text-[4.5rem] lg:text-[5.5rem]'
           )}
           style={{ letterSpacing: '-0.04em' }}
