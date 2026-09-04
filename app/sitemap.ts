@@ -6,15 +6,15 @@ import type { MetadataRoute } from 'next';
 // devem refletir mudanças materiais de conteúdo da rota (atualizar manualmente
 // quando rewriting copy/structure).
 const ROUTE_DATES = {
-  home: '2026-05-25',
-  work: '2026-05-25',
-  contentEngine: '2026-05-25',
-  nexacore: '2026-05-25',
-  stjApp: '2026-05-25',
-  esteticaMd: '2026-05-24',
+  home: '2026-09-04',
+  work: '2026-09-04',
+  contentEngine: '2026-09-04',
+  caluna: '2026-09-04',
+  stark: '2026-09-04',
+  esteticaMd: '2026-09-04',
   playground: '2026-05-23',
   process: '2026-05-25',
-  privacidade: '2026-05-25',
+  privacidade: '2026-09-04',
 } as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -40,14 +40,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${base}/work/nexacore`,
-      lastModified: ROUTE_DATES.nexacore,
+      url: `${base}/work/caluna`,
+      lastModified: ROUTE_DATES.caluna,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
     {
-      url: `${base}/work/stj-app`,
-      lastModified: ROUTE_DATES.stjApp,
+      url: `${base}/work/stark`,
+      lastModified: ROUTE_DATES.stark,
       changeFrequency: 'monthly',
       priority: 0.9,
     },
