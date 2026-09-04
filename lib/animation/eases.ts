@@ -24,3 +24,49 @@ export type EaseTuple = readonly [number, number, number, number];
 export function toCss(ease: EaseTuple): string {
   return `cubic-bezier(${ease[0]}, ${ease[1]}, ${ease[2]}, ${ease[3]})`;
 }
+
+/**
+ * F5 (2026-09-02): avaliador JS do mesmo cubic-bezier que o CSS usa — pra
+ * animações imperativas leves (rAF) sem carregar GSAP. Mesmo algoritmo do
+ * WebKit/Blink (Newton-Raphson com fallback em bissecção). `t` em [0, 1].
+ * Uso: `const ease = cubicBezier(EASES.dramatic); value = from + (to - from) * ease(t)`.
+ */
+export function cubicBezier(ease: EaseTuple): (t: number) => number {
+  const [p1x, p1y, p2x, p2y] = ease;
+  const cx = 3 * p1x;
+  const bx = 3 * (p2x - p1x) - cx;
+  const ax = 1 - cx - bx;
+  const cy = 3 * p1y;
+  const by = 3 * (p2y - p1y) - cy;
+  const ay = 1 - cy - by;
+  const sampleX = (t: number) => ((ax * t + bx) * t + cx) * t;
+  const sampleY = (t: number) => ((ay * t + by) * t + cy) * t;
+  const sampleDX = (t: number) => (3 * ax * t + 2 * bx) * t + cx;
+  const solveX = (x: number) => {
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+      const err = sampleX(t) - x;
+      if (Math.abs(err) < 1e-6) return t;
+      const d = sampleDX(t);
+      if (Math.abs(d) < 1e-6) break;
+      t -= err / d;
+    }
+    let lo = 0;
+    let hi = 1;
+    t = x;
+    while (lo < hi) {
+      const xt = sampleX(t);
+      if (Math.abs(xt - x) < 1e-6) return t;
+      if (x > xt) lo = t;
+      else hi = t;
+      t = (hi - lo) / 2 + lo;
+      if (hi - lo < 1e-7) break;
+    }
+    return t;
+  };
+  return (t: number) => {
+    if (t <= 0) return 0;
+    if (t >= 1) return 1;
+    return sampleY(solveX(t));
+  };
+}

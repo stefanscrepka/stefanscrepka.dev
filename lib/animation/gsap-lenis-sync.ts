@@ -48,6 +48,18 @@ export function initSmoothScroll(options: SmoothScrollOptions = {}): Lenis {
     easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
     smoothWheel,
     syncTouch,
+    // F5 (2026-09-02), Lenis 1.3 API (README verificado):
+    //  • stopInertiaOnNavigate — mata o momentum quando um link interno é
+    //    clicado; sem isso a página nova nascia ainda "deslizando" no soft-nav
+    //    do Next.
+    //  • prevent — avaliado no caminho do evento ANTES do smoothing: dentro de
+    //    um Dialog/Sheet (Radix, role="dialog") ou de [data-lenis-prevent] a
+    //    roda rola o conteúdo do overlay, não a página. Complementa (não
+    //    substitui) o stop()/start() via `data-scroll-locked` no provider.
+    //  • respectReducedMotion (default true) — defesa em profundidade; o
+    //    provider já nem instancia Lenis sob reduced-motion.
+    stopInertiaOnNavigate: true,
+    prevent: (node) => !!node.closest?.('[data-lenis-prevent],[role="dialog"]'),
   });
 
   // Sync Lenis com GSAP ticker (gotcha #3)

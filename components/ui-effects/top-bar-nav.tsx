@@ -66,6 +66,17 @@ export function TopBarNav({ items, className }: TopBarNavProps) {
         {/* Right side spacer pra centralizar links visualmente quando nav existe */}
         <span aria-hidden="true" className="hidden w-[28px] md:block lg:w-[80px]" />
       </div>
+      {/* F5 (2026-09-02): progresso de leitura sobre o hairline inferior da
+          nav — 1px lime que cresce da esquerda com o scroll do documento. CSS
+          scroll-driven (animation-timeline: scroll(root)), zero JS, fora da
+          thread principal; Firefox e reduced-motion simplesmente não o veem
+          (scaleX 0). Numa home de ~14k px é uma affordance de leitura, não
+          decoração — e é o único lime da nav além do mark e do link ativo. */}
+      <span
+        aria-hidden="true"
+        data-scroll-progress
+        className="pointer-events-none absolute inset-x-0 -bottom-px h-px origin-left bg-(--color-accent)"
+      />
     </header>
   );
 }
@@ -81,7 +92,7 @@ function NavLogo() {
     // Lighthouse. Voice-control users falam "Stefan" e bate.
     <Link
       href="/"
-      aria-label="Stefan — home"
+      aria-label="Stefan, home"
       className={cn(
         'group inline-flex items-center gap-3 rounded-md outline-none',
         'transition-colors',
@@ -147,7 +158,10 @@ function NavLinks({ items }: { items: TopBarNavItem[] }) {
               ease: EASES.standard,
             }}
             className={cn(
-              'relative inline-flex h-9 items-center rounded-md px-3 text-sm font-medium outline-none',
+              // F5 (2026-09-02): a nav fala na voz mono uppercase que já é a voz
+              // de UI do site (eyebrows, footer, chips) — Geist Sans fica pra
+              // títulos e corpo. Três vozes, três funções (R4 §1.4, griffin.com).
+              'relative inline-flex h-9 items-center rounded-md px-3 font-mono text-xs uppercase tracking-wider outline-none',
               'transition-colors',
               isActive
                 ? 'text-(--color-text-1)'

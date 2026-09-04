@@ -7,7 +7,7 @@ export default function NotFound() {
   return (
     <section className="flex min-h-dvh flex-col items-center justify-center gap-6 px-4 text-center">
       <h1 className="text-4xl font-semibold !tracking-[-0.025em] !leading-[1.05] md:text-5xl lg:text-6xl">
-        404 — rota não encontrada
+        404. Rota não encontrada.
       </h1>
       <p className="max-w-md font-mono text-sm text-(--color-text-2)">
         Essa rota não existe (ou existiu e foi refatorada). O resto do site continua rodando.

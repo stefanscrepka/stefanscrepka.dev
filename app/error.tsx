@@ -30,7 +30,7 @@ export default function ErrorBoundary({ error, reset }: ErrorProps) {
         Erro inesperado.
       </h1>
       <p className="max-w-md font-mono text-sm text-(--color-text-2)">
-        Já registrei o stack trace no Sentry. Você pode tentar de novo ou voltar pra home — o resto
+        Já registrei o stack trace no Sentry. Você pode tentar de novo ou voltar pra home. O resto
         do site continua rodando.
       </p>
       {error.digest ? (

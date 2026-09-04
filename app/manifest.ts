@@ -2,9 +2,9 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Stefan Heinz Screpka — AI Product Engineer',
+    name: 'Stefan Heinz Screpka · AI Product Engineer',
     short_name: 'Stefan Screpka',
-    description: 'Construo IA multi-agente em produção — e o produto inteiro ao redor dela.',
+    description: 'Construo IA multi-agente em produção, e o produto inteiro ao redor dela.',
     start_url: '/',
     id: '/',
     scope: '/',

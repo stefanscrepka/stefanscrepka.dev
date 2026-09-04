@@ -11,6 +11,7 @@ import { MotionProvider } from '@/components/providers/motion-provider';
 import { Footer } from '@/components/sections/footer';
 import { ContactIcon, ManifestoIcon, ProcessIcon, WorkIcon } from '@/components/shared/nav-icons';
 import { GrainOverlay } from '@/components/ui-effects/grain-overlay';
+import { TargetCursor } from '@/components/ui-effects/target-cursor.client';
 import { TopBarNav, type TopBarNavItem } from '@/components/ui-effects/top-bar-nav';
 import { CalModalProvider } from '@/lib/contact/cal-modal-context';
 import './globals.css';
@@ -59,11 +60,11 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Stefan Heinz Screpka — AI Product Engineer',
+    default: 'Stefan Heinz Screpka · AI Product Engineer',
     template: '%s · Stefan Heinz Screpka',
   },
   description:
-    'Construo IA multi-agente em produção — e o produto inteiro ao redor dela. 22 agentes Claude SDK aprovados via Telegram. Três produtos rodando.',
+    'Construo IA multi-agente em produção, e o produto inteiro ao redor dela. 19 agentes Claude aprovados no Telegram. Três produtos rodando.',
   authors: [{ name: 'Stefan Heinz Screpka' }],
   creator: 'Stefan Heinz Screpka',
   openGraph: {
@@ -115,7 +116,7 @@ const personJsonLd = {
   telephone: '+55-42-99859-2522',
   image: `${baseUrl}/avatar-stefan.avif`,
   description:
-    'AI Product Engineer brasileiro. Multi-agent IA com Claude SDK + product engineering full-stack. Três produtos em produção: Content Engine, NexaCore SaaS, STJ App.',
+    'AI Product Engineer brasileiro. Multi-agent IA com Claude SDK + product engineering full-stack. Content Engine (multi-agente), Caluna (secretária de clínica no WhatsApp), STARK (passagem de turno industrial) e Estética MD.',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Ponta Grossa',
@@ -174,7 +175,7 @@ const websiteJsonLd = {
   url: baseUrl,
   name: 'Stefan Heinz Screpka',
   description:
-    'Portfolio de Stefan Heinz Screpka — AI Product Engineer. Três produtos em produção: Content Engine (multi-agente Claude SDK), NexaCore (B2B multi-tenant), STJ App (PWA cockpit).',
+    'Portfolio de Stefan Heinz Screpka, AI Product Engineer. Content Engine (multi-agente Claude), Caluna (secretária de clínica no WhatsApp) e STARK (passagem de turno industrial), com capturas reais e detalhes técnicos abertos.',
   inLanguage: 'pt-BR',
   publisher: { '@id': `${baseUrl}/#person` },
 };
@@ -247,7 +248,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <LenisProvider>
             <CalModalProvider>
               <TopBarNav items={navItems} />
-              <main id="main" className="relative">
+              {/* F7 (2026-09-04): z-10 + fundo opaco — o rodapé é fixo atrás
+                  (md+) e é revelado quando o conteúdo termina (footer.tsx). */}
+              <main id="main" className="relative z-10 bg-(--color-bg)">
                 {/* W-audit (2026-06-10): crossfade de rota via View Transitions.
                     Antes a navegação era corte seco. Só o conteúdo do <main>
                     participa do grupo "page-fade" (CSS em globals.css) — nav e
@@ -269,6 +272,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </MotionProvider>
         <AboutThisSiteGate />
         <GrainOverlay />
+        <TargetCursor />
         {IS_PROD ? (
           <>
             <Analytics />
