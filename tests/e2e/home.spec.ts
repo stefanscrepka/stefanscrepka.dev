@@ -42,13 +42,13 @@ test.describe('work routes', () => {
     await page.goto('/work');
     await expect(page).toHaveTitle(/Work/);
     // Links têm href /work/{slug} — busca via href attribute (mais estável que regex name)
-    for (const slug of ['content-engine', 'nexacore', 'stj-app', 'estetica-md']) {
+    for (const slug of ['content-engine', 'caluna', 'stark', 'estetica-md']) {
       await expect(page.locator(`a[href="/work/${slug}"]`).first()).toBeAttached();
     }
   });
 
   test('each case study page returns 200 + has hero', async ({ page }) => {
-    for (const slug of ['content-engine', 'nexacore', 'stj-app', 'estetica-md']) {
+    for (const slug of ['content-engine', 'caluna', 'stark', 'estetica-md']) {
       const resp = await page.goto(`/work/${slug}`);
       expect(resp?.status()).toBe(200);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
