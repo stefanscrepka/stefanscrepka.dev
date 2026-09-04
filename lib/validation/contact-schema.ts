@@ -23,7 +23,7 @@ export const ContactSchema = z.object({
   mensagem: z
     .string()
     .trim()
-    .min(10, { message: 'Conta um pouco mais — pelo menos 10 caracteres.' })
+    .min(10, { message: 'Conta um pouco mais: pelo menos 10 caracteres.' })
     .max(2000, { message: 'Mensagem grande demais (>2000 caracteres).' }),
   // Honeypot: campo invisível pra bot. Server descarta se preenchido.
   website: z.string().max(0).optional(),

@@ -90,7 +90,7 @@ export async function submitContact(
   if (!apiKey) {
     // Em dev sem API key, simular sucesso mas logar.
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('[contact] RESEND_API_KEY ausente — simulando envio em dev.', input);
+      console.warn('[contact] RESEND_API_KEY ausente, simulando envio em dev.', input);
       return { status: 'success' };
     }
     return {
@@ -122,7 +122,7 @@ export async function submitContact(
       from: FROM,
       to: input.email,
       replyTo: INTERNAL_TO,
-      subject: 'Recebido — respondo em <12h.',
+      subject: 'Recebido. Respondo em <12h.',
       react: ContactConfirmation({
         nome: input.nome,
         prefere: input.prefere,
