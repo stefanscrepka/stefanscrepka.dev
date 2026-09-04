@@ -72,7 +72,7 @@
 
 ### Acessibilidade (WCAG AA failing)
 
-- [ ] **Múltiplos `<main>` aninhados** — `app/privacidade/page.tsx:111` + `app/work/content-engine/page.tsx:31` + `app/work/nexacore/page.tsx:22` + `app/work/estetica-md/page.tsx:20` + `app/work/stj-app/page.tsx:39`. Layout já wrapa em `<main>` (`app/layout.tsx:206`).
+- [ ] **Múltiplos `<main>` aninhados** — `app/privacidade/page.tsx:111` + `app/work/content-engine/page.tsx:31` + `app/work/nexacore/page.tsx:22` + `app/work/estetica-md/page.tsx:20` + `app/work/stark/page.tsx`. Layout já wrapa em `<main>` (`app/layout.tsx:206`).
   - **Fix (5 min)**: trocar cada `<main>` interno por `<>` ou `<div>`.
 
 - [ ] **Sheet mobile nav sem `SheetTitle`/`SheetDescription`** — `components/ui-effects/top-bar-nav.tsx:205-246`. Radix warning + sem accessible name.

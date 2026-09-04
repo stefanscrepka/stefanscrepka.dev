@@ -514,12 +514,259 @@ eu escolher um número ou reescrever uma afirmação — então parei e deixei d
 - **Lighthouse CI verde**: perf **0.98–0.99** · a11y **1.00 nas 5 URLs** (era 0.96 em
   /privacidade) · BP 0.96 · SEO 1.00 · **CLS 0.000** em tudo
 
+## FASE 5 — ✅ Implementado + validado (sessão 2026-09-02) — polish "Apple-level" por componente
+
+Método: pesquisa em 7 frentes (R1 fontes, R2/R3 motion APIs e libs de componentes, R4 referências
+de design 2026, R5 audit de performance, R6 3D, R7 ciência de motion/leitura — 75 fontes verificadas),
+depois loop medido por lote: captura (filme de scroll + element shots, 22 rotas×viewports) →
+análise de pixel (massa cromática, ritmo/zonas mortas, lime) → fix → rebuild em :3001 → suítes →
+reavaliar. Relatório de trabalho: `_audit/f5/FINDINGS-after.md` (+ `research/R1..R7`).
+Branch: `f5/polish` (sem commit — só quando você pedir).
+
+### Medido antes → depois (mesmos frames, mesmo método)
+
+| Medida | Antes | Depois |
+|---|---|---|
+| Massa cromática no fold da home (desktop / mobile) | 14.46% / 15.60% | **2.40% / 4.46%** (refs: Linear 0.04%, Griffin 0.56%) |
+| Massa cromática bento / timeline | 2.21% / 2.46% | 1.68% / 1.14% |
+| Zona morta manifesto→contact | 840px | **624px** |
+| Long tasks de hidratação da home (mediana de 5) | 1951ms | **894ms** |
+| Feixe da timeline: progresso a 0 / 50% / 100% | travado até ~57% | 0 / 810 / 1620px |
+| Alinhamento feixe × 4 marcadores | sonda quebrada | **0.0px** |
+| `text-3` sobre `surface-overlay` (WCAG 1.4.3) | 4.46:1 ✗ | **4.73:1** ✓ |
+| LCP home (H1) / CLS | 360ms / 0 | 388–424ms / 0 (sem regressão) |
+
+### P0 — defeitos reais (medidos, não achismo)
+
+1. ✅ **Glow final do feixe 56px à direita da linha** (`marginLeft` dentro do wrapper com padding) → `calc(var(--beam-line) - var(--beam-pad))`.
+2. ✅ **Dois pontos no início do feixe** (dot inicial 20px acima do 1º marcador) → `startDot={false}`.
+3. ✅ **Buraco de ~300px no Other Work ≥1024** (face frontal do FlipCard não esticava) → `h-full` na face + cover `object-top`.
+4. ✅ **Feixe CSS travado até 57% da seção** — no Chrome, `exit 0%` de um sujeito mais alto que o viewport só começa quando o fundo encosta no fundo → `animation-range: cover 100vh cover 100%` (= fallback JS `-top/height`).
+5. ✅ **Stats row servia "0 agentes Claude" no HTML** (crawler/reader/print/JS falhando) → valor final no servidor; rebaixa pra 0 só se ainda está fora do viewport na hidratação.
+6. ✅ **`--color-surface-overlay` 26% → 24%** (R7: text-3 sobre overlay falhava AA por 0.04).
+7. ✅ **Vídeo do hero sem mecanismo de pausa** (WCAG 2.2.2 nível A — autoplay >5s em paralelo com conteúdo; reduced-motion é preferência de SO, não controle na página) → `hero-video-toggle.client.tsx`, só renderiza quando há source ativa, persiste na sessão.
+8. ✅ Código morto: `scroll-pinned-horizontal.tsx`, `macbook-scroll.tsx`, `ContentEnginePanel`; comentários que descreviam código que não existia mais.
+9. ✅ **CLS 0.0024 na home apontado pelo Lighthouse em 3/3 runs** (`section#hero > div.pointer-events-none > div.absolute`): o botão de pausa do vídeo montava depois da hidratação, a faixa de stats crescia 16px, o hero crescia e o brilho absoluto (140% da altura) deslocava → `md:min-h` reservando a altura do botão. Build final: CLS 0.000 nos 15 runs.
+
+### P1 — motion sem custo (R2/R3)
+
+- ✅ Marquee em CSS keyframe (pausa fora da viewport e no hover; reduced = parado).
+- ✅ Count-up em IO+rAF com o mesmo cubic-bezier (`cubicBezier()` em `lib/animation/eases.ts`) — GSAP+ScrollTrigger fora do path eager do hero (~46 KB gz a menos em toda visita).
+- ✅ Feixe da timeline em CSS scroll-driven (`view()`), JS só quando `animation-timeline` não existe; reset explícito em reduced-motion (o kill global de 0.01ms não serve pra timelines de progresso).
+- ✅ Assinatura com `DrawSVGPlugin` (GSAP 3.13+ gratuito) medindo o comprimento real — some o workaround `pathLength=1` + attr plugin.
+- ✅ Lenis: `stopInertiaOnNavigate` + `prevent` em `[data-lenis-prevent],[role="dialog"]`.
+- ✅ Stagger do H1 55→45ms (assenta em ~1.1s; R7: ~1s pra reveal de texto); reveal do manifesto com `stagger: { amount: 0.5 }` (era 35ms × ~66 palavras ≈ 2.9s até a última).
+
+### P1 — gramática dos sites de engenharia 2026 (R4)
+
+- ✅ Vídeo do hero quase-mono (`saturate(0.12) contrast(1.06) brightness(0.92)`, opacity 0.5): a onda vira textura de luz; o único evento de cor acima da dobra é a palavra em itálico + o CTA.
+- ✅ Anos da timeline em branco semibold — acento como estrutura (marcador + feixe), nunca como fill.
+- ✅ Bento XL: diagrama de orquestração RSC (CRON 03H → Claude Agent SDK → S0…S4 em arco → E-0 humano, único nó aceso; leader lines com callouts mono) + caption "22 agentes · 5 squads · 1 humano no loop"; chips-líder acesos (Claude Agent SDK, pgvector, TypeScript strict, BullMQ) — uma coisa acesa por célula.
+- ✅ INFRA: telemetria simulada (ping + "ok") → `<dl>` de superfícies de runtime com o papel real de cada uma (Vercel GRU1 · este site + NexaCore; Coolify VPS · Content Engine 24/7 · GPU local; Sentry; Langfuse). Interim honesto até você decidir a/b/c da Fase 4.
+- ✅ Flagship: diagrama reequilibrado (header de spec-sheet "CONTENT ENGINE · PIPELINE NOTURNO / 22 AGENTES · 5 SQUADS", caixas maiores, rodapé "CRON 03H–07H30 · APROVAÇÃO HUMANA ≤10 MIN/DIA · GPU LOCAL"; no mobile só os IDs).
+- ✅ Nav em mono uppercase (voz de UI, como os eyebrows) + linha de progresso de scroll de 1px (`animation-timeline: scroll(root)`).
+- ✅ Corner-ticks (marcas de registro) nos mini-cards e no teaser do playground — moldura que não encaixota; acendem em lime no hover/focus.
+- ✅ H2 do Work em dois tons por luminância ("Três problemas resolvidos." em text-2); hover de um tile escurece os irmãos (`:has()`, só pointer fine).
+- ✅ Relógio vivo GMT-3 no rodapé (`Intl.DateTimeFormat`, 15s).
+- ✅ Contact sobe 24dvh sobre o fim do palco do manifesto (transição Lando, zona morta 840→624px); carimbo SH em outline, só md+, 26vw≤340px sangrando 30% pelo canto; botão Cal.com com fundo opaco por cima.
+- ✅ Radiogroup do contato em 3 colunas no mobile; NBSP antes de "·" (timeline, caption do bento).
+- ✅ Modal "Sobre este site" reescrito com números reais (seção "MEDIDO, NÃO PROMETIDO", crédito do vídeo Veo).
+
+### P2 — View Transition
+
+- ✅ Morph do título tile→case: `<ViewTransition name="case-title-<slug>" share="case-title-morph" enter="none" exit="none">` no h3 dos tiles (home e /work) e no h1 do case; 420ms na curva padrão; reduced-motion já zera todos os `::view-transition-*`. Verificado (`_audit/f5/probe-vt5.mjs`, clique sem auto-scroll): home → case e /work → case fecham o par (group + old + new, 420ms); sem par (alvo fora da viewport — regra do React) o snapshot solitário segue o fade da página (`:only-child`). Bônus do caminho: Featured Work sem `m.*` (reveal em CSS + controlador) e a home com UM filho DOM sob o `page-fade` (1 snapshot de saída em vez de 9).
+
+### 📝 Verificado e NÃO alterado
+
+- Frase de fechamento do rodapé já tem o beat próprio (R7 "fim" do peak-end) — `FooterClosing` once.
+- Skip-link "Pular para o conteúdo" aparece no meio das element shots: artefato do `captureBeyondViewport` do Playwright (header fixo pintado no meio), provado com `probe-skiplink.mjs` (transform −90px, sem foco). No site não aparece.
+- Mola do CTA magnético (ζ=1.49, sem overshoot) e do sucesso do form (ζ=0.657, um overshoot de 6.5%) — R7 diz que estão certas; não mexer.
+- Costura manifesto→contact: hairline de seção como em todas as outras; o tom oliva acima é a atmosfera do palco terminando.
+
+### 🔴 Decisões SUAS (com a evidência que a pesquisa trouxe)
+
+1. **22 vs 24 agentes** (S0=6·S1=4·S2=2·S3=8·S4=4 = 24 no diagrama; 8 pontos dizem 22). R7/Fogg 2003: contradição notada generaliza pra todos os números da página. Resolver pro número menor e verificável.
+2. **"100+ testes runtime"** → exato e datado ("117 testes · set/2026"). R7/Janiszewski & Uy 2008: número redondo aberto é descontado; o preciso, não.
+3. **Screenshot real do Content Engine** (STEFAN-TODO #1) — R7/Riegelsberger 2005: captura com dados reais é *sintoma* (evidência cara de falsificar); diagrama é *símbolo*. E colocar pelo menos um artefato real acima ou logo abaixo da dobra (prominence-interpretation).
+4. **Vídeo do hero**: manter (agora quase-mono), regravar, ou só atmosfera. R7: a impressão "premium" fecha em 17–50ms — o poster estático é a impressão, a animação de entrada não conta.
+5. **INFRA a/b/c** — (b) está aplicado como interim; (c) ligar em dado real continua em aberto.
+6. **PP Editorial New**: "free for personal use" é ambíguo (fsType 4). Instrument Serif Italic (OFL, 27 KB, precisa ~1.06em) ou licença web (~US$40).
+7. **Tokens × brand book**: `--color-bg` renderiza #070806 (brand book: #0F1212); accent #CDFF35 (brand: #D2FF00). Escolher a fonte da verdade.
+8. **3D** — R6, com a CSP medida: **nada no hero** (r3f = +234 KB gz na rota que não pode regredir; CSP bloqueia WASM: DRACO/KTX2/Rive morrem). Plano: Fase 0 redesenhar o SH (traço de 763 segmentos, ~42% sub-pixel — extrudado "brilha"); Fase 1 bake em Blender → AVIF + loop curto no Contact (0 KB JS, ~60 KB); Fase 2 r3f só se a Fase 1 "ficar massa". `'wasm-unsafe-eval'` na CSP é decisão separada.
+9. **Geist subsetting via next/font/local** (~80 KB a menos) — Google Fonts Geist perde `ss01`; `tnum/calt/zero` no Geist Mono são no-ops (a fonte não tem essas features).
+10. **Trilho de margem, dither semântico, stepper sticky nos cases, faixa de acento full-bleed única, escada de hairlines** (R4 §1.2/1.6/1.8/1.13/1.15) — ficaram fora de propósito: ou mudam o layout, ou dependem dos seus artefatos. Lista pronta em `_audit/f5/research/R4-design-references.md`.
+
+**Validação global da Fase 5** (build de produção, :3001):
+- `_audit/s10-validate.mjs` — **14/14 PASS** · `_audit/f4/validate.mjs` — **6/6 PASS** (sonda de alinhamento refeita pra DOM + geometria sem transform)
+- `_audit/f5/verify-lote2.mjs` — feixe/assinatura/marquee/stats ✓ · `capture.mjs` — 22 rotas×viewports, 0 pageerror, CLS 0 (playground 0.059 conhecido)
+- `pnpm test` (vitest) **4/4** · `tsc --noEmit` limpo · Biome limpo · build verde (25 rotas)
+- Hidratação (long tasks, mediana de 5 runs): **894–914ms** (baseline 1951ms)
+- **Lighthouse CI (build final, mediana de 3 runs × 5 URLs)**: perf **0.98** (home) / **0.99** (/work, /work/content-engine, /process, /privacidade) · a11y **1.00** nas 5 · BP 0.96 · SEO 1.00 · **CLS 0.000 nos 15 runs** · TBT 0ms. (`pnpm lhci` quebra num shim do corepack nesta máquina — rodar `node node_modules/@lhci/cli/src/cli.js collect|assert --config=_audit/f5/lighthouserc.f5.json` com o server em :3001.)
+- e2e: **25 passed / 2 skipped**; as 2 falhas são `product-screenshots.spec.ts` (abre um `index.html` local do Estética MD que não existe nesta máquina — mesma exclusão da Fase 4).
+
+## FASE 6 — ✅ Implementado + validado (sessão 2026-09-04) — fumaça verde, SVGs desenhados, artefatos reais
+
+Pedido do Stefan: "essa fumaça verde em volta de tudo tá parecendo IA slop", "SVGs muito feios
+(o do content engine)", "as imagens dos sistemas dava pra melhorar", "STJ acho melhor tirar". Regra
+de trabalho: subir cada sistema e capturar EU MESMO (nada de screenshot antigo), e o brand book v1
+(`Trabalho-final/stefan_heinz_screpka_brandbook_v1.pdf`) como constituição: "Precision, not
+decoration" · "Restraint, not spectacle" · §11 proporção 90/8/2 · §17 "Do not add gradients, glow,
+shadows or 3D effects" · "Do not stretch, rotate or rebuild the mark".
+Branch: `f5/polish` (F5 + F6 sem commit — só quando você pedir; patch de segurança do F5 em
+`%TEMP%/claude/.../scratchpad/f5-uncommitted-backup.patch`).
+
+### O que era a "fumaça verde" (inventário medido, `grep radial|blur|glow`)
+
+| Onde | O que | Agora |
+|---|---|---|
+| `MockupFrame` (toda captura) | `0 0 60px` lime a 40% + reflexo no chão + brilho lime no topo + tilt 3D | removido (componente deletado) |
+| Tiles do Featured Work, mini-cards, teaser | halo `0 0 32–48px accent-glow` no hover + `glass-panel` (backdrop-blur) | borda um degrau mais clara + marcas de corte acendem |
+| Hero | elipse 160%×140% em `blur-3xl`, lime 12% | removido — atmosfera é o vídeo (já quase mono) |
+| Contact | blob 60vh×55vw `blur-3xl` + carimbo SH cortado 30% pelo canto + halo no avatar | só a hairline vertical; SH inteiro segue na nav/rodapé |
+| FlipCard Estética MD | halo amber 32px nas 3 faces + halo no CTA | sombra neutra |
+| Tokens `--shadow-glow-lime-sm/md`, `-amber-sm` | blur 16–32px | **anel** de 2–3px a 22–28% (mesma gramática do anel de foco) — 20+ consumidores mudam de uma vez |
+| Case hero | ponto com `animate-ping` ("ao vivo" sem ler estado) | ponto estático |
+| `SquadsStatusLine` | pontinhos lime pulsando S0→S1→… | removido (simulava pipeline vivo) |
+
+### SVGs desenhados → artefatos reais
+
+- **Flagship / índice / hero do case**: `SquadsDiagram` (caixas IN→S0…E-0) → captura real do
+  **Content Engine Studio** (página Equipe: caixa de entrada com o pacote do dia + os 19 papéis),
+  marca **SK3D** (a sua), runtime em modo scripted (regras, $0, sem LLM). Página do case ganhou a
+  seção "O produto, rodando" (Hoje + Equipe) e a página **/marca** no painel do Squad 0.
+- **/work/content-engine**: os sete `DiagramDots`/`DiagramOverview`/`DiagramHITL` → registros
+  crus copiados do código (`lib/work/content-engine-artifacts.ts`): papéis dos agentes
+  (`apps/web/src/lib/agent-roles.ts`), templates O-1…O-6 (`packages/prompts/templates`), as 14
+  regex `AI_TELL_PATTERNS_V1` (`apps/runtime/src/anti-slop/ai-tells.ts` L17–32), os 8 comandos do
+  bot (`apps/telegram-bot/src/bot.ts`).
+- **Other Work**: terminal falso (Caronas) → `InMemoryRepository.java` L15–32 verbatim; IDE falsa
+  (Estrutura C) → `02_fibonacci_memoizado.c` L25–42 verbatim. Componentes novos
+  `CodeArtifact` / `RegistryList` (zero dependência, linha numerada, quebra com recuo pendurado).
+- Deletados: `diagrams.tsx`, `content-engine-panels.tsx`, `product-cover.tsx`, os dois
+  `product-mockup.tsx`, `squads-status-line.tsx`, `compare-slider.tsx`, CSS `.ce-*`.
+
+### Moldura nova — `components/work/artifact-frame.tsx`
+
+Marcas de corte + hairline (`--color-hairline-alpha-2/-3`, escada nova) + barra mono com a
+PROCEDÊNCIA (rota · ambiente · data) + legenda. Sem tilt, sem halo, sem bolinhas de macOS. Acervo
+consultado antes (cult-ui BrowserWindow, Magic UI Safari, Aceternity Code Block) e descartado com
+razão registrada no cabeçalho do arquivo. `contain: inline-size` + `min-w-0` porque `<pre>` e a
+barra empurravam a largura no mobile (+300px em /work/stark, +24px em /design-system — medidos e
+zerados: `f4/validate` 6/6).
+
+### Capturas (todas em 2×, `_audit/f6/raw` → masters → AVIF crf24 yuv444, `public/work-screenshots`)
+
+| Sistema | Como subiu | Captura |
+|---|---|---|
+| Content Engine Studio | `apps/web` :3200 (acme) / :3201 (**sk3d**, cópia gitignored em `.brand-tmp/web-sk3d`) + runtime :4010 em modo scripted (Docker `dev-db` :5433). Ciclo diário scripted rodado pra `sk3d` (O-1…O-5 + intel/strategy/creation/review/editor → `ready_for_approval`) | `/agentes`, `/` (Hoje), `/marca` |
+| STARK | `LP/` `next dev -p 3300` + seed do projeto (login admin do README) | telão 1920×1080, painel, relatório, lista |
+| NexaCore (**hoje: Caluna**) | subagente subiu `Caluna/nexacore-saas` em :3600 (Postgres/Redis novos em :5434/:6380, `prisma db push` + `prisma/seed.ts`, login pelo widget Clerk da instância dev com e-mail de teste) e capturou **11 rotas com dados de seed** — mas o produto está **rebatizado Caluna** (92 refs no código, 0 "NexaCore", commit "pós-rebrand"), palette clara creme/dourado, marca ainda em construção. **O site segue com as capturas de produção** (striveos.shop 4K, tenant vazio, R$ 0,00); striveos.shop respondeu **HTTP 522** duas vezes hoje. AVIF das telas limpas prontos em `_audit/f6/avif/caluna-{services,clients,landing,dashboard}.avif` | dashboard, agenda (produção) · 11 rotas Caluna em `raw/nexacore__*` |
+| Estética MD | cópia local servida em :3700 | home + seção Tratamentos |
+| Abalo · site STARK | `dist/` servidos em :3400 / :3500 | home |
+| SK3D patches | render `output/_FINAL_todos.png` | grid Série A |
+
+### STJ App → STARK
+
+STJ saiu (rota, OG, dados, social proof, JSON-LD; `redirects()` 308 `/work/stj-app → /work`; segue
+citado só na timeline 2025, como história). Entrou **STARK** (`app/work/stark`): passagem de turno
+de uma linha de OSB — status honesto "Piloto · proposta comercial entregue em jul/2026"; cliente
+anonimizado ("fabricante multinacional de painéis, PR"); seção "Motor de cálculo" com
+`painel.ts` L80–85 e L136–139 verbatim. Other Work ganhou SK3D, Abalo e o site da STARK.
+Copy "três produtos em produção" agora = Content Engine, NexaCore, Estética MD.
+
+### Medido antes → depois (mesmo método F5, `chroma.py`, frames equivalentes)
+
+| Frame | F5 | F6 |
+|---|---|---|
+| Featured Work (el-work) chroma | 0.75% | **0.45%** |
+| Other Work (el-other-work) | 9.34% (halo amber + capa) | 3.1–7.4% (só a mídia real) |
+| Case Content Engine y765 | 1.76% | 1.71% |
+| Case NexaCore y765 | 2.91% | 2.41% |
+| Hero fold desktop / mobile | 2.40 / 4.46 | 2.40 / 4.46 (o beam removido estava abaixo do limiar do medidor; visualmente sumiu) |
+
+### Validação (build de produção, :3001)
+
+- `s10-validate` **14/14** · `f4/validate` **6/6** · `verify-lote2` ok (feixe 0/810/1620, assinatura S→tefan→flourish)
+- `capture.mjs` 22 rotas × viewports: 0 pageerror (só `/_vercel/*` 404 local), **CLS 0** (playground 0.059 conhecido)
+- vitest **4/4** · `tsc` limpo · Biome limpo · build 25 rotas
+- **e2e 25 passed** contra a build (`PLAYWRIGHT_BASE_URL=http://localhost:3001`) — a config antiga reusava QUALQUER servidor em :3000; no dia era o Langfuse do Docker (`lang="en"`, 404) — corrigido em `playwright.config.ts`
+- Lighthouse (mediana 3 runs × 5 URLs): perf **0.98** home / **0.99** demais · a11y **1.00** (o número de linha a 60% de opacidade dava 2.69:1 em /work/content-engine — corrigido, 1.00 re-medido) · BP 0.96 · SEO 1.00 · CLS 0
+
+### 🔴 Decisões SUAS (F6)
+
+1. **22 agentes**: o registro do próprio Studio (`agent-roles.ts`) tem **19 papéis no ciclo diário + 6 no onboarding**; o site diz 22 em 8 pontos. Nada novo afirma contagem; escolha o número e eu propago.
+2. **STARK**: o nome do cliente ficou fora (sem autorização de marca), mas a captura do relatório mostra o nome do produto da linha ("LP OSB APA PLUS…") e o supervisor do seed. Aprovar como está, ou eu recorto.
+3. **NexaCore → Caluna**: o produto foi rebatizado e o site não sabe. Opções: (a) manter "NexaCore" + capturas de produção (tenant vazio) — como está; (b) renomear o case pra Caluna (URL `/work/nexacore`, JSON-LD, OG, sitemap e 8 pontos de copy) e usar as capturas locais limpas (Serviços, Clientes, landing); (c) título NexaCore + capturas Caluna com legenda "rebatizado". Não publiquei a marca nova sem o seu ok. Bugs reais do produto vistos no seed (não mexi no repo): Agenda "Valor do Dia **R$ 8.001.200.180,00**" (preços concatenados como string, `800+1200+180`), Pagamentos "Recebido **R$ 21.800,00**" (Clientes mostra R$ 2.180,00 pros mesmos 3), Dashboard "próximo às **Invalid Date**", saudação "Usuário"; drift de migração (`migrate deploy` ok, seed cai com `P2022 googleDriveEnabled` — precisou `db push`); `next dev` estoura o heap sem `--max-old-space-size=8192`.
+4. **Link privado**: `github.com/stefanscrepka/content-engine` é privado — o CTA "Ver no GitHub" virou "Ver o produto rodando ↓". Se quiser publicar o repo, eu volto o link.
+5. **Chip "Sk3d"** no Studio (title-case do slug em `app-shell.tsx`) aparece na captura de /marca — é do produto, não do site.
+6. **Efeitos colaterais do subagente NexaCore** (revisar): o classificador bloqueou 2 comandos dele (script que levava `CLERK_SECRET_KEY` à API do Clerk; cópia do `.env`) — nenhum valor de segredo foi impresso; ele contornou criando o usuário de teste `stefan+clerk_test@example.com` (código 424242) na sua instância **dev** do Clerk e inserindo a linha `User` que o `seed.ts` manda inserir. Containers `nexacore-shots-pg`/`-redis` + volumes `nexacore-shots_*` são novos (os antigos intactos; o volume antigo `nexacore-saas_postgres_data` está vazio — por isso as capturas de maio eram vazias). Repo `git status` limpo. As chaves Clerk estão numa **quarta** cópia do repo (`14-Codigos e Projetos Dev/opt/nexacore-saas/.env`).
+7. Servidores que deixei rodando pra re-captura: runtime CE :4010, Studio :3200/:3201, STARK :3300, Caluna :3600 (+ Docker `nexacore-shots-*`), estáticos :3400/:3500/:3700, portfolio :3001. Pode matar tudo (`Get-NetTCPConnection -LocalPort 3001,3200,3201,3300,3400,3500,3600,3700 | % OwningProcess | sort -u | % { Stop-Process -Id $_ }`; `docker rm -f nexacore-shots-pg nexacore-shots-redis`).
+
+## FASE 7 — ✅ Implementado + validado (sessão 2026-09-04, à noite) — a segunda passada: assinatura, imagens tratadas, Caluna, copy humana, acervo
+
+Feedback do Stefan sobre a F6, ponto a ponto, e o que foi feito (branch `f5/polish`, tudo ainda sem commit):
+
+| Crítica | O que era | O que ficou |
+|---|---|---|
+| "o contato invade o manifesto antes de terminar a animação" | F5 puxava o Contact 24dvh pra cima; ele entrava a 70% do range e a assinatura só fechava a 87% (medido em `_audit/f7/sig-probe.mjs`) | a timeline do palco desconta a sobreposição real (`margin-top` negativa do irmão, lida do DOM) e a seção ganhou +24dvh/+18dvh; o Contact só sobe com a assinatura completa (contact top = 965px a 70%, viewport 900) |
+| "melhorar a rasterização da assinatura, fazer ela assinar mesmo" | `drop-shadow` duplo forçava o SVG a virar bitmap borrada; máscara de 4 traços a 60–95px revelava em blocos; velocidade = velocidade do scroll | esqueleto do fill (`skeleton.py`) → ductus real com 30 trechos de largura = espessura local (`trace.py`, 98,3% de cobertura + rect final) → `gen-sig.py` emite o componente. Assinada **no tempo** (2,34 s medidos no DOM: S 0,69 s → "tefan" 0,96 s → barra do t → ponto), disparada quando o palco passa de 30%, com a ponta da caneta correndo na frente. Sem glow: vetor puro |
+| "ainda tem muitos — no site" | 156 linhas com travessão fora de comentários | 0 no texto visível (`patch-f7c.py`, arquivo a arquivo; sobraram só em comentários de código) |
+| "linguagem muito robotizada" | prova social e tiles como ficha técnica ("22 agentes Claude SDK · orquestrados em 5 squads, cron 24/7") | frases com verbo ("Uma equipe de agentes escreve, revisa e espera a sua aprovação. Todo dia."), fato em mono embaixo |
+| "não está desatualizado?" (22 agentes, 27 tabelas, 100+ testes, LGPD) | números de maio | auditoria do código (subagente, `ROADMAP` abaixo): **19 agentes** (17 no ciclo diário) em 5 squads · **57 tabelas** · **2.059 testes** no runtime (3.468 no monorepo) · 28 regex anti-slop (14+14) · cron 03:00→07:30 America/Sao_Paulo · prompt cache com dois TTLs, desligado por padrão · GPU: bge-m3, Qwen 3.5 9B, SD 3.5, faster-whisper · **"LGPD compliance" não existe no código** → trocado por "rotulagem de IA obrigatória no publish" |
+| "mudamos para Caluna e você manteve NexaCore" | case NexaCore com capturas de produção vazias | `/work/caluna` (redirect 308 do antigo), copy do posicionamento novo (secretária no WhatsApp, 11 ferramentas, 35 models, 554 testes), capturas do build atual com seed (landing, serviços, clientes, como funciona), Caluna em social proof, manifesto, timeline, bento, SEO, JSON-LD, sitemap, testes |
+| "print da STARK no meio da transição" | captura a ~1 s, na intro (IHM) | `cap-site.mjs`: espera 15 s, congela as animações, pixel 0 → o hero real ("Linha parada vira ponto de partida") |
+| "imagens amadoras / não tratou" | capturas cruas | pipeline `cap-site.mjs` (assentar, congelar `document.getAnimations()`, esconder cursor/scrollbar, 2×), moldura de navegador (`ArtifactFrame variant="browser"`) pra sites, moldura de registro pra apps, Estética/Abalo refeitos no pixel 0 |
+| "3D: só as bolinhas; algo interativo e criativo" | render dos patches | visualizador r3f com **três meshes reais** (patch Bahia em relevo, a bola com 12 soquetes, peça de CAD com o SK3D em relevo), decimados no Blender 4.4 (`_audit/f7/3d/blend_prep.py`), sem Draco (CSP), carregado só ao entrar na tela; foto do patch impresso; render Cycles do Quadro Correnteza |
+| "Caronas e C: monte de código, cards longos" | 18 linhas cada | 8–9 linhas (o miolo), cards na altura da captura ao lado |
+| "IA Agentic com um SVG imenso" | diagrama de arco/nós | ledger do cron copiado de `env.ts` + faixa dos 5 squads com contagem |
+| "não usou o footer do acervo" | 3 colunas + rodapé rolando | rodapé **fixo atrás da página, revelado no fim** (hyperiux/parallax-footer), frase grande + ação (21st/ember-footer-cta), colunas curtas (smoothui/footer-1); newsletter (watermelon) descartada com motivo no cabeçalho do arquivo |
+| "/privacidade gigante" | 8 seções, ~1.100 palavras | "Em cinco linhas" + 4 blocos, metade do tamanho, mesma base legal |
+
+**Método desta fase** (o que faltou na F6): inventário real do acervo (`acervo.json`, `triagem.json` → necessidades `rodape`, `fileira-marcas`, `revelacao-imagem`…), leitura do `feedback_design_taste.md` do Stefan no projeto Caluna, subagente de auditoria claim↔evidência nos dois repos (Opus, read-only), e conferência visual por seção em desktop e mobile depois de cada build (`_audit/f7/shots.mjs`), com zoom 3× na assinatura e amostragem de tempo no DOM (`sig-timing.mjs`).
+
+**Validação (build final, :3001)**: `s10` 14/14 · `f4` 6/6 · vitest 4/4 · `tsc` e Biome limpos · e2e 25 passed (as 2 falhas são o `product-screenshots.spec` que abre um `index.html` inexistente, igual F4–F6) · Lighthouse mediana 3×5 URLs: perf 0.98 (home) / 0.99, a11y 1.00, SEO 1.00, CLS 0 · 0 requisições ≥400 fora de `/_vercel/*` · chroma: Featured Work 0.52%, Stack 0.75%, Other Work 4.22% (foto e render reais), rodapé 1.63% (o botão).
+
+### 🔴 Decisões SUAS (F7)
+
+1. **A bola do viewer**: o STL `multi-flag-ball.stl` é modelo seu ou base de terceiros? A nota diz "fatiada e impressa", não "modelada". Se for de terceiros, eu tiro do seletor.
+2. **Peça de CAD**: está como "pra uma fabricante de painéis" (o cliente Arauco anonimizado, mesma regra do STARK). Se puder nomear, eu nomeio.
+3. **Conta de teste do Clerk** e containers `nexacore-shots-*` do subagente (ver F6 #6) continuam existindo.
+4. **Commit**: F5 + F6 + F7 sem commit. `git add -A && git commit` quando quiser.
+5. Servidores ainda rodando: portfolio :3001, CE :4010/:3200/:3201, STARK :3300, Caluna :3600, estáticos :3400/:3500/:3700.
+
+## FASE 8 — ✅ Implementado + validado (sessão 2026-09-05) — hero novo, 3D de verdade, assinatura no scroll, acervo varrido, commits
+
+Feedback do Stefan sobre a F7 e o que foi feito:
+
+| Crítica | O que ficou |
+|---|---|
+| "o tracing da assinatura está 1000× pior: não vai segundo o scroll" | Voltou a ser **scrubbed** (a versão de 25/05 era assim), mas sobre o ductus novo de 30 trechos e com a ponta da caneta correndo na frente. Janelas no range do sticky: S 0,30→0,50 · "tefan" 0,52→0,76 · barra do t 0,78 · ponto 0,825 · rect 0,85. Sem glow. |
+| "o contato não invadia o manifesto em 25/05" | Contact de volta ao fluxo normal (sem a margem negativa do F5); manifesto em 130/180dvh. Medido: o Contact encosta no fim do palco exatamente a 100% do range, nunca antes. |
+| "vasco impresso é feio, a bola não é minha, o quadro do Grêmio é antigo, os piores projetos no viewer" | Curadoria nas memórias do projeto logos-futebol (subagente, read-only): entraram o **LEVITA v4** (macro Flamengo, Vasco de frente, prancha cotada gerada da geometria), a **cena animada do hub da STARK** (154 quadros, 330 malhas, 244 objetos animados: vídeo de 5 s a 324 KB + a cena aberta no Blender 4.4, capturada por `_audit/f8/blender-shot.ps1`) e a **peça de CAD**. O viewer mostra o LEVITA Grêmio montado com as **cores reais dos filamentos do 3MF** (#101010, #F2F2F2, #0056B8; `_audit/f8/3d/levita_glb.py`) e a peça de CAD, de frente. Saíram o patch do Bahia, a bola de terceiros, a foto do Vasco e o Correnteza (safra reprovada nas memórias). |
+| "a hero dá pra melhorar bastante; essa fala está perdida" | Pesquisa (subagente) diagnosticou: um foco só (a manchete) e quatro faixas de texto pequeno com o mesmo peso; a subline repetia "em produção" e o número dos stats. Hero em **duas colunas**: manchete + **uma linha de prova com verbo** ("Às 03h um cron acorda 19 agentes Claude. Às 07h30 o pacote do dia espera três botões seus no Telegram.") + CTAs à esquerda; à direita **o turno de hoje** (`components/hero/day-rail.tsx`: o cron como o runtime o executa, 07h30 aceso, relógio real). Eyebrow mono que se resolve de glifos (`hero-eyebrow.client.tsx`, padrão 21st/decrypt-text). O bento XL trocou o ledger do cron pelo **registro dos agentes** (19 + 6, por squad). |
+| "você realmente estudou todo o acervo?" | Dois subagentes varreram os **2.240 itens** (803 + 1.437) com a régua do acervo, 20 rejeitados com motivo, TOP 10 de cada. Entraram nesta fase: **cursor de mira** (reactbits/target-cursor reescrito: ponto + quatro cantos de 12px que enquadram qualquer alvo clicável, os mesmos 12px das marcas de corte; só ponteiro fino, sem reduced-motion, cursor nativo volta em campos de texto), **eyebrow que se resolve** (21st/decrypt-text), **copiar e-mail** no contato (21st/copy-button), **pausa que também para a marquee** (21st/logo-marquee, fecha o WCAG 2.2.2), **carimbo de coordenada** no rodapé (refero/dope.security). Fila com os relatórios em `_audit/f8/research-*.md`: command-menu ⌘K, hover-slider como índice do Other Work, ascii-effect no avatar, painel Lighthouse como prova no case, animateView pro morph. |
+
+**Validação (build final, :3001)**: `s10` 14/14 · `f4` 6/6 · vitest 4/4 · `tsc` e Biome limpos · e2e 25 passed (2 falhas conhecidas do `product-screenshots.spec`) · Lighthouse mediana 3×5: ver tabela na sessão · hero fold chroma medido · 0 requisições ≥400 fora de `/_vercel/*` · CSP: o viewer usa `useGLTF(src, false)` (o decoder Draco em WASM disparava CompileError).
+
+**Commits**: a partir desta fase o trabalho de F5–F8 foi commitado em série pequena na `f5/polish` (mensagens curtas, convencionais, sem co-autor) e enviado ao `origin`.
+
+### 🔴 Decisões SUAS (F8)
+
+1. **Peça de CAD**: cliente segue anonimizado ("uma fabricante de painéis"). Nomear é com você.
+2. **Escudos de clube**: o card diz "estudo pessoal" (a memória do projeto registra a dúvida da Lei Pelé art. 87 pra venda; mostrar ≠ vender).
+3. **Hub da STARK**: a legenda não diz "conceito original" porque a coreografia foi medida do vídeo de referência do cliente (memória `hub`); se quiser, eu escrevo isso no card.
+4. **Cursor de mira**: se incomodar, é um componente só (`target-cursor.client.tsx`) montado no layout.
+5. **Fila do acervo** (ver `_audit/f8/research-acervo-*.md`): ⌘K, índice do Other Work com preview, painel Lighthouse no case. Diga quais quer.
+
 ## Artefatos de validação
 
 - `_audit/logs/s10-validate.json` — resultado das 14 sondas (PASS/FAIL com números)
 - `_audit/shots/v-*.png` — provas visuais (headline sem replay, CTA visível, anel lime, timeline)
 - `_audit/video/` — vídeo da navegação com View Transition (blackdetect: zero)
 - `_audit/s10-validate.mjs` — suíte re-rodável: `BASE_URL=http://localhost:3001 node _audit/s10-validate.mjs`
+- **Fase 8 (2026-09-05)** — `_audit/f8/` (gitignored): `research-acervo-digest.md`, `research-3d-e-hero-digest.md`, `roadmap-f8-section.md`, `patch-f8*.py`, `blender-shot.ps1` + `blender-ui-setup.py` (captura da UI do Blender), `3d/levita_glb.py`, `hub/` (vídeo), `masters/`, `avif/`, `shots/`, `shots-hero.mjs`, `probe-skip.mjs`, `sig/`
+- **Fase 7 (2026-09-04, noite)** — `_audit/f7/` (gitignored): `sig/` (skeleton.py, trace.py, gen-sig.py, ductus.json, overlays), `sig-probe.mjs` / `sig-timing.mjs` / `sig-frames.mjs`, `cap-site.mjs` (captura assentada no pixel 0), `site-settle.mjs`, `shots.mjs` (seções desktop+mobile), `find-404.mjs`, `3d/` (blend_prep.py, GLBs e previews), `patch-f7*.py`, `lighthouserc.f7.json`, `roadmap-f7-section.md`
+- **Fase 6 (2026-09-04)** — `_audit/f6/` (gitignored): `raw/` capturas 2× de todos os sistemas · `masters/` recortes · `avif/` encodes · `cap*.mjs`/`ce-*.mjs`/`nexacore-*.mjs` scripts de captura por sistema · `probe-overflow.mjs` (largura de scroll por rota/viewport) · `shot-sections.mjs` (recorte por seção) · `patch-f6*.py` (patches idempotentes com `assert count==1`) · `lighthouserc.ce.json` · `logs/` (server, seed, capturas) · `roadmap-f6-section.md`
 - **Fase 3 (2026-06-11)**:
   - `_audit/f3-sig-lab.html` + `f3-sig-shot.mjs` — laboratório do ductus da assinatura
     (grid de coordenadas + modo `?coverage` magenta/lime)
@@ -550,4 +797,11 @@ eu escolher um número ou reescrever uma afirmação — então parei e deixei d
   (2^14). `home__mobile` (32812px) e `design-system__mobile` (26080px) geraram "zonas
   mortas" falsas de 37–50% na primeira análise. Em página alta, confie no filme de
   scroll, não no fullPage.
+- **Fase 5 (2026-09-02)** — `_audit/f5/`:
+  - `capture.mjs` (filme + element shots + LCP/CLS/console; `OUT=… LOGS=…`), `shot-el.mjs`,
+    `shot-vp.mjs` (viewport com o elemento centralizado — sem o artefato do header fixo),
+    `zoom.py`, `chroma.py` (massa cromática), `analyze_rhythm.py`, `lime_frames.py`
+  - `verify-lote1.mjs`, `verify-lote2.mjs`, `probe-beam-range.mjs`, `probe-vt.mjs`,
+    `probe-skiplink.mjs`; `FINDINGS-baseline.md` → `FINDINGS-after.md`; `research/R1..R7`
+  - Em Git Bash, passar `/` como rota exige `MSYS_NO_PATHCONV=1`.
 - A pasta `_audit/` está no `.gitignore` — apague quando quiser.
