@@ -2,23 +2,20 @@
 
 import { useEffect, useRef } from 'react';
 import { type TechId, TechLogo } from '@/components/shared/tech-logo';
-import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 import { cn } from '@/lib/utils';
 
 // Partner marquee — infinite linear scroll de logos do stack/parceiros.
 // Pattern Lando Norris parceiros row + AnimeJS sponsor strip.
-// GSAP gsap.to translateX -50% loop seamless (mesma técnica de code-marquee-track).
-// Reduced-motion: estático sem loop.
 //
-// W-perf (2026-05-25): GSAP carregado via dynamic import dentro do useEffect
-// pra evitar leak no first-load (Hero é eager). Static `import { gsap } from
-// 'gsap'` vazava 70 KB uncompressed pra toda rota do site.
-
-interface MarqueeTween {
-  kill(): void;
-  pause(): void;
-  resume(): void;
-}
+// F5 (2026-09-02): o loop virou CSS puro (`@keyframes marquee-x` em
+// globals.css, `translate3d(-50%)` sobre a track com duas cópias — a mesma
+// geometria do tween GSAP anterior). Motivos, medidos:
+//   • GSAP core (~28 KB gz) era importado dinamicamente aqui e no CountUp em
+//     toda visita, inclusive mobile — só pra mover uma faixa e contar até 100.
+//   • CSS animation = compositor-only, zero JS por frame.
+// Pausa no hover é `:hover` em CSS; pausa fora da viewport é o atributo
+// `data-offscreen` (IntersectionObserver, única responsabilidade desta ilha).
+// Reduced-motion: `@media` em globals.css desliga a animação — faixa estática.
 
 const TECH_ITEMS: TechId[] = [
   'vercel',
@@ -46,44 +43,23 @@ interface PartnerMarqueeProps {
 }
 
 export function PartnerMarquee({ className }: PartnerMarqueeProps) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const animationRef = useRef<MarqueeTween | null>(null);
-  const reduced = useReducedMotionSafe();
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!trackRef.current || reduced === null || reduced) return;
-    let cancelled = false;
-    let tween: MarqueeTween | null = null;
-    (async () => {
-      const { gsap } = await import('gsap');
-      if (cancelled || !trackRef.current) return;
-      // W-motion #1: duration lê token --motion-marquee (40s) em vez de
-      // hardcoded 50s. Sincroniza com outros marquees do site (consistência).
-      // Fallback 40 se var não definida.
-      const root = getComputedStyle(document.documentElement);
-      const raw = root.getPropertyValue('--motion-marquee').trim();
-      const seconds = raw.endsWith('s') ? Number.parseFloat(raw) : 40;
-      tween = gsap.to(trackRef.current, {
-        x: '-50%',
-        duration: Number.isFinite(seconds) && seconds > 0 ? seconds : 40,
-        ease: 'none',
-        repeat: -1,
-      });
-      animationRef.current = tween;
-    })();
-    return () => {
-      cancelled = true;
-      tween?.kill();
-      animationRef.current = null;
-    };
-  }, [reduced]);
+    const el = rootRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([entry]) => {
+      el.toggleAttribute('data-offscreen', !(entry?.isIntersecting ?? true));
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
     <div
+      ref={rootRef}
       data-slot="partner-marquee"
       aria-hidden="true"
-      onMouseEnter={() => animationRef.current?.pause()}
-      onMouseLeave={() => animationRef.current?.resume()}
       className={cn(
         'group/partner relative w-full overflow-hidden',
         'hairline-top hairline-bottom py-5',
@@ -97,12 +73,13 @@ export function PartnerMarquee({ className }: PartnerMarqueeProps) {
           'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
       }}
     >
-      <div ref={trackRef} className="flex w-max items-center gap-10 will-change-transform">
+      <div className="marquee-track flex w-max items-center gap-10 will-change-transform">
         {/* Cópia 1 — key=id é único dentro da cópia (TECH_ITEMS não tem duplicates). */}
         {TECH_ITEMS.map((id) => (
           <PartnerItem key={`a-${id}`} id={id} />
         ))}
-        {/* Cópia 2 — prefix 'b-' difere da cópia 1 mas dentro da cópia 2 o id é único. */}
+        {/* Cópia 2 — prefix 'b-' difere da cópia 1 mas dentro da cópia 2 o id é único.
+            Precisa ser idêntica à cópia 1: o loop translada exatamente -50%. */}
         {TECH_ITEMS.map((id) => (
           <PartnerItem key={`b-${id}`} id={id} />
         ))}

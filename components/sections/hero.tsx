@@ -1,21 +1,24 @@
 import { CTAGroup } from '@/components/hero/cta-group';
+import { DayRail } from '@/components/hero/day-rail';
 import { EditorialAccent } from '@/components/hero/editorial-accent';
 import { HeadlineWordReveal } from '@/components/hero/headline-word-reveal';
-import { MonoSubhead } from '@/components/hero/mono-subhead';
+import { HeroEyebrow } from '@/components/hero/hero-eyebrow.client';
+import { HeroVideoToggle } from '@/components/hero/hero-video-toggle.client';
 import { PartnerMarquee } from '@/components/hero/partner-marquee';
 import { StatsRow } from '@/components/hero/stats-row';
 
 // ============================================================
-// Section 1 — Hero (single-column)
+// Section 1 — Hero
 //
-// Layout: single-column editorial editorial (midu/landonorris). Headline
-// massiva ocupa largura ate max-w-5xl. Subhead mono + CTAs + Spotify widget.
-// Slot direito do dual-column anterior (Spline glass) foi removido — asset
-// estava deslocado + peso pesado.
-//
-// Background eclipse lime aparece SO nesta section via div absolute inset-0
-// dentro do <section>. Mask gradient corta bottom 25% (caracteres CJK da
-// imagem original) + fade pra dark.
+// F8 (2026-09-05): duas colunas em lg. À esquerda, a manchete (a mesma
+// frase que assina o manifesto e o rodapé), UMA linha de prova com verbo
+// ("Às 03h um cron acorda 19 agentes…") e os CTAs. À direita, o contrapeso
+// que faltava: o turno de hoje, o dia de trabalho do Content Engine como o
+// cron o executa (day-rail.tsx). Antes, abaixo da manchete vinham quatro
+// faixas de texto pequeno com o mesmo peso (subhead em lista de
+// palavras-chave, CTAs, stats, marquee) e nenhuma tinha prioridade; a
+// subline repetia "em produção" e o número dos stats. O eyebrow mono se
+// resolve de glifos no primeiro paint (hero-eyebrow.client.tsx).
 // ============================================================
 
 export async function HeroSection() {
@@ -59,6 +62,7 @@ export async function HeroSection() {
         className="hero-media-mask pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
         <video
+          data-hero-video
           autoPlay
           loop
           muted
@@ -66,7 +70,15 @@ export async function HeroSection() {
           preload="metadata"
           poster="/bg/hero-poster-v2.avif"
           className="h-full w-full object-cover"
-          style={{ opacity: 0.55, filter: 'saturate(0.85)' }}
+          // F5 (2026-09-02): o loop é uma onda olive-dourada (matiz ~90–100°)
+          // e, a saturate(0.85), era a maior superfície de cor do site: 14.25%
+          // de massa cromática no fold (medido, _audit/f5/research/R4 §0) contra
+          // 0.04% no linear.app e 0.56% no griffin.com — e brigava com o lime
+          // (124°) em vez de sustentá-lo. Quase-monocromático: a onda vira
+          // textura de luz (prata/grafite) e o único evento de cor acima da
+          // dobra volta a ser a palavra em itálico + o CTA. O poster (mobile)
+          // recebe o mesmo filtro por ser desenhado pelo <video>.
+          style={{ opacity: 0.5, filter: 'saturate(0.12) contrast(1.06) brightness(0.92)' }}
         >
           {/* WebM/VP9 preferido por browsers modernos. <source media> mantém
               gate por viewport + prefers-reduced-motion (mobile + reduced =
@@ -84,23 +96,11 @@ export async function HeroSection() {
         </video>
       </div>
 
-      {/* Atmosphere — radial lime beam emanating from bottom-center.
-          Stage-light pattern. Layered atrás do conteudo.
-          W2.5 (2026-05-23): mixBlendMode 'screen' removido — forçava recálculo
-          GPU absurdo com video por trás (Safari iOS jank). Alpha bakeado
-          diretamente nos stops OKLCH dá mesma luminância sem compositing custo. */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-0">
-        <div
-          className="absolute left-1/2 bottom-[-30%] h-[140%] w-[160%] -translate-x-1/2 blur-3xl"
-          style={{
-            background: `radial-gradient(ellipse 50% 80% at 50% 100%,
-              oklch(94% 0.22 124 / 0.12) 0%,
-              oklch(94% 0.22 124 / 0.05) 28%,
-              oklch(94% 0.22 124 / 0.015) 55%,
-              transparent 75%)`,
-          }}
-        />
-      </div>
+      {/* F6 (2026-09-04): o "radial lime beam" (elipse 160%×140% em blur-3xl,
+          lime a 12%) saiu. Era a maior mancha de acento do site depois do
+          vídeo e lia como fumaça, não como palco — o brand book v1 §11 fixa a
+          proporção 90/8/2 (preto/off-white/lime) e o §17 veta glow. A
+          atmosfera do hero é o próprio vídeo, já quase monocromático. */}
 
       {/* Top vignette — escurece levemente o topo pra deixar headline respirando
           contra o palco escuro. */}
@@ -118,12 +118,13 @@ export async function HeroSection() {
           Economiza ~80px de scroll inicial sem comprometer hero respiração desktop. */}
       <div
         className={[
-          'container-max relative z-10 flex flex-col',
-          'pt-20 pb-8 sm:pt-32 sm:pb-16',
-          'lg:pb-20 lg:pt-32',
+          'container-max relative z-10 grid gap-12',
+          'pt-20 pb-8 sm:pt-24 sm:pb-12',
+          'lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] lg:items-end lg:gap-16 lg:pt-24 lg:pb-14',
         ].join(' ')}
       >
-        <div className="flex max-w-5xl flex-col gap-6 lg:gap-7">
+        <div className="flex max-w-5xl flex-col gap-5 lg:gap-6">
+          <HeroEyebrow text="AI Product Engineer · Ponta Grossa, Paraná" />
           {/* W-mob2 #1: leading-[0.92] mobile (text-4xl=60px → ~55px line-height) faz
               descendentes de "g/p/q/y" de "multi-agente" italic colidirem com linha
               abaixo. Em mobile usar 0.98; sm:↑ retoma 0.92 cinematográfico. */}
@@ -143,22 +144,39 @@ export async function HeroSection() {
               headline-word-reveal.tsx. Mata o replay GSAP (SSR pintava,
               idle escondia, re-animava) e tira SplitText do bundle da home. */}
           <HeadlineWordReveal className="text-4xl max-sm:!text-[clamp(3.25rem,1.765rem+7.63vw,4.8rem)] sm:text-5xl !leading-[0.98] sm:!leading-[0.92] !tracking-[-0.035em] font-semibold text-balance">
-            Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto
+            Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção, e o produto
             inteiro ao redor dela.
           </HeadlineWordReveal>
 
-          <MonoSubhead>
-            AI Product Engineer · 22 agentes Claude SDK aprovados via Telegram · três produtos em
-            produção.
-          </MonoSubhead>
+          {/* A linha de prova: uma frase com verbo, o fato mais forte do site,
+              no lugar da lista de palavras-chave. */}
+          <p
+            data-slot="hero-proof"
+            className="max-w-[38ch] text-base leading-relaxed text-(--color-text-1) sm:text-lg"
+            style={{
+              textShadow:
+                '0 0 1px color-mix(in oklch, var(--color-bg) 92%, transparent), 0 1px 2px color-mix(in oklch, var(--color-bg) 88%, transparent), 0 0 6px color-mix(in oklch, var(--color-bg) 72%, transparent)',
+            }}
+          >
+            Às 03h um cron acorda 19 agentes Claude. Às 07h30 o pacote do dia espera três botões
+            seus no Telegram.
+          </p>
 
           <CTAGroup />
         </div>
+
+        <DayRail />
       </div>
 
-      {/* Stats row strip */}
-      <div className="container-max relative z-10 py-6 hairline-bottom">
+      {/* Stats row strip + controle do vídeo (WCAG 2.2.2 — ver hero-video-toggle).
+          md:min-h-9: o botão (36px) só monta depois da hidratação e só em md+;
+          sem a altura reservada a faixa crescia 16px, o hero crescia junto e o
+          brilho absoluto (140% da altura, bottom -30%) deslocava — Lighthouse
+          media CLS 0.0024 na home em 3/3 runs (lote 4d), apontando exatamente
+          `section#hero > div.pointer-events-none > div.absolute`. */}
+      <div className="container-max relative z-10 flex items-center justify-between gap-6 py-6 hairline-bottom min-h-[calc(2.25rem+3rem)]">
         <StatsRow />
+        <HeroVideoToggle className="shrink-0" />
       </div>
 
       {/* Partner marquee — logos infinite scroll. Stefan AMA esse modulo. */}

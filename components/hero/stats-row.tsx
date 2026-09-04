@@ -2,18 +2,22 @@
 
 import { useEffect, useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
-import { EASES, toCss } from '@/lib/animation/eases';
+import { cubicBezier, EASES } from '@/lib/animation/eases';
 import { cn } from '@/lib/utils';
 
 // Layer 7 do 8-layer choreography: stats row tabular-nums count-up 0→target.
-// 1500ms ease-dramatic, trigger via IntersectionObserver (on view).
+// ease-dramatic, trigger via IntersectionObserver (on view, uma vez).
 // Honesty (HANDOFF §3): 22 agentes (não 25), 27 tabelas, 100+ vitest tests
 // (não 1203 — esse number agrega pytest etc).
 // Reduced-motion: snap target values direto.
 //
-// W-perf (2026-05-25): GSAP + ScrollTrigger carregados via dynamic import
-// dentro do useEffect. Static imports vazavam 70 KB uncompressed pro
-// first-load de toda rota (StatsRow vive dentro do Hero, que é eager).
+// F5 (2026-09-02): GSAP + ScrollTrigger saíram daqui. O count-up é um
+// IntersectionObserver + requestAnimationFrame com o MESMO easing (o cubic-
+// bezier `--ease-dramatic`, avaliado em JS por `cubicBezier()`), a mesma
+// duração em escala log e a mesma escrita imperativa no DOM. Antes, este
+// componente (e o marquee) puxavam ~46 KB gz de gsap+ScrollTrigger no path
+// eager do Hero em TODA visita — inclusive mobile, onde o Lenis nem inicia e
+// nada mais precisava de GSAP. Um contador de três números não justifica isso.
 
 interface StatItem {
   value?: number;
@@ -21,13 +25,16 @@ interface StatItem {
   label: string;
 }
 
+// F7 (2026-09-04): números conferidos no código do Content Engine —
+// agent-roles.ts (19), db/schema.ts + auth-schema.ts (57 tabelas), 243
+// arquivos de teste com 2.059 casos no runtime. "LGPD compliance" saiu: não
+// existe mecanismo no código (o que existe é rotulagem de IA no publish).
 const HERO_STATS: StatItem[] = [
-  { value: 22, label: 'agentes Claude' },
-  { value: 27, label: 'tabelas Postgres' },
-  { value: 100, suffix: '+', label: 'testes runtime' },
-  { label: 'prompt cache 2 camadas' },
-  { label: 'GPU local pro inference' },
-  { label: 'LGPD compliance' },
+  { value: 19, label: 'agentes Claude' },
+  { value: 57, label: 'tabelas Postgres' },
+  { value: 2059, label: 'testes no runtime' },
+  { label: 'inference local numa RTX 3070' },
+  { label: 'rotulagem de IA obrigatória no publish' },
 ];
 
 interface StatsRowProps {
@@ -81,65 +88,76 @@ function StatEntry({ stat, isLast }: { stat: StatItem; isLast: boolean }) {
   );
 }
 
+const easeDramatic = cubicBezier(EASES.dramatic);
+
 function CountUp({ target }: { target: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotionSafe();
 
   useEffect(() => {
-    if (!ref.current || reduced === null) return;
+    const node = ref.current;
+    if (!node || reduced === null) return;
 
-    // Reduced-motion: snap target instantly via DOM mutation (sem React commit).
-    if (reduced) {
-      ref.current.textContent = String(target);
+    // Reduced-motion / sem IntersectionObserver: o HTML já traz o valor final.
+    if (reduced || typeof IntersectionObserver === 'undefined') {
+      node.textContent = String(target);
       return;
     }
 
-    let cancelled = false;
-    let tween: { kill(): void } | null = null;
+    // F5 (2026-09-02): o servidor renderiza o VALOR FINAL (antes era "0").
+    // Crawler, reader mode, print e JS falhando liam "0 agentes Claude" — um
+    // número errado justamente onde o site promete honestidade. O contador só
+    // rebaixa pra 0 quando o stat ainda está FORA do viewport na hidratação
+    // (desktop 1440×900: y≈972; mobile 390×844: y≈1400 — o caso normal). Se
+    // já está visível (tela alta, ou o usuário rolou antes do JS), fica no
+    // valor final: nunca existe "aparece, some e volta".
+    const rect = node.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      node.textContent = String(target);
+      return;
+    }
+    node.textContent = '0';
 
-    (async () => {
-      const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-        import('gsap'),
-        import('gsap/ScrollTrigger'),
-      ]);
-      if (cancelled || !ref.current) return;
-      gsap.registerPlugin(ScrollTrigger);
+    let raf = 0;
+    // W-motion #9: duration constante 1.5s sentia diferente para targets
+    // diferentes (22 vs 100 = mesmo tempo, mas 100 conta ~4.5× mais rápido).
+    // D'Silva motion principle: perceived speed ≠ duration. Log scaling
+    // mantém velocidade perceptual aproximadamente constante.
+    const durationMs = (0.6 + Math.log10(Math.max(target, 1)) * 0.4) * 1000;
 
-      const node = ref.current;
-      const obj = { n: 0 };
-      // W-motion #9: duration constante 1.5s sentia diferente para targets
-      // diferentes (22 vs 100 = mesmo tempo, mas 100 conta ~4.5× mais rápido).
-      // D'Silva motion principle: perceived speed ≠ duration. Log scaling
-      // mantém velocidade perceptual aproximadamente constante.
-      const duration = 0.6 + Math.log10(Math.max(target, 1)) * 0.4;
-      tween = gsap.to(obj, {
-        n: target,
-        duration,
-        ease: toCss(EASES.dramatic),
-        scrollTrigger: {
-          trigger: node,
-          // 'top bottom' = dispara quando topo do stat chega no bottom do viewport
-          // (i.e., elemento entra no viewport pela primeira vez). Substitui 'top 90%'
-          // que falhava quando hero tinha altura > viewport (stats no fim da section).
-          start: 'top bottom',
-          once: true,
-        },
-        // Imperative DOM update — evita ~90 React commits/s × 3 stats em paralelo.
-        onUpdate: () => {
-          node.textContent = String(Math.round(obj.n));
-        },
-      });
-    })();
+    const run = () => {
+      const start = performance.now();
+      const tick = (now: number) => {
+        const t = Math.min(1, (now - start) / durationMs);
+        // Escrita imperativa — evita ~90 React commits/s × 3 stats em paralelo.
+        node.textContent = String(Math.round(target * easeDramatic(t)));
+        if (t < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    };
+
+    // Dispara quando o topo do stat entra pelo bottom do viewport (mesmo
+    // gatilho do ScrollTrigger `start: 'top bottom'` anterior), uma vez.
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          io.disconnect();
+          run();
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(node);
 
     return () => {
-      cancelled = true;
-      tween?.kill();
+      io.disconnect();
+      cancelAnimationFrame(raf);
     };
   }, [target, reduced]);
 
   return (
     <span ref={ref} className="font-semibold text-(--color-text-1)">
-      0
+      {target}
     </span>
   );
 }
