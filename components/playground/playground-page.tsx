@@ -71,7 +71,7 @@ export function PlaygroundPage() {
         <header className="mb-10 flex flex-col gap-3 sm:mb-14">
           <p className="eyebrow">PLAYGROUND</p>
           <h1 className="text-3xl font-semibold sm:text-4xl lg:text-5xl !leading-[1.02] !tracking-[-0.025em]">
-            Algoritmos C que aprendi na faculdade — visualizados.
+            Algoritmos em C que aprendi na faculdade, visualizados.
           </h1>
           <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
             Hanoi recursivo, Fibonacci memoizado vs ingênuo, e balanceamento de parênteses com

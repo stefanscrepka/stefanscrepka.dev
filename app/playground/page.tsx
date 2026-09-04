@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Playground · Stefan Heinz Screpka',
     description:
-      'Algoritmos da faculdade — Hanoi 3D, Fibonacci, Parênteses — virando demos interativos.',
+      'Algoritmos da faculdade (Hanoi 3D, Fibonacci, Parênteses) virando demos interativos.',
   },
 };
 

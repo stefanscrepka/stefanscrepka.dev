@@ -63,7 +63,7 @@ export function PrimitivesSection() {
       {/* Buttons */}
       <div className="flex flex-col gap-6">
         <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-          Button — 8 variants × 4 sizes (default | sm | lg | icon)
+          Button · 8 variants × 4 sizes (default | sm | lg | icon)
         </p>
         <div className="flex flex-col gap-4">
           {BUTTON_VARIANTS.map((variant) => (
@@ -122,7 +122,7 @@ export function PrimitivesSection() {
       {/* Card variants */}
       <div className="flex flex-col gap-6">
         <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-          Card — 4 variants
+          Card · 4 variants
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           {(['default', 'elevated', 'overlay', 'tracing'] as const).map((variant) => (
@@ -200,7 +200,7 @@ export function PrimitivesSection() {
             <div className="flex flex-col gap-2">
               <Label htmlFor="ds-invalid">Email (estado inválido)</Label>
               <Input id="ds-invalid" defaultValue="not-an-email" aria-invalid="true" />
-              <p className="text-xs text-(--color-danger)">Formato inválido — use seu@email.com</p>
+              <p className="text-xs text-(--color-danger)">Formato inválido: use seu@email.com</p>
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="ds-disabled">Disabled</Label>
@@ -217,7 +217,7 @@ export function PrimitivesSection() {
       {/* Tabs */}
       <div className="flex flex-col gap-6">
         <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-          Tabs — variant line (default) + pill
+          Tabs · variant line (default) + pill
         </p>
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="flex flex-col gap-3 rounded-lg border border-(--color-hairline) p-6">

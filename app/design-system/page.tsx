@@ -32,7 +32,7 @@ export default function DesignSystemPage() {
           <code className="font-mono">components/ui-effects/</code> usando{' '}
           <code className="font-mono">radix-ui</code> unified +{' '}
           <code className="font-mono">cva</code> + <code className="font-mono">tw-animate-css</code>
-          . Sem CLI shadcn — tokens OKLCH controlados end-to-end (gotcha #2 evitado: zero conflito
+          . Sem CLI shadcn: tokens OKLCH controlados end-to-end (gotcha #2 evitado: zero conflito
           HSL).
         </p>
         <nav className="flex flex-wrap gap-2 mt-2" aria-label="Sumário">

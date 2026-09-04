@@ -124,7 +124,7 @@ export function ParensViz() {
           balanced={balanced}
           message={
             balanced
-              ? `Pilha vazia ao final — ${outcome.processed} chars processados`
+              ? `Pilha vazia ao final. ${outcome.processed} chars processados`
               : (failMsg ?? 'não balanceado')
           }
         />

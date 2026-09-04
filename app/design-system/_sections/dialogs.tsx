@@ -118,7 +118,7 @@ export function DialogsSection() {
                 12 + Shiki SSR + Sentry. Hospedado em Vercel Fluid Compute.
               </p>
               <p>
-                Hero 3D scene em react-three-fiber custom — 3 placas glass refractive, NÃO um Spline
+                Hero 3D scene em react-three-fiber custom: 3 placas glass refractive, NÃO um Spline
                 template. Reeded Liquid Glass inspiration reconstruído em código.
               </p>
               <p>

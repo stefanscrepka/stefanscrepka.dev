@@ -12,7 +12,7 @@ const COLOR_GROUPS = [
     ],
   },
   {
-    title: 'Accent — Lime A',
+    title: 'Accent · Lime A',
     swatches: [
       { token: '--color-accent', label: 'accent' },
       { token: '--color-accent-hover', label: 'accent-hover' },
@@ -30,7 +30,7 @@ const COLOR_GROUPS = [
     ],
   },
   {
-    title: 'Sub-accent — Amber (scope: /work/estetica-md)',
+    title: 'Sub-accent · Amber (scope: /work/estetica-md)',
     swatches: [
       { token: '--color-amber', label: 'amber' },
       { token: '--color-amber-glow', label: 'amber-glow' },
@@ -50,7 +50,7 @@ const COLOR_GROUPS = [
 
 // F4 (2026-08-29): `--text-7xl` e `--color-info` foram REMOVIDOS desta lista.
 // Ambos ja tinham sido removidos do @theme em globals.css por nao terem
-// consumidores, mas continuavam listados aqui — `fontSize: var(--text-7xl)`
+// consumidores, mas continuavam listados aqui · `fontSize: var(--text-7xl)`
 // sem valor faz o span herdar o tamanho do pai, entao a pagina do design
 // system exibia uma linha "text-7xl" renderizada no tamanho do body.
 // Um design system que documenta token inexistente e pior que nao documentar.
@@ -63,7 +63,7 @@ const TYPE_SCALE = [
   { token: '--text-2xl', label: 'text-2xl', sample: 'Heading small' },
   { token: '--text-xl', label: 'text-xl', sample: 'Subheading' },
   { token: '--text-lg', label: 'text-lg', sample: 'Body large' },
-  { token: '--text-base', label: 'text-base', sample: 'Body text — 17px cadence Apple' },
+  { token: '--text-base', label: 'text-base', sample: 'Body text · 17px cadence Apple' },
   { token: '--text-sm', label: 'text-sm', sample: 'Body small / form labels' },
   { token: '--text-xs', label: 'text-xs', sample: 'Caption / mono stats' },
 ] as const;
@@ -135,7 +135,7 @@ export function TokensSection() {
       {/* Type scale */}
       <div className="flex flex-col gap-4">
         <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-          Type scale — ratio 1.333 fluid (clamp 320→1920px)
+          Type scale · ratio 1.333 fluid (clamp 320→1920px)
         </p>
         <div className="flex flex-col gap-1 divide-y divide-(--color-hairline)">
           {TYPE_SCALE.map((t) => (
@@ -163,7 +163,7 @@ export function TokensSection() {
       {/* Spacing */}
       <div className="flex flex-col gap-4">
         <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-          Spacing — 8pt base (Tailwind v4 default --spacing)
+          Spacing · 8pt base (Tailwind v4 default --spacing)
         </p>
         <div className="flex flex-col gap-2">
           {SPACING_STOPS.map((n) => (
@@ -184,7 +184,7 @@ export function TokensSection() {
       {/* Motion durations */}
       <div className="flex flex-col gap-4">
         <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-          Motion — durations
+          Motion · durations
         </p>
         <div className="grid gap-2 sm:grid-cols-2">
           {MOTION_TOKENS.map((m) => (
@@ -205,7 +205,7 @@ export function TokensSection() {
       {/* Easings */}
       <div className="flex flex-col gap-4">
         <p className="font-mono text-xs uppercase tracking-wider text-(--color-text-3)">
-          Motion — easings
+          Motion · easings
         </p>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {EASING_TOKENS.map((e) => (

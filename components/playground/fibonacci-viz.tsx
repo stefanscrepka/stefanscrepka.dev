@@ -107,7 +107,7 @@ export function FibonacciViz() {
             '[&::-moz-range-thumb]:cursor-pointer'
           )}
         />
-        <p className="font-mono text-2xs text-(--color-text-3)">1—{MAX_N}</p>
+        <p className="font-mono text-2xs text-(--color-text-3)">1 a {MAX_N}</p>
       </div>
 
       {/* Chart */}
@@ -163,7 +163,7 @@ export function FibonacciViz() {
               labelStyle={{ color: 'var(--color-text-1)', fontWeight: 600 }}
               itemStyle={{ color: 'var(--color-text-2)' }}
               formatter={(value) =>
-                typeof value === 'number' ? value.toLocaleString('pt-BR') : String(value ?? '—')
+                typeof value === 'number' ? value.toLocaleString('pt-BR') : String(value ?? '·')
               }
             />
             <Legend
@@ -198,11 +198,11 @@ export function FibonacciViz() {
 
       {/* Stat summary */}
       <dl className="grid grid-cols-1 gap-4 border-t border-(--color-hairline) pt-5 sm:grid-cols-3">
-        <Stat label="Naive — chamadas" value={naiveLast.toLocaleString('pt-BR')} tone="danger" />
-        <Stat label="Memoizado — chamadas" value={memoLast.toLocaleString('pt-BR')} tone="accent" />
+        <Stat label="Naive · chamadas" value={naiveLast.toLocaleString('pt-BR')} tone="danger" />
+        <Stat label="Memoizado · chamadas" value={memoLast.toLocaleString('pt-BR')} tone="accent" />
         <Stat
           label="Speedup"
-          value={speedup > 1 ? `${speedup.toLocaleString('pt-BR')}×` : '—'}
+          value={speedup > 1 ? `${speedup.toLocaleString('pt-BR')}×` : '·'}
           tone="text-1"
         />
       </dl>

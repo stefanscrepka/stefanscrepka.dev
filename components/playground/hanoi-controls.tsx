@@ -78,7 +78,7 @@ export function HanoiControls({
           )}
         />
         <p className="font-mono text-2xs text-(--color-text-3)">
-          1—{maxN} {maxN < 8 ? '(mobile cap)' : ''}
+          1 a {maxN} {maxN < 8 ? '(mobile cap)' : ''}
         </p>
       </div>
 
