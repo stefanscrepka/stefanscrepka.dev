@@ -79,3 +79,6 @@ screenshots-2026-05-21/
 /stj-app.vercel.app_*.png
 /striveos.shop_*.png
 /pricing.html
+
+# Playwright MCP session artifacts (screenshots/snapshots do agente)
+/.playwright-mcp/

@@ -22,6 +22,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   compress: true,
   productionBrowserSourceMaps: false,
+  // F6 (2026-09-04): o case do STJ App saiu do portfólio (decisão do Stefan).
+  // A rota já circulou; quem chegar por ela cai no índice, 301.
+  async redirects() {
+    return [
+      { source: '/work/stj-app', destination: '/work', permanent: true },
+      // F7 (2026-09-04): o produto foi rebatizado Caluna.
+      { source: '/work/nexacore', destination: '/work/caluna', permanent: true },
+    ];
+  },
   turbopack: {
     root: projectRoot,
   },

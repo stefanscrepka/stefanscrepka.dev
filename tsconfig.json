@@ -37,5 +37,16 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", ".next", "dist", "build", ".vercel", "coverage", "playwright-report"]
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    ".vercel",
+    "coverage",
+    "playwright-report",
+    "_audit",
+    ".agents",
+    ".claude"
+  ]
 }

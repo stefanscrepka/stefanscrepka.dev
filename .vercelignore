@@ -1,0 +1,46 @@
+# Controla o que o CLI sobe pra Vercel.
+#
+# ATENÇÃO: ao contrário do que a intuição sugere, o CLI NÃO usa .gitignore como
+# fallback. A doc é explícita: "all files within your project are uploaded to
+# Vercel if no source path is specified to be excluded in a .vercelignore"
+# (vercel.com/docs/deployments/vercel-ignore). Sem este arquivo, um `vercel
+# deploy` daqui subiria ~645 MB de artefato local — auditoria, capturas,
+# node_modules de skills — junto com o site.
+#
+# Já excluídos automaticamente pela plataforma (não repetir): .git, .next,
+# .vercel, node_modules, .env.local, .env.*.local, .DS_Store, .gitignore.
+#
+# Critério das entradas abaixo: só entra o que tem MOTIVO — peso em disco ou
+# estado local do agente. Config pequena (biome/eslint/tsconfig) fica, porque
+# excluir por arrumação só cria risco de build quebrado sem ganho real.
+
+# ── Estado local de agentes/editor: 140 MB, nada disso é o site ──────────────
+.agents
+.claude
+.mcp.json
+.vscode
+
+# ── Auditoria sensorial, capturas e relatórios: ~470 MB ──────────────────────
+_audit
+.lighthouseci
+.playwright-mcp
+test-results
+playwright-report
+screenshots-2026-05-21
+
+# ── Capturas de scratch soltas na raiz: ~20 MB ──────────────────────────────
+stj-app.vercel.app_*.png
+striveos.shop_*.png
+pricing.html
+
+# ── Fontes de marca (PSD/PNG de origem): 15 MB, não entram no bundle ────────
+brand-source
+
+# ── Cache incremental do tsc: 1.8 MB, regenerado no build ───────────────────
+*.tsbuildinfo
+
+# ── Defesa em profundidade: env vem do painel da Vercel, nunca de arquivo ────
+# (.env.local e .env.*.local já são excluídos por padrão; .env "puro" não é.)
+.env
+.env.*
+!.env.example
