@@ -2,24 +2,28 @@ import Link from 'next/link';
 import { AnchorLink } from '@/components/shared/anchor-link';
 import { SHMonogram } from '@/components/shared/sh-monogram';
 import { cn } from '@/lib/utils';
-import { FooterBreathingHairline, FooterClosing } from './footer.client';
+import { FooterBreathingHairline, FooterClosing, FooterRevealSpacer } from './footer.client';
 import { FooterAboutButton } from './footer-about-button.client';
+import { FooterClock } from './footer-clock.client';
 
-// Footer cinematic minimal — 3 colunas + bottom row.
-// Background ligeiramente mais escuro que body (oklch -2% L) pra criar "shelf"
-// visual sob o Contact. Lime hairline divisor top + generous bottom padding.
+// Footer — F7 (2026-09-04), a partir do acervo (Referencias-logo/acervo/saida,
+// necessidade "rodape"): o que ficou de cada referência e o que não entrou.
+//
+//   hyperiux/parallax-footer — o rodapé fixo atrás da página, revelado pelo
+//     conteúdo que sobe. É o "último beat" que o site não tinha: a página
+//     termina de rolar e o rodapé já está lá, parado. Entrou (md+).
+//   21st/ember-footer-cta — uma frase grande e UMA ação, acima das colunas.
+//     Entrou: a frase peak-end do manifesto vira o fecho, com "Falar comigo"
+//     ao lado. O gradiente pixelado deles não entrou (brand book §17).
+//   smoothui/footer-1 — colunas curtas com rótulo mono e o bloco da marca à
+//     esquerda. Entrou a estrutura; as quatro colunas viraram três.
+//   watermelon/footer — newsletter. Não entrou: não existe newsletter.
 //
 // Estrutura:
-//   ROW 1 (3 col): Logo+frase · Navegação · Contato/redes
-//   ROW 2 (hairline): © + city · About this site → · GitHub source →
-//
-// Anti-padrões evitados: sem "Made with ♥", sem newsletter fake, sem 6+ col,
-// sem marquee redundante (já tem no Hero), sem sign-off competindo com Contact.
+//   ROW 1: fecho (frase) · ação (Falar comigo → / WhatsApp)
+//   ROW 2: marca + lugar/hora/status · Navegação · Conexão direta
+//   ROW 3: © · Sobre este site · Privacidade · GitHub source
 
-// W0.8 + W4.1 (2026-05-23): hrefs agora absolute (`/#work`) pra funcionar
-// quando footer é montado em rotas internas (case studies, /privacidade etc).
-// AnchorLink intercepta `#x` puro pra smooth scroll, então `/#work` cai pro
-// fallback `<a href>` nativo que navega + dispara hash scroll.
 const NAV_LINKS = [
   { label: 'Work', href: '/#work' },
   { label: 'Process', href: '/process' },
@@ -28,164 +32,179 @@ const NAV_LINKS = [
 ] as const;
 
 const SOCIAL_LINKS = [
-  { label: 'WhatsApp', href: 'https://wa.me/5542998592522', external: true },
-  { label: 'Email', href: 'mailto:stefanheinz2006@gmail.com', external: true },
-  {
-    label: 'LinkedIn',
-    href: 'https://www.linkedin.com/in/stefan-heinz-screpka-323ab9242/',
-    external: true,
-  },
-  { label: 'GitHub', href: 'https://github.com/stefanscrepka', external: true },
+  { label: 'WhatsApp', href: 'https://wa.me/5542998592522' },
+  { label: 'Email', href: 'mailto:stefanheinz2006@gmail.com' },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/stefan-heinz-screpka-323ab9242/' },
+  { label: 'GitHub', href: 'https://github.com/stefanscrepka' },
 ] as const;
 
-// W-mob2 #11: py-2 mobile dá clickable area ~36px (sm:py-0 mantém visual desktop discreto).
 const linkClass = cn(
   'inline-flex items-center gap-1.5 py-2 sm:py-0 text-sm text-(--color-text-2)',
   'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
   'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
 );
 
+const metaLinkClass = cn(
+  'inline-flex items-center gap-1 py-2 sm:-my-2 transition-colors',
+  'duration-(--motion-fast) ease-(--ease-standard)',
+  'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
+);
+
 export function Footer() {
   return (
-    <footer
-      data-slot="footer"
-      className={cn(
-        'relative isolate bg-(--color-surface-deep)',
-        // Background deeper que body — token --color-surface-deep cria shelf sutil
-        // sob Contact (-3% L vs --color-bg).
-        'border-t border-(--color-hairline)',
-        'pt-16 pb-[max(5rem,calc(5rem+env(safe-area-inset-bottom)))] sm:pt-20 sm:pb-[max(6rem,calc(6rem+env(safe-area-inset-bottom)))]',
-        'pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]'
-      )}
-    >
-      {/* Lime hairline divisor — sinaliza fim do conteúdo (gradient fade nas pontas).
-          W-motion #10: animação `hairline-breathe` 4s ease-in-out infinite oscila
-          opacity 0.4 → 0.6. Awwwards 2025 trend em footers cinematográficos.
-          Reduced-motion: bloco global em globals.css zera animation-duration.
-          F3.5 (2026-06-11): virou ilha client — pausa fora da viewport via
-          IntersectionObserver (footer.client.tsx). */}
-      <FooterBreathingHairline />
+    <>
+      <FooterRevealSpacer />
+      <footer
+        data-slot="footer"
+        className={cn(
+          'relative isolate bg-(--color-surface-deep)',
+          'border-t border-(--color-hairline)',
+          // md+: fixo atrás do <main> (que tem z-10 e fundo opaco); o
+          // espaçador acima reserva a altura no fluxo.
+          'md:fixed md:inset-x-0 md:bottom-0 md:z-0',
+          'pt-14 pb-[max(3.5rem,calc(3.5rem+env(safe-area-inset-bottom)))] sm:pt-16 sm:pb-[max(4rem,calc(4rem+env(safe-area-inset-bottom)))]',
+          'pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]'
+        )}
+      >
+        <FooterBreathingHairline />
 
-      <div className="container-max flex flex-col gap-12 sm:gap-14">
-        {/* ROW 1 — 3 colunas (Brand · Nav · Conexão).
-            W-mob2 #6: gap-6 mobile (era gap-10) reduz spacing entre cols stacked. */}
-        <div className="grid gap-6 sm:gap-12 lg:grid-cols-[1.4fr_1fr_1fr]">
-          {/* Col 1 — Brand */}
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-(--color-accent)" aria-hidden="true">
-                <SHMonogram size={32} />
-              </span>
-              <span className="font-mono text-xs uppercase tracking-widest text-(--color-text-3)">
-                stefanscrepka.dev
-              </span>
+        <div className="container-max flex flex-col gap-10 sm:gap-12">
+          {/* ROW 1 — fecho + ação */}
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-end lg:gap-12">
+            <div className="flex flex-col gap-4">
+              <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+                Última linha
+              </p>
+              <FooterClosing />
             </div>
-            <p className="max-w-xs text-sm leading-relaxed text-(--color-text-2)">
-              Construo IA multi-agente em produção — e o produto inteiro ao redor dela.
-            </p>
-            <p className="mt-1 font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
-              Ponta Grossa, Paraná{' '}
-              <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
-                ·
-              </span>
-              <span className="text-(--color-accent)">disponível</span>
-            </p>
+            <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+              <AnchorLink
+                href="/#contato"
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-pill bg-(--color-accent) px-5 py-3',
+                  'font-mono text-sm font-medium text-(--color-bg)',
+                  'transition-[transform,background-color] duration-(--motion-fast) ease-(--ease-standard)',
+                  'hover:-translate-y-[1px] hover:bg-(--color-accent-hover) focus-visible:-translate-y-[1px]'
+                )}
+              >
+                Falar comigo
+                <span aria-hidden="true">→</span>
+              </AnchorLink>
+              <a
+                href="https://wa.me/5542998592522"
+                target="_blank"
+                rel="noreferrer"
+                className={cn(
+                  'inline-flex items-center gap-2 rounded-pill border border-(--color-hairline-strong) px-5 py-3',
+                  'font-mono text-sm text-(--color-text-1)',
+                  'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
+                  'hover:border-(--color-accent) hover:text-(--color-accent) focus-visible:border-(--color-accent)'
+                )}
+              >
+                WhatsApp
+              </a>
+            </div>
           </div>
 
-          {/* Col 2 — Navegação */}
-          <FooterColumn title="Navegação">
-            <ul className="flex flex-col gap-2.5">
-              {NAV_LINKS.map((item) => (
-                <li key={item.href}>
-                  <AnchorLink href={item.href} className={linkClass}>
-                    {item.label}
-                  </AnchorLink>
-                </li>
-              ))}
-            </ul>
-          </FooterColumn>
+          {/* ROW 2 — marca · navegação · conexão */}
+          <div className="grid gap-8 border-t border-(--color-hairline) pt-8 sm:grid-cols-3 sm:gap-10">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-(--color-accent)" aria-hidden="true">
+                  <SHMonogram size={28} />
+                </span>
+                <span className="font-mono text-xs uppercase tracking-widest text-(--color-text-3)">
+                  stefanscrepka.dev
+                </span>
+              </div>
+              <p className="max-w-xs text-sm leading-relaxed text-(--color-text-2)">
+                IA multi-agente em produção, e o produto inteiro ao redor dela.
+              </p>
+              {/* F8: coordenada + hora, o carimbo de fim de página (acervo:
+                  refero/dope.security "coordinate footer"). */}
+              <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+                25.09° S · 50.16° W{' '}
+                <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
+                  ·
+                </span>
+                Ponta Grossa, Paraná{' '}
+                <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
+                  ·
+                </span>
+                <FooterClock />{' '}
+                <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
+                  ·
+                </span>
+                <span className="text-(--color-accent)">disponível</span>
+              </p>
+            </div>
 
-          {/* Col 3 — Direct conexão */}
-          <FooterColumn title="Conexão direta">
-            <ul className="flex flex-col gap-2.5">
-              {SOCIAL_LINKS.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    target={item.href.startsWith('mailto:') ? undefined : '_blank'}
-                    rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}
-                    className={linkClass}
-                  >
-                    {item.label}
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      className="size-3 shrink-0 text-(--color-text-3)"
-                      aria-hidden="true"
-                      focusable="false"
+            <FooterColumn title="Navegação">
+              <ul className="flex flex-col gap-2.5">
+                {NAV_LINKS.map((item) => (
+                  <li key={item.href}>
+                    <AnchorLink href={item.href} className={linkClass}>
+                      {item.label}
+                    </AnchorLink>
+                  </li>
+                ))}
+              </ul>
+            </FooterColumn>
+
+            <FooterColumn title="Conexão direta">
+              <ul className="flex flex-col gap-2.5">
+                {SOCIAL_LINKS.map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      target={item.href.startsWith('mailto:') ? undefined : '_blank'}
+                      rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}
+                      className={linkClass}
                     >
-                      <path
-                        d="M7 17L17 7M9 7h8v8"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </FooterColumn>
-        </div>
-
-        {/* ROW 2 — Closing line memoravel (peak-end rule) + meta links.
-            Copy autoral recursivo com manifesto pull-quote ("Software serio
-            tem o mesmo padrao... funciona 24/7 ou alguem perde dinheiro").
-            Substitui copyright generico anterior. */}
-        <div className="flex flex-col gap-6 border-t border-(--color-hairline) pt-8 sm:gap-8">
-          {/* Closing statement — frase autoral memoravel.
-              F3.9 (2026-06-11): reveal sutil on-scroll (footer.client.tsx) —
-              o peak-end ganha um beat próprio agora que a frase está visível
-              (Fase 1 #2 consertou a cor; este é o refinamento previsto). */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
-            <FooterClosing />
-            <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3) shrink-0">
-              ponta grossa · 2026
-            </p>
+                      {item.label}
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className="size-3 shrink-0 text-(--color-text-3)"
+                        aria-hidden="true"
+                        focusable="false"
+                      >
+                        <path
+                          d="M7 17L17 7M9 7h8v8"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </FooterColumn>
           </div>
 
-          {/* Meta row — meta links discretos. W1.6 (2026-05-23): adicionado
-              link "Privacidade →" pro /privacidade, requisito LGPD.
-              W-mob2 #11: py-2 mobile pra tap target ~36px. */}
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-2xs tracking-wide text-(--color-text-3)">
-            <FooterAboutButton />
-            <Link
-              href="/privacidade"
-              className={cn(
-                'inline-flex items-center gap-1 py-2 sm:-my-2 transition-colors',
-                'duration-(--motion-fast) ease-(--ease-standard)',
-                'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
-              )}
-            >
-              Privacidade →
-            </Link>
-            <a
-              href="https://github.com/stefanscrepka/stefanscrepka-dev"
-              target="_blank"
-              rel="noreferrer"
-              className={cn(
-                'inline-flex items-center gap-1 py-2 sm:-my-2 transition-colors',
-                'duration-(--motion-fast) ease-(--ease-standard)',
-                'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
-              )}
-            >
-              GitHub source →
-            </a>
+          {/* ROW 3 — meta */}
+          <div className="flex flex-col gap-4 border-t border-(--color-hairline) pt-6 font-mono text-2xs tracking-wide text-(--color-text-3) sm:flex-row sm:items-center sm:justify-between">
+            <p className="uppercase tracking-widest">© 2026 Stefan Heinz Screpka</p>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+              <FooterAboutButton />
+              <Link href="/privacidade" className={metaLinkClass}>
+                Privacidade →
+              </Link>
+              <a
+                href="https://github.com/stefanscrepka/stefanscrepka-dev"
+                target="_blank"
+                rel="noreferrer"
+                className={metaLinkClass}
+              >
+                GitHub source →
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }
 
