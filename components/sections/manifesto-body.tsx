@@ -13,12 +13,12 @@ export const MANIFESTO_PULL_QUOTE =
   'Software sério tem o mesmo padrão de qualquer sistema crítico: ou funciona 24/7 ou alguém perde dinheiro.';
 
 export const MANIFESTO_BODY_PARAGRAPHS = [
-  'Eu construo nesse padrão. TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude SDK orquestrado em squads. Três produtos em produção — NexaCore, Content Engine, STJ App — provam.',
-  'Não vendo “ajudo empresas a inovar”. Vendo entrega que paga conta. Aprovação humana em ≤10 minutos por dia. Anti-slop validator com 14 regex pt-BR. Stack local GPU subsidiando custo de inferência.',
+  'Eu construo nesse padrão. TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude orquestrado em squads. Três produtos em produção provam: Content Engine, Caluna, Estética MD.',
+  'Não vendo “ajudo empresas a inovar”. Vendo entrega que paga conta. Aprovação humana em três botões por dia. Anti-slop com 28 regex pt-BR. GPU local subsidiando o custo de inferência.',
 ];
 
 export const MANIFESTO_SIGNATURE =
-  'Construo IA multi-agente em produção — e o produto inteiro ao redor dela.';
+  'Construo IA multi-agente em produção, e o produto inteiro ao redor dela.';
 
 // W-design #3: leitmotif tipográfico — PP Editorial italic em "multi-agente"
 // no manifesto signature (eco do hero). 3 batidas pelo site: Hero, Manifesto,
@@ -26,7 +26,7 @@ export const MANIFESTO_SIGNATURE =
 function ManifestoSignatureRich() {
   return (
     <>
-      Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção — e o produto inteiro
+      Construo IA <EditorialAccent>multi-agente</EditorialAccent> em produção, e o produto inteiro
       ao redor dela.
     </>
   );
@@ -71,7 +71,7 @@ export function ManifestoBody({
           “{MANIFESTO_PULL_QUOTE}”
         </p>
         <footer className="sr-only">
-          <cite>Stefan Heinz Screpka — Manifesto</cite>
+          <cite>Stefan Heinz Screpka, Manifesto</cite>
         </footer>
       </blockquote>
 

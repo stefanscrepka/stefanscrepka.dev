@@ -2,6 +2,7 @@
 
 import { useGSAP } from '@gsap/react';
 import { gsap } from 'gsap';
+import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useRef } from 'react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
@@ -10,7 +11,10 @@ import { ManifestoBackdrop } from './manifesto-backdrop';
 import { ManifestoBody } from './manifesto-body';
 import { SignatureStefan } from './signature-stefan-svg';
 
-gsap.registerPlugin(ScrollTrigger);
+// F5 (2026-09-02): DrawSVGPlugin (+2.2 KB gz neste chunk, que já é dynamic)
+// mede o comprimento real de cada stroke e interpola o dash. GSAP 3.13+ é
+// gratuito com todos os plugins.
+gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
 
 // Section #manifesto — UNICA section, arquitetura Lando-fiel.
 //
@@ -23,7 +27,7 @@ gsap.registerPlugin(ScrollTrigger);
 //   - 0px gap entre reveal e proxima section (NAO ha tela preta)
 //
 // Aqui:
-//   <section id="manifesto" h-[200vh] bg-(--color-bg) relative>
+//   <section id="manifesto" h-[180dvh] bg-(--color-bg) relative>
 //     <div sticky top-0 h-screen overflow-hidden>
 //       <ManifestoBackdrop /> + <bg name> + <atmosphere>
 //       <inner manifesto REAL — encolhe scale 1 → 0.4>
@@ -31,16 +35,38 @@ gsap.registerPlugin(ScrollTrigger);
 //           <ManifestoBody />
 //         </frame>
 //       </inner>
-//       <signature SVG lime overtop com clip-path reveal>
+//       <signature SVG lime overtop — escrita pelo scroll, ductus real>
 //     </div>
 //   </section>
 //
-// Sticky range = section.height - viewport.height = 200vh - 100vh = 100vh
-// de scroll travado durante o reveal. Apos esse range, sticky desprende
-// NATURALMENTE, inner translata up junto com outer, ContactSection emerge
-// pelo bottom no doc flow. ZERO teletransporte, ZERO buraco.
+// Sticky range = section.height - viewport.height. Apos esse range, sticky
+// desprende NATURALMENTE, inner translata up junto com outer, ContactSection
+// emerge pelo bottom no doc flow. ZERO teletransporte, ZERO buraco.
+//
+// F7/F8 (2026-09-04/05) — a assinatura é guiada pelo SCROLL (scrub), como em
+// maio, mas sobre o ductus real: 30 trechos gerados do esqueleto do fill
+// (signature-stefan-svg.tsx), cada traço com a própria curva, e a ponta da
+// caneta (data-sig-pen) correndo na frente do traço. O F7 tinha trocado o
+// scrub por tempo (2 s) e o Stefan reprovou: a assinatura esperava o scroll
+// parar pra começar. Agora quem rola vê a caneta andar. O halo de
+// drop-shadow que rasterizava o SVG numa bitmap borrada continua fora.
 
 const FINAL_SCALE = 0.4;
+
+// Janela da assinatura no range do sticky: começa a 30% (o cartão já quase
+// no tamanho final) e fecha a 85%; o resto do range é hold com a assinatura
+// completa, até o sticky soltar.
+const SIGN_START = 0.3;
+
+// Ritmo por traço, em fração do range (as janelas se encostam: pausas curtas
+// = a caneta levantando). Curva por traço por cima dos trechos lineares.
+const STROKE_TIMING: Record<string, { at: number; duration: number; ease: string }> = {
+  s: { at: 0.3, duration: 0.2, ease: 'power1.inOut' },
+  tefan: { at: 0.52, duration: 0.24, ease: 'power1.out' },
+  tbar: { at: 0.78, duration: 0.035, ease: 'power2.out' },
+};
+const DOT_AT = 0.825;
+const SIGN_END = 0.85;
 
 interface ManifestoSectionProps {
   className?: string;
@@ -66,7 +92,10 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
         y: 8,
         filter: 'blur(8px)',
         duration: 0.6,
-        stagger: 0.035,
+        // F5/R7 (2026-09-02): `amount` distribui os 500ms pelo total de
+        // palavras (≈7.5ms/palavra): o parágrafo inteiro está legível em ~1.1s
+        // (Heer & Robertson 2007; Brysbaert 2019: 252ms/palavra).
+        stagger: { amount: 0.5 },
         ease: 'expo.out',
         scrollTrigger: { trigger: innerRef.current, start: 'top 70%', once: true },
       });
@@ -77,7 +106,7 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
     { dependencies: [reduced] }
   );
 
-  // Timeline scrubbed que anima durante o range do sticky.
+  // Timeline scrubbed do palco + assinatura no tempo.
   useGSAP(
     () => {
       const section = sectionRef.current;
@@ -89,20 +118,25 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       if (!section || !inner || !frame || !name || !atmosphere || !sig) return;
       if (reduced === null) return;
 
-      // F3.1 (2026-06-11): elementos do trim-path da assinatura — 3 strokes
-      // de máscara seguindo o ductus (S → "tefan" → flourish) + rect de
-      // segurança do estado final. Ver signature-stefan-svg.tsx.
-      const sigSegs = sig.querySelectorAll<SVGPathElement>('[data-sig-seg]');
-      const sigMaskFill = sig.querySelector<SVGRectElement>('[data-sig-mask-fill]');
+      // Elementos da assinatura (signature-stefan-svg.tsx): traços em ordem
+      // de escrita, cada um com seus trechos; o ponto; o rect de segurança; a
+      // ponta da caneta.
+      const strokes = Array.from(sig.querySelectorAll<SVGGElement>('[data-sig-stroke]'));
+      const pieces = Array.from(sig.querySelectorAll<SVGPathElement>('[data-sig-piece]'));
+      const dot = sig.querySelector<SVGCircleElement>('[data-sig-dot]');
+      const maskFill = sig.querySelector<SVGRectElement>('[data-sig-mask-fill]');
+      const pen = sig.querySelector<SVGCircleElement>('[data-sig-pen]');
 
       if (reduced) {
         gsap.set(inner, { scale: FINAL_SCALE });
-        // W-perf (2026-05-25): frame agora é overlay opacity em vez de
-        // animar backgroundColor/borderColor (não composited, força paint).
         gsap.set(frame, { opacity: 1 });
         gsap.set(name, { opacity: 0.08, scale: 1 });
         gsap.set(atmosphere, { opacity: 1 });
-        // Markup default já é assinatura completa (dashoffset 0 + rect on).
+        // Markup default já é a assinatura completa; explícito de qualquer forma.
+        gsap.set(pieces, { drawSVG: '100%' });
+        if (dot) gsap.set(dot, { opacity: 1 });
+        if (maskFill) gsap.set(maskFill, { opacity: 1 });
+        if (pen) gsap.set(pen, { opacity: 0 });
         gsap.set(sig, { opacity: 1 });
         return;
       }
@@ -113,12 +147,12 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       gsap.set(name, { opacity: 0, scale: 1.2 });
       gsap.set(atmosphere, { opacity: 0 });
       gsap.set(sig, { opacity: 0 });
-      // attr plugin (não CSS): o CSSPlugin não interpola strokeDashoffset
-      // mid-tween (snap binário no fim — medido em _audit/f3-tween-test.html);
-      // animar o atributo interpola e evita inline-style sobre o markup.
-      gsap.set(sigSegs, { attr: { 'stroke-dashoffset': 1 } });
-      if (sigMaskFill) gsap.set(sigMaskFill, { opacity: 0 });
+      gsap.set(pieces, { drawSVG: '0%' });
+      if (dot) gsap.set(dot, { opacity: 0 });
+      if (maskFill) gsap.set(maskFill, { opacity: 0 });
+      if (pen) gsap.set(pen, { opacity: 0 });
 
+      // ---- Palco + assinatura, tudo scrubbed -----------------------------
       const tl = gsap.timeline();
 
       // ENTRY (0 → 0.5) — manifesto encolhe + bg layers emergem + sig fade-in.
@@ -129,48 +163,46 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
       tl.to(atmosphere, { opacity: 1, ease: 'power1.out', duration: 0.15 }, 0);
       tl.to(inner, { scale: FINAL_SCALE, ease: 'power2.out', duration: 0.5 }, 0);
       tl.to(frame, { opacity: 1, ease: 'power2.out', duration: 0.4 }, 0.05);
+      tl.to(sig, { opacity: 1, ease: 'power1.out', duration: 0.06 }, SIGN_START);
+      if (pen) tl.to(pen, { opacity: 1, duration: 0.03 }, SIGN_START);
 
-      // SIGNATURE drawn (0.3 → 0.87) — F3.1 (2026-06-11): trim-path REAL.
-      // Era clip-path linear (wipe esquerda→direita); agora 3 strokes de
-      // máscara seguem o ductus da escrita com easing por segmento
-      // (equivalente ao Trim Path do Rive que o Lando usa):
-      //   S        power1.inOut — a caneta acelera no meio da curva grande
-      //   "tefan"  power1.out   — letras correntes, desacelera no n
-      //   flourish power2.out   — a volta sob o nome é um golpe rápido e
-      //                           confiante (assinatura real: letras lentas,
-      //                           flourish snap)
-      // Overlap de 0.02 entre segmentos = continuidade de caneta no scrub.
-      tl.to(sig, { opacity: 1, ease: 'power1.out', duration: 0.06 }, 0.3);
-      if (sigSegs.length === 3) {
-        tl.to(
-          sigSegs[0] as SVGPathElement,
-          { attr: { 'stroke-dashoffset': 0 }, ease: 'power1.inOut', duration: 0.24 },
-          0.3
+      // Cada traço: sub-timeline linear (trecho dura o que mede) tweenada
+      // pelo progress com a curva do traço, na janela dele dentro do scrub.
+      for (const stroke of strokes) {
+        const timing = STROKE_TIMING[stroke.dataset.sigStroke ?? ''];
+        if (!timing) continue;
+        const strokePieces = Array.from(
+          stroke.querySelectorAll<SVGPathElement>('[data-sig-piece]')
         );
-        tl.to(
-          sigSegs[1] as SVGPathElement,
-          { attr: { 'stroke-dashoffset': 0 }, ease: 'power1.out', duration: 0.26 },
-          0.52
-        );
-        tl.to(
-          sigSegs[2] as SVGPathElement,
-          { attr: { 'stroke-dashoffset': 0 }, ease: 'power2.out', duration: 0.09 },
-          0.76
-        );
-        if (sigMaskFill) {
-          // Rede de segurança: fecha a máscara 100% no fim (antialiasing das
-          // pontas dos strokes não deixa resíduo no estado final).
-          tl.to(sigMaskFill, { opacity: 1, duration: 0.02 }, 0.85);
+        const total = strokePieces.reduce((sum, p) => sum + Number(p.dataset.sigLen ?? '0'), 0);
+        if (strokePieces.length === 0 || total <= 0) continue;
+        const sub = gsap.timeline({ paused: true });
+        for (const piece of strokePieces) {
+          const share = Number(piece.dataset.sigLen ?? '0') / total;
+          sub.to(piece, {
+            drawSVG: '100%',
+            duration: share,
+            ease: 'none',
+            onUpdate() {
+              if (!pen) return;
+              const len = piece.getTotalLength();
+              const point = piece.getPointAtLength(len * this.progress());
+              pen.setAttribute('cx', point.x.toFixed(1));
+              pen.setAttribute('cy', point.y.toFixed(1));
+            },
+          });
         }
-      } else {
-        // Fallback defensivo (máscara ausente): wipe antigo.
-        gsap.set(sig, { clipPath: 'inset(0 100% 0 0)' });
-        tl.to(sig, { clipPath: 'inset(0 0% 0 0)', ease: 'power2.inOut', duration: 0.55 }, 0.3);
+        tl.to(sub, { progress: 1, duration: timing.duration, ease: timing.ease }, timing.at);
       }
-
-      // HOLD signature visible (0.87 → 1.0) — sticky CSS libera naturalmente
-      // depois desse range, inner translata up junto com outer, ContactSection
-      // emerge pelo bottom. Sem cascading exit manual.
+      if (dot) tl.to(dot, { opacity: 1, duration: 0.015 }, DOT_AT);
+      if (pen) tl.to(pen, { opacity: 0, duration: 0.02 }, SIGN_END - 0.01);
+      if (maskFill) {
+        // Rede de segurança: fecha a máscara 100% no fim (antialiasing das
+        // pontas dos trechos não deixa resíduo no estado final).
+        tl.to(maskFill, { opacity: 1, duration: 0.01 }, SIGN_END);
+      }
+      // HOLD (0.86 → 1.0): assinatura completa até o sticky soltar.
+      tl.to({}, { duration: 1 - SIGN_END - 0.01 }, SIGN_END + 0.01);
 
       const trigger = ScrollTrigger.create({
         trigger: section,
@@ -209,6 +241,8 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
         // section.offsetHeight - innerHeight (GSAP scrub adapta automático).
         // W-mob (2026-05-25): dvh em vez de vh — iOS Safari URL bar dinâmica
         // criava jank ~80px de buffer + signature SVG descentrada.
+        // F8 (2026-09-05): de volta a 130/180dvh (25/05): o Contact não sobe
+        // mais por cima do palco, então a seção não precisa da folga.
         'h-[130dvh] md:h-[180dvh]',
         className
       )}
@@ -287,19 +321,18 @@ export function ManifestoSection({ className }: ManifestoSectionProps) {
           </div>
         </div>
 
-        {/* Signature SVG lime cursive overtop — z-30 com drop-shadow glow. */}
+        {/* Signature SVG lime cursive overtop — z-30. F7: sem drop-shadow
+            (o filter forçava o SVG a virar bitmap e borrava as bordas) e sem
+            will-change: vetor puro, rasterizado pelo browser na resolução da
+            tela a cada frame. */}
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-[30] flex items-center justify-center px-6"
         >
           <div
             ref={sigRef}
-            className="flex w-full max-w-3xl items-center justify-center will-change-transform"
-            style={{
-              color: 'var(--color-accent)',
-              filter:
-                'drop-shadow(0 0 28px color-mix(in oklch, var(--color-accent) 40%, transparent)) drop-shadow(0 0 10px color-mix(in oklch, var(--color-accent) 60%, transparent))',
-            }}
+            className="flex w-full max-w-3xl items-center justify-center"
+            style={{ color: 'var(--color-accent)' }}
           >
             <div className="flex w-full items-center justify-center [&>svg]:h-auto [&>svg]:max-h-[55vh] [&>svg]:w-full">
               <SignatureStefan />
