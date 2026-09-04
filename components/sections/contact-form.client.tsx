@@ -299,7 +299,12 @@ export function ContactForm() {
           aria-invalid={!!errors.prefere}
           aria-labelledby={errors.prefere ? `${formId}-prefere-error` : undefined}
           className={cn(
-            'inline-flex flex-wrap gap-2 rounded-pill p-1',
+            // F5 (2026-09-02): no mobile (390px, card p-6 → ~310px úteis) o
+            // `inline-flex flex-wrap` jogava "CAL.COM" pra uma segunda linha e o
+            // pill virava um blob de duas alturas (frame 20 do filme F5).
+            // Mobile = grid de 3 colunas iguais (cada pill cabe com px-3 +
+            // tracking-wider); sm+ volta ao inline-flex original.
+            'grid w-full grid-cols-3 gap-1.5 rounded-pill p-1 sm:inline-flex sm:w-auto sm:gap-2',
             'border border-(--color-hairline) bg-(--color-surface)/40 shadow-(--shadow-inset-bisel)'
           )}
         >
@@ -322,8 +327,8 @@ export function ContactForm() {
                 <span
                   className={cn(
                     'inline-flex cursor-pointer items-center justify-center gap-2',
-                    'rounded-pill px-4 py-2 sm:px-5 sm:py-2.5',
-                    'font-mono text-xs uppercase tracking-widest',
+                    'rounded-pill px-3 py-2.5 sm:px-5',
+                    'font-mono text-xs uppercase tracking-wider sm:tracking-widest',
                     'border outline-none transition-all duration-(--motion-fast) ease-(--ease-standard)',
                     'peer-focus-visible:shadow-(--shadow-glow-lime-sm)',
                     active

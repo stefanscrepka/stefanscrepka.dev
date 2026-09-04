@@ -1,10 +1,16 @@
-// Decorative SH monogram backdrop atrás do Contact.
-// V3 (2026-05-24): usa <SHMonogram /> canonical (filled) com opacity 0.08 em vez
-// de versão outline custom anterior. Coerência total com mark em top-bar/footer.
-// aria-hidden, zero JS, CSS-only.
-
-import { SHMonogram } from '@/components/shared/sh-monogram';
 import { cn } from '@/lib/utils';
+
+// Decorativo atrás do Contact — F6 (2026-09-04): só a hairline vertical.
+//
+// O que saiu, e por quê:
+//   • O blob radial lime (60vh × 55vw, blur-3xl, "light leak") — a maior
+//     mancha de fumaça verde da parte de baixo da página; brand book v1 §17
+//     veta glow, §11 fixa lime em 2% da massa.
+//   • O carimbo SH em outline sangrando 30% pelo canto — em qualquer frame lia
+//     como polígonos soltos, e o brand book veta cortar/rotacionar a marca
+//     ("Do not stretch, rotate or rebuild the mark"). A marca inteira já vive
+//     na nav e no rodapé, nos tamanhos que o brand book prevê.
+// aria-hidden, zero JS, CSS-only.
 
 interface ContactMonogramBackdropProps {
   className?: string;
@@ -17,32 +23,8 @@ export function ContactMonogramBackdrop({ className }: ContactMonogramBackdropPr
       data-slot="contact-monogram-backdrop"
       className={cn('pointer-events-none absolute inset-0 -z-10 overflow-hidden', className)}
     >
-      {/* Gradient light leak top-right — sutil, faz a página "exalar" no fim */}
-      <div
-        className="absolute -top-32 right-[-10vw] h-[60vh] w-[55vw] rounded-full blur-3xl opacity-25"
-        style={{
-          background:
-            'radial-gradient(circle at center, var(--color-accent-glow) 0%, transparent 70%)',
-        }}
-      />
-
-      {/* Monograma SH gigante filled lime — ancora bottom-right.
-          Opacity 0.08 dá feel de marca-d'água sem competir com form.
-          Style.width/height sobrescreve width attribute pra escalar de mobile (280px)
-          até desktop (640px) via clamp. */}
-      <SHMonogram
-        size={1024}
-        className="absolute -right-12 -bottom-16 sm:-right-16 sm:-bottom-24"
-        style={{
-          width: 'clamp(280px, 50vw, 640px)',
-          height: 'clamp(280px, 50vw, 640px)',
-          color: 'var(--color-accent)',
-          opacity: 0.08,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Scanline ultra-sutil left edge — sinaliza "interior técnico" no close */}
+      {/* Hairline vertical na borda esquerda — sinaliza "interior técnico" no
+          close; um único traço, a meia força, esvaindo nas pontas. */}
       <div
         className="absolute left-0 top-0 h-full w-px"
         style={{

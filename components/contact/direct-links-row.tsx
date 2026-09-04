@@ -1,6 +1,7 @@
 'use client';
 
 import { SiGithub, SiWhatsapp } from '@icons-pack/react-simple-icons';
+import { useEffect, useState } from 'react';
 import { useCalModal } from '@/lib/contact/cal-modal-context';
 import { cn } from '@/lib/utils';
 
@@ -63,6 +64,42 @@ const LINKS: DirectLinkItem[] = [
   },
 ];
 
+// F8 (2026-09-05): o e-mail também se copia (acervo: 21st/copy-button). O
+// botão fica fora do <a> (botão dentro de link é HTML inválido) e volta ao
+// rótulo em 1,6 s. Sem clipboard (http, permissão) o botão nem aparece.
+function CopyEmailButton({ email }: { email: string }) {
+  const [state, setState] = useState<'idle' | 'copied' | 'unavailable'>('idle');
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.clipboard) setState('unavailable');
+  }, []);
+  if (state === 'unavailable') return null;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(email);
+      setState('copied');
+      window.setTimeout(() => setState('idle'), 1600);
+    } catch {
+      setState('unavailable');
+    }
+  };
+  return (
+    <button
+      type="button"
+      onClick={copy}
+      aria-live="polite"
+      className={cn(
+        'absolute right-3 top-3 rounded-md border border-(--color-hairline-strong) px-2 py-1',
+        'font-mono text-[10px] uppercase tracking-wider text-(--color-text-3)',
+        'transition-colors duration-(--motion-fast) hover:border-(--color-accent) hover:text-(--color-accent)',
+        'focus-visible:border-(--color-accent) focus-visible:text-(--color-accent) focus-visible:outline-none',
+        state === 'copied' && 'border-(--color-accent) text-(--color-accent)'
+      )}
+    >
+      {state === 'copied' ? 'copiado ✓' : 'copiar'}
+    </button>
+  );
+}
+
 export function DirectLinksRow() {
   const { open: calOpen, openModal } = useCalModal();
 
@@ -72,14 +109,15 @@ export function DirectLinksRow() {
           Hover lift -2px + border lime + icon vira lime. */}
       <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {LINKS.map((item) => (
-          <li key={item.label}>
+          <li key={item.label} className="relative">
+            {item.href.startsWith('mailto:') ? <CopyEmailButton email={item.detail} /> : null}
             <a
               href={item.href}
               target={item.external ? '_blank' : undefined}
               rel={item.external ? 'noreferrer' : undefined}
               className={cn(
                 'group/link flex h-full flex-col gap-3 rounded-xl px-4 py-4 sm:px-5 sm:py-5',
-                'border border-(--color-hairline) glass-panel',
+                'border border-(--color-hairline) bg-(--color-surface)',
                 'shadow-(--shadow-inset-bisel)',
                 'outline-none transition-[border-color,background-color,transform,box-shadow]',
                 'duration-(--motion-fast) ease-(--ease-standard)',
@@ -133,7 +171,10 @@ export function DirectLinksRow() {
           onClick={openModal}
           className={cn(
             'group/cal inline-flex shrink-0 items-center justify-center gap-2 rounded-pill',
-            'border border-(--color-accent) bg-transparent px-6 py-3',
+            // F5: fundo opaco (= fundo da seção, invisível em repouso) pra
+            // ocultar o carimbo SH que sangra atrás do botão — ver
+            // contact-monogram-backdrop.tsx.
+            'border border-(--color-accent) bg-(--color-bg) px-6 py-3',
             'font-mono text-sm font-semibold text-(--color-accent)',
             'outline-none transition-[background-color,box-shadow,transform]',
             'duration-(--motion-fast) ease-(--ease-standard)',

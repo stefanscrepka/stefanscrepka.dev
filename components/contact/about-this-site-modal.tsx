@@ -6,114 +6,138 @@ import { cn } from '@/lib/utils';
 
 // "Sobre este site" — modal honest credits.
 // HANDOFF §38: Motion Narrative Map (1 linha por seção justificando motion).
-// HANDOFF §59-61: Reeded Glass attribution (template Spline community → r3f custom).
+//
+// F5 (2026-09-02): conteúdo reescrito pra bater com o site que EXISTE. O texto
+// anterior descrevia um hero r3f com placas de vidro, um sublinhado desenhado,
+// um "code marquee", uma seção "What I Build", um scroll horizontal pinned no
+// case do Content Engine, Shiki e postprocessing no stack — nada disso está
+// mais no código (removidos entre 2026-05 e 2026-06). Num modal que se chama
+// "créditos honestos", cada linha abaixo aponta pra algo que dá pra abrir o
+// DevTools e conferir. Números vêm de medição (ROADMAP.md, Fase 3/4), não de
+// meta.
 //
 // Trigger: hash #about-this-site no URL abre automaticamente.
 // Fecha: ESC, X, clique fora, ou alterar hash.
 
 const STACK_CREDITS = [
-  { label: 'Framework', value: 'Next.js 16 · React 19 · TypeScript strict' },
+  { label: 'Framework', value: 'Next.js 16 (App Router, RSC) · React 19 · TypeScript strict' },
   {
     label: 'Styling',
-    value: 'Tailwind v4 (OKLCH tokens) · Geist + Geist Mono · PP Editorial New italic',
+    value:
+      'Tailwind v4 com tokens OKLCH · Geist + Geist Mono · PP Editorial New italic (uma palavra)',
   },
-  { label: 'Motion', value: 'Motion 12 · GSAP 3.15 · Lenis smooth scroll' },
-  { label: '3D', value: 'react-three-fiber + drei + postprocessing · Three.js 184' },
-  { label: 'Code highlight', value: 'Shiki SSR (zero runtime)' },
-  { label: 'Forms', value: 'react-hook-form · Zod · Server Actions' },
+  {
+    label: 'Motion',
+    value:
+      'Motion 12 · GSAP 3.15 + ScrollTrigger · Lenis 1.3 (só desktop; desligado em touch e em prefers-reduced-motion)',
+  },
+  {
+    label: '3D',
+    value:
+      'react-three-fiber 9 + drei · Three.js 0.184, só no /playground e no visualizador 3D do Other Work, carregados sob demanda',
+  },
+  { label: 'Forms', value: 'react-hook-form · Zod 4 · Server Actions' },
   { label: 'Email', value: 'Resend · React Email' },
   {
-    label: 'Embed',
-    value: '@calcom/embed-react · honeypot anti-spam + Vercel platform protection',
+    label: 'Embed / anti-spam',
+    value: '@calcom/embed-react (modal, nunca link externo) · honeypot · Vercel BotID',
   },
   {
-    label: 'A11y / perf',
-    value: 'Lighthouse CI · Playwright · prefers-reduced-motion fallback em todas as 12 seções',
+    label: 'Qualidade',
+    value: 'Biome · Vitest · Playwright · Lighthouse CI · sondas próprias de contraste e ritmo',
   },
   {
-    label: 'Deploy',
-    value: 'Vercel gru1 + Coolify VPS (Content Engine 24/7) · Sentry · Vercel Analytics',
+    label: 'Deploy / observabilidade',
+    value: 'Vercel · Sentry · Vercel Analytics + Speed Insights',
   },
 ];
 
 const MOTION_NARRATIVE = [
   {
-    section: 'Hero r3f',
-    why: 'Três placas glass = três produtos em produção. Idle drift sutil mantém vida sem competir com texto.',
+    section: 'Hero · headline',
+    why: 'Cada palavra é um <span> renderizado no servidor; a entrada é CSS puro (600ms, stagger 45ms) e roda do primeiro paint, antes de qualquer JS. Não existe estado "aparece, some e volta".',
   },
   {
-    section: 'Italic underline',
-    why: 'PP Editorial italic existe pra UMA palavra: "multi-agente". Sublinhado lime desenhado anuncia que esse é o nó central.',
+    section: 'Hero · stats',
+    why: 'Contagem 0→N com duração em escala log: 19 e 2.059 chegam com a mesma velocidade percebida. Tabular-nums pra nada pular.',
   },
   {
-    section: 'Code marquee',
-    why: 'Loop infinito imita CI/CD passing — sensação de produto vivo, não slide deck.',
+    section: 'Hero · marquee',
+    why: 'Loop linear de 40s com os logos do stack; pausa no hover. Em reduced-motion fica parado.',
   },
   {
-    section: 'Stats count-up',
-    why: 'Tabular-nums + count-up dá peso. 22 agentes, 27 tabelas, 100+ testes — números reais.',
+    section: 'Hero · CTA magnético',
+    why: 'Só o botão primário atrai o cursor (±6px, raio de 80px). Um por página. Mais que isso vira truque.',
   },
   {
-    section: 'Featured Work reveal',
-    why: 'Stagger 120ms convida o olho a ler cada card antes de pular pro próximo.',
+    section: 'Featured Work',
+    why: 'O tile flagship entra 80ms antes dos dois half-tiles: o olho lê o Content Engine primeiro. Hover levanta 2px, a borda clareia um degrau, as marcas de corte da captura acendem em lime e a seta do "Ver case" avança. Sem scale, sem halo.',
   },
   {
-    section: 'What I Build hover',
-    why: 'Direction-aware lime overlay vem do quadrante onde o cursor entrou — micro-interação que recompensa exploração.',
+    section: 'Other Work · FlipCard',
+    why: 'Estética MD é o único bloco amber do site. Vira no hover (desktop) ou no toque (touch); em reduced-motion as faces trocam sem rotação.',
   },
   {
-    section: 'Other Work FlipCard',
-    why: 'Estética MD é único bloco amber do site. Flip card cria diferenciação física, não só cromática.',
+    section: 'Stack · perimeter trace',
+    why: 'Uma linha lime desenha o contorno da célula no hover: circuito ligando, referência à eletrotécnica. CSS puro (stroke-dashoffset), zero JS.',
   },
   {
-    section: 'Bento Skills perimeter trace',
-    why: 'Linha lime desenhando o contorno on hover sugere circuito ligando — referência à eletrotécnica.',
+    section: 'Jornada · tracing beam',
+    why: 'O gradiente lime segue o scroll e liga 2021 a 2026 numa linha só; cada marcador acende ao entrar na tela.',
   },
   {
-    section: 'Timeline tracing beam',
-    why: 'Beam scroll-driven liga 2021 a 2026 em uma única linha. Reforça narrativa contínua.',
+    section: 'Manifesto',
+    why: 'Sticky CSS no padrão do landonorris.com: o texto encolhe até virar um cartão e, quando o palco passa de 30%, a assinatura é escrita no tempo (2 s) na ordem real da caneta: S, "tefan", a barra do t, o ponto. A ponta da caneta corre na frente do traço. Reduced-motion: estado final, estático.',
   },
   {
-    section: 'Manifesto word-by-word',
-    why: 'Stagger 40ms force a leitura. Não é decorativo — é ritmo.',
+    section: 'Contato · sucesso',
+    why: 'Spring (stiffness 280) no "Recebido. Respondo em <12h.": a recompensa física de ter enviado.',
   },
   {
-    section: 'Contact success spring',
-    why: 'Overshoot tight stiffness 300 dá satisfação física no "Enviado". Recompensa a ação.',
+    section: 'Troca de rota',
+    why: 'View Transitions: 180ms de saída + 280ms de entrada com 8px de subida. Nav e footer ficam parados.',
   },
   {
-    section: 'Case studies (Content Engine)',
-    why: 'Scroll horizontal pinned = 7 squads atravessam a tela como pipeline real, não galeria.',
+    section: 'Rodapé',
+    why: 'Fica fixo atrás da página e é revelado quando o conteúdo termina de rolar (md+), o último beat. Padrão parallax footer do acervo; no mobile volta ao fluxo normal.',
   },
 ];
 
 // Pares [label_bold, texto_continuação] — evita dangerouslySetInnerHTML.
 const ATTRIBUTIONS: ReadonlyArray<readonly [string, string]> = [
   [
-    'Hero r3f scene',
-    ' inspirada no template "Reeded Liquid Glass Prism" (Spline community), reconstruída do zero em react-three-fiber sem usar o editor Spline.',
+    'Padrões Aceternity UI',
+    ' (TracingBeam, conceito de BentoGrid) reconstruídos sobre os tokens do site, nada instalado como dependência.',
   ],
+  ['FlipCard', ' segue o padrão do Animate UI (Other Work, Estética MD).'],
   [
-    'Aceternity UI primitives',
-    ' (FloatingDock, MacBookScroll, CompareSlider, TracingBeam, BentoGrid concept) — copy-paste shadcn-style, custom em lime.',
+    'Reveal do manifesto',
+    ' foi estudado no landonorris.com e replicado com CSS sticky + timeline GSAP scrubbed (não pin).',
   ],
-  ['Animate UI FlipCard', ' (Other Work — Estética MD card).'],
   [
     'Fontes',
-    ': Geist + Geist Mono (Vercel, open source) · PP Editorial New italic (Pangram Pangram, licença comercial).',
+    ': Geist + Geist Mono (Vercel, open source) · PP Editorial New italic (Pangram Pangram, licença free for personal use).',
   ],
-  ['Anti-slop validator regex pt-BR', ' é código real do Content Engine — não placeholder.'],
   [
-    'Screenshots',
-    ' dos produtos são raw PNG (sem retoque de modelo gen-image). Chrome de mockup via CSS perspective.',
+    'Capturas',
+    ' são todas do produto real, sem retoque, com a procedência na barra de cada moldura: Estética MD em produção; Content Engine Studio, Caluna e STARK rodando em ambiente local (runtime em modo scripted e o seed de cada projeto: o fluxo é o de produção, o conteúdo é de fixture). Nenhuma capa é diagrama ou mockup.',
+  ],
+  [
+    'Trechos de código',
+    ' (regex do anti-slop, papéis dos agentes, comandos do bot, o agregador de OEE do STARK, o repositório do Caronas, o Fibonacci em C) são cópias literais dos arquivos citados na barra de cada bloco.',
+  ],
+  ['Anti-slop validator regex pt-BR', ' é código real do Content Engine, não placeholder.'],
+  [
+    'Vídeo de fundo do hero',
+    ' é um loop gerado (Google Veo) e tratado em ffmpeg. É atmosfera, não evidência de produto.',
   ],
 ];
 
-const PERF_BUDGET = [
-  'LCP < 2.2s mobile · INP < 180ms · CLS < 0.08',
-  'Bundle JS initial < 165KB gzipped',
-  'r3f stack (~245KB) carregado lazy via dynamic({ ssr:false }) — só bate em /playground ou hero com motion ativo',
-  'Reduced-motion: r3f vira poster SVG, marquees pausam, scroll-pinned vira vertical',
+const MEASURED = [
+  'Lighthouse CI em build de produção (5 rotas): performance 0.98–0.99 · acessibilidade 1.00 · SEO 1.00 · CLS 0',
+  'LCP da home é o próprio título (texto), não uma imagem: ~0,35s em build local; em campo depende da rede',
+  'Three.js (~245 KB) só é baixado em /playground e quando o visualizador 3D do Other Work entra na tela',
+  'Toda animação tem paridade em prefers-reduced-motion: headline e manifesto no estado final, marquee parado, contagens instantâneas',
 ];
 
 export function AboutThisSiteModal() {
@@ -148,7 +172,7 @@ export function AboutThisSiteModal() {
         <div className="flex flex-col gap-2 border-b border-(--color-hairline) px-6 pt-6 pb-4">
           <DialogTitle>Sobre este site</DialogTitle>
           <DialogDescription>
-            Créditos honestos · Motion Narrative Map · stack confirmado · performance budget.
+            Créditos honestos · o porquê de cada animação · stack confirmado · o que foi medido.
           </DialogDescription>
         </div>
 
@@ -167,7 +191,7 @@ export function AboutThisSiteModal() {
               </ul>
             </CreditSection>
 
-            <CreditSection title="MOTION NARRATIVE MAP">
+            <CreditSection title="POR QUE CADA ANIMAÇÃO EXISTE">
               <p className="mb-3 text-xs leading-relaxed text-(--color-text-3)">
                 Cada animação tem razão física ou emocional. Não é decorativa.
               </p>
@@ -196,9 +220,9 @@ export function AboutThisSiteModal() {
               </ul>
             </CreditSection>
 
-            <CreditSection title="PERFORMANCE BUDGET">
+            <CreditSection title="MEDIDO, NÃO PROMETIDO">
               <ul className="flex flex-col gap-1.5 font-mono text-xs leading-relaxed text-(--color-text-2)">
-                {PERF_BUDGET.map((row) => (
+                {MEASURED.map((row) => (
                   <li key={row}>· {row}</li>
                 ))}
               </ul>

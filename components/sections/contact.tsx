@@ -14,8 +14,9 @@ import { ContactFormLazyMount } from './contact-form-lazy.client';
 //   4. Direct links: 4 cards minimal (WhatsApp / Email / LinkedIn / GitHub) em row.
 //   5. Cal.com modal trigger ghost abaixo (HANDOFF §97: nunca link externo, sempre embedded).
 //
-// Decorativo: monograma SH gigante lime outline opacity 0.1 ancorado bottom-right,
-// scanline left edge ultra-sutil. Reforça identidade sem competir com form.
+// Decorativo (F6): só a hairline vertical na borda esquerda. O blob radial
+// lime (60vh × 55vw em blur-3xl) e o carimbo SH cortado pelo canto saíram —
+// o brand book veta glow e veta cortar/rotacionar a marca (v1 §17).
 
 export function ContactSection() {
   return (
@@ -23,6 +24,10 @@ export function ContactSection() {
       id="contato"
       className={cn(
         'relative isolate overflow-hidden',
+        // F8 (2026-09-05): fluxo normal de novo, como em 25/05. A margem
+        // negativa do F5 (18/24dvh) fazia o Contact subir por cima do palco do
+        // manifesto antes da assinatura terminar; o Stefan preferiu a versão
+        // em que cada seção fica no seu lugar.
         'container-max section-pad-y-lg border-t border-(--color-hairline)'
       )}
       data-slot="contact"
@@ -34,8 +39,8 @@ export function ContactSection() {
             Avatar autoral (foto Stefan apoiado em GTR em garagem underground) +
             headline editorial. Vibe midu mas com atitude gritty propria. */}
         <header className="flex flex-col gap-8 sm:gap-10 lg:flex-row lg:items-start lg:gap-12">
-          {/* Avatar editorial — vertical portrait 3:4 com hairline + glow lime
-              sutil no hover. Tilt -2deg adiciona personalidade (anti-perfeicao
+          {/* Avatar editorial — vertical portrait 3:4 com hairline (F6: o halo
+              lime de 32px saiu — retrato não é botão). Tilt -2deg adiciona personalidade (anti-perfeicao
               deliberada, princ. 10 estetica master). */}
           <div className="shrink-0">
             <div
@@ -49,14 +54,14 @@ export function ContactSection() {
               )}
               style={{
                 transform: 'rotate(-2deg)',
-                boxShadow: 'var(--shadow-cinema), 0 0 32px var(--color-accent-glow)',
+                boxShadow: 'var(--shadow-cinema)',
               }}
             >
               {/* W0.4 (2026-05-23): avatar PNG 3.07 MB → AVIF 384×512 15 KB
                   (-99.5%). next/image continua negociando densidade via sizes. */}
               <Image
                 src="/avatar-stefan.avif"
-                alt="Stefan Heinz Screpka — retrato autoral"
+                alt="Stefan Heinz Screpka, retrato autoral"
                 fill
                 sizes="(min-width: 1024px) 192px, (min-width: 640px) 160px, 128px"
                 className="object-cover"
@@ -89,7 +94,7 @@ export function ContactSection() {
               </span>
               <span className="tabular-nums">12</span>
               <span aria-hidden="true" className="mx-2.5 text-(--color-hairline-strong)">
-                —
+                ·
               </span>
               <span>próximo passo</span>
             </p>
@@ -110,7 +115,7 @@ export function ContactSection() {
             </h2>
             <p className="max-w-prose text-reading text-(--color-text-2)">
               Form chega direto no meu email. Confirmação automática. Se prefere síncrono, WhatsApp
-              ou Cal.com 15min embedded — sem ida-e-volta pra marcar horário.
+              ou Cal.com 15min embedded, sem ida e volta pra marcar horário.
             </p>
           </div>
         </header>
@@ -120,7 +125,7 @@ export function ContactSection() {
         <div
           className={cn(
             'mx-auto w-full max-w-3xl',
-            'rounded-3xl border border-(--color-hairline) glass-panel',
+            'rounded-3xl border border-(--color-hairline) bg-(--color-surface)',
             'shadow-(--shadow-inset-bisel)',
             'p-6 sm:p-10 lg:p-12'
           )}
