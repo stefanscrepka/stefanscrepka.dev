@@ -12,7 +12,11 @@
   --color-surface-deep: oklch(10% 0.005 130);
   --color-surface: oklch(18% 0.008 130);
   --color-surface-elevated: oklch(22% 0.010 130);
-  --color-surface-overlay: oklch(26% 0.012 130);
+  /* F5/R7 (2026-09-02): 26% → 24% L. text-3 (63%) sobre overlay 26% media
+     4.46:1 — falha WCAG 1.4.3 AA por um fio, e overlay é justamente onde
+     vive microcopy (dialog "About this site", Cal.com, dropdowns). A 24%
+     fica 4.73:1 (OKLCH→sRGB 8-bit→luminância relativa). */
+  --color-surface-overlay: oklch(24% 0.012 130);
 
   /* === Accent — Lime A === */
   --color-accent: oklch(94% 0.22 124);
@@ -56,6 +60,11 @@
   --color-hairline-strong: oklch(30% 0.010 130);
   --color-hairline-alpha: oklch(98% 0.005 130 / 0.06);
   --color-hairline-alpha-strong: oklch(98% 0.005 130 / 0.10);
+  /* F6 (2026-09-04): escada de hairlines (R4 §1.15 — deck.co .06/.08/.10/.12/.15,
+     linear.app .05/.08/.12). Dois degraus a mais entre o alpha e o strong pra
+     enquadrar mídia (ArtifactFrame) sem borda "de card". */
+  --color-hairline-alpha-2: oklch(98% 0.005 130 / 0.08);
+  --color-hairline-alpha-3: oklch(98% 0.005 130 / 0.15);
   --color-border-focus: oklch(94% 0.22 124);
 
   /* === Semantic === */
@@ -178,9 +187,17 @@
   --shadow-inset-bisel:
     inset 0 0 0 1px oklch(98% 0.005 130 / 0.06),
     inset 0 1px 0 0 oklch(98% 0.005 130 / 0.04);
-  --shadow-glow-lime-sm: 0 0 16px var(--color-accent-emissive);
-  --shadow-glow-lime-md: 0 0 32px var(--color-accent-emissive);
-  --shadow-glow-amber-sm: 0 0 16px oklch(82% 0.18 75 / 0.4);
+  /* F6 (2026-09-04): o "glow" virou ANEL. Os três tokens eram blur de 16–32px em
+     lime a 40% — o halo que se acumulava em volta de mockups, cards, inputs e
+     botões e lia como fumaça (brand book v1 §17: "Do not add gradients, glow,
+     shadows or 3D effects"; R4 §1.15: na página escura a elevação é
+     propriedade de BORDA, não de blur). Os nomes ficam (20+ consumidores e o
+     /design-system os documenta); o desenho muda: um contorno nítido de 2–3px
+     a baixa opacidade — a mesma gramática do anel de foco, que é a única razão
+     legítima de um contorno lime existir. */
+  --shadow-glow-lime-sm: 0 0 0 2px oklch(94% 0.22 124 / 0.22);
+  --shadow-glow-lime-md: 0 0 0 3px oklch(94% 0.22 124 / 0.26);
+  --shadow-glow-amber-sm: 0 0 0 2px oklch(82% 0.18 75 / 0.28);
 
   /* === Easings === */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -209,9 +226,10 @@
   --motion-drift: 60s;
 
   /* === Custom animations (v4 namespace --animate-* → animate-* utilities).
-     Apenas grain-drift está em uso (grain-overlay.tsx). marquee/fade-up/shimmer
-     foram removidos por dead code — marquees usam GSAP (code-marquee-track,
-     partner-marquee), reveals usam Motion 12 useInView, shimmer não era consumido. === */
+     Apenas grain-drift está em uso (grain-overlay.tsx). fade-up/shimmer foram
+     removidos por dead code — reveals usam Motion 12 useInView, shimmer não era
+     consumido. F5 (2026-09-02): o marquee do hero voltou a ser CSS (keyframe
+     `marquee-x` no fim deste arquivo), tirando o GSAP do path eager do Hero. === */
   --animate-grain-drift: grain-drift var(--motion-drift) linear infinite;
 }
 
@@ -679,7 +697,12 @@ html[data-pre-hydration] .anim-pre-hidden {
    Aqui cada palavra é um <span> server-rendered com --word-i; a animação
    parte do PRIMEIRO paint (antes da hidratação), então não existe estado
    "visível antes de esconder". Espelha o tween anterior: 600ms,
-   stagger 55ms, y -0.18em, ease enter.
+   stagger 45ms, y -0.18em, ease enter.
+   F5/R7 (2026-09-02): 55 → 45ms. Regra: assentar o headline em ~1s
+   (Heer & Robertson 2007; Brysbaert 2019 = 252ms/palavra de leitura).
+   H1 de 12 palavras: 600 + 55×11 = 1205ms → 600 + 45×11 = 1095ms.
+   ≤90ms/palavra continua "ornamental"; a faixa 150–600ms/palavra é a
+   que atrapalha leitura (RSVP, Di Nocera 2018).
    opacity inicial 0.01 (não 0): Chrome registra o paint dos glifos no
    primeiro frame e o LCP permanece no FCP em vez de migrar pro fim do
    stagger — visualmente indistinguível de 0 sobre fundo escuro.
@@ -693,7 +716,7 @@ html[data-pre-hydration] .anim-pre-hidden {
 @media (prefers-reduced-motion: no-preference) {
   .headline-word {
     animation: headline-word-in 600ms var(--ease-enter) both;
-    animation-delay: calc(var(--word-i, 0) * 55ms);
+    animation-delay: calc(var(--word-i, 0) * 45ms);
   }
 }
 
@@ -723,6 +746,65 @@ html[data-pre-hydration] .anim-pre-hidden {
 }
 
 ::view-transition-new(.page-fade) {
+  animation: vt-page-in 280ms var(--ease-enter) both;
+}
+
+/* F5 (2026-09-02): reveal do Featured Work em CSS. O grupo nasce com
+   data-reveal="pending" (SSR) e o controlador troca pra "in" quando entra na
+   viewport; cada item entra com 600ms na curva dramática, 50ms + 80ms×índice
+   (mesmos números do island Motion que isto substitui — a suíte s10 mede o
+   hero liderando as metades). Reduced-motion: tudo visível, sem transição. */
+[data-slot='featured-work'] [data-reveal-item] {
+  transition:
+    opacity 600ms var(--ease-dramatic),
+    transform 600ms var(--ease-dramatic);
+  transition-delay: calc(50ms + var(--reveal-i, 0) * 80ms);
+}
+
+[data-slot='featured-work'] [data-reveal='pending'] [data-reveal-item] {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='featured-work'] [data-reveal-item] {
+    transition: none;
+  }
+
+  [data-slot='featured-work'] [data-reveal='pending'] [data-reveal-item] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* F5 (2026-09-02): morph do título tile → case. O <h3> do tile e o <h1> do
+   case compartilham `name="case-title-<slug>"` (React <ViewTransition
+   share="case-title-morph">); o grupo anima posição+tamanho enquanto o par
+   old/new faz crossfade. 420ms na curva padrão: mais longo que o fade da
+   página (180/280) porque é movimento que o olho acompanha (R7 regra 1:
+   ~1s pra transição espacial grande, aqui um deslocamento de meia tela). */
+::view-transition-group(.case-title-morph) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-standard);
+}
+
+::view-transition-old(.case-title-morph),
+::view-transition-new(.case-title-morph) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-standard);
+  /* snapshots com tamanhos diferentes: escala pelo grupo, sem distorcer */
+  height: 100%;
+  object-fit: contain;
+  object-position: left top;
+}
+
+/* Sem par (o React nomeou só um lado — ex.: o h2 de destino fora da viewport):
+   o snapshot solitário segue o fade da página em vez de animar 420ms sozinho. */
+::view-transition-old(.case-title-morph):only-child {
+  animation: vt-page-out 180ms var(--ease-exit) both;
+}
+
+::view-transition-new(.case-title-morph):only-child {
   animation: vt-page-in 280ms var(--ease-enter) both;
 }
 
@@ -795,16 +877,257 @@ html[data-pre-hydration] .anim-pre-hidden {
   opacity: 1;
 }
 
-/* Barras do StatusBar (INFRA cell) — antes era <style> inline por célula com
-   gate JS de reduced-motion; o kill global encerra a animação no frame "to"
-   (scaleY 1 ≈ estático em 80%, intenção original preservada). */
-@keyframes progress-pulse {
+
+/* ============================================================
+   F5 (2026-09-02): marquee do hero em CSS puro.
+   Antes: gsap.to(track, { x: '-50%', repeat: -1 }) importado dinamicamente
+   dentro do Hero (path eager) em toda visita — inclusive mobile, onde nada
+   mais usava GSAP. A track tem duas cópias idênticas; -50% fecha o loop.
+   Pausa: hover (CSS) e fora da viewport (`data-offscreen`, IO na ilha).
+   Reduced-motion: faixa estática.
+   ============================================================ */
+/* F8: o botão do hero pausa a marquee junto com o vídeo (WCAG 2.2.2). */
+[data-slot='partner-marquee'][data-paused] .marquee-track {
+  animation-play-state: paused;
+}
+
+/* F8: cursor de mira (target-cursor.client.tsx). Só existe com ponteiro fino
+   e sem reduced-motion; sobre campos de texto o cursor nativo volta. */
+html[data-cursor='custom'],
+html[data-cursor='custom'] a,
+html[data-cursor='custom'] button,
+html[data-cursor='custom'] [role='button'] {
+  cursor: none;
+}
+html[data-cursor='custom'] input,
+html[data-cursor='custom'] textarea,
+html[data-cursor='custom'] select,
+html[data-cursor='custom'] [contenteditable='true'] {
+  cursor: auto;
+}
+[data-slot='target-cursor'] {
+  position: fixed;
+  inset: 0 auto auto 0;
+  z-index: 70;
+  pointer-events: none;
+}
+[data-slot='target-cursor'] [data-cursor-dot] {
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-text-1);
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+[data-slot='target-cursor'] [data-cursor-corner] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--color-accent);
+  will-change: transform;
+}
+[data-slot='target-cursor'] [data-cursor-corner='tl'] {
+  border-right: 0;
+  border-bottom: 0;
+}
+[data-slot='target-cursor'] [data-cursor-corner='tr'] {
+  border-left: 0;
+  border-bottom: 0;
+}
+[data-slot='target-cursor'] [data-cursor-corner='bl'] {
+  border-right: 0;
+  border-top: 0;
+}
+[data-slot='target-cursor'] [data-cursor-corner='br'] {
+  border-left: 0;
+  border-top: 0;
+}
+
+@keyframes marquee-x {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+[data-slot='partner-marquee'] .marquee-track {
+  animation: marquee-x var(--motion-marquee) linear infinite;
+}
+
+[data-slot='partner-marquee']:hover .marquee-track,
+[data-slot='partner-marquee'][data-offscreen] .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot='partner-marquee'] .marquee-track {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   F5 (2026-09-02): TracingBeam — cometa lime compositor-only.
+   O gradiente é pintado uma vez numa janela de `--beam-window` px no topo de
+   um elemento com a altura do trilho; o scroll só translada esse elemento
+   (transform) até a janela chegar na base. Range da view-timeline =
+   `cover 100vh → cover 100%` (topo do trilho no topo do viewport → base do
+   trilho no topo) = o mesmo mapeamento do
+   useScroll({ offset: ['start start', 'end start'] }) anterior.
+   Browsers sem animation-timeline (Firefox) recebem `--beam-p` de um listener
+   passivo (tracing-beam.tsx) e usam a MESMA expressão de transform.
+   Reduced-motion: gradiente esticado no trilho inteiro, parado — o estado
+   "desenhado" que o componente sempre teve como fallback.
+   ============================================================ */
+[data-slot='tracing-beam'] {
+  --beam-window: clamp(20rem, 55vh, 40rem);
+}
+
+.beam-fill {
+  height: 100%;
+  background:
+    linear-gradient(
+        to bottom,
+        transparent 0%,
+        var(--color-accent) 40%,
+        var(--color-accent) 60%,
+        transparent 100%
+      )
+      0 0 / 100% var(--beam-window) no-repeat;
+  transform: translate3d(0, calc((100% - var(--beam-window)) * var(--beam-p, 0)), 0);
+  will-change: transform;
+}
+
+@keyframes beam-travel {
   from {
-    transform: scaleY(0.6);
-    opacity: 0.35;
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: scaleY(1);
-    opacity: 0.85;
+    transform: translate3d(0, calc(100% - var(--beam-window)), 0);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-slot='tracing-beam'] {
+      view-timeline-name: --beam;
+      view-timeline-axis: block;
+    }
+    .beam-fill {
+      animation: beam-travel linear both;
+      animation-timeline: --beam;
+      /* Medido no Chrome (probe-beam-range.mjs): pra um sujeito MAIS ALTO que
+         o viewport, `exit 0%` só dispara quando a base do trilho entra pela
+         base do viewport — o cometa ficava parado no primeiro terço da
+         seção. `cover` é inequívoco: 0% = topo do trilho na base do viewport;
+         +100vh = topo do trilho no topo do viewport (o início que queremos);
+         100% = base do trilho no topo do viewport. Mesmo mapeamento do
+         fallback JS (-top / height). */
+      animation-range: cover 100vh cover 100%;
+    }
+  }
+}
+
+/* Reset EXPLÍCITO: o kill global (animation-duration: 0.01ms) não é um
+   "stop" definido pra uma animação dirigida por progresso — poderia congelar
+   o cometa no keyframe `from`. Aqui o estado reduzido é declarado por inteiro. */
+@media (prefers-reduced-motion: reduce) {
+  .beam-fill {
+    animation: none !important;
+    animation-timeline: none !important;
+    transform: none;
+    background-size: 100% 100%;
+  }
+}
+
+/* ============================================================
+   F5 (2026-09-02): progresso de leitura na nav — 1px lime sobre o hairline
+   inferior do header, dirigido pelo scroll do documento (scroll(root)).
+   Estado base = scaleX(0): Firefox (sem animation-timeline) e reduced-motion
+   não veem nada, o que é um design legítimo (o elemento simplesmente não
+   existe), não um estado quebrado.
+   ============================================================ */
+[data-scroll-progress] {
+  transform: scaleX(0);
+}
+
+@keyframes grow-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-scroll-progress] {
+      animation: grow-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll-progress] {
+    animation: none !important;
+    animation-timeline: none !important;
+    transform: scaleX(0);
+  }
+}
+
+/* ============================================================
+   F5 (2026-09-02): corner-ticks — marcas de registro em dois cantos opostos
+   (TL + BR), 1px, 12px de perna. Enquadra mídia/diagramas sem encaixotar:
+   um segundo peso de moldura ao lado do hairline + raio dos cards (R4 §1.5).
+   Cor via --tick-color (default hairline-strong); consumidores acendem lime
+   no hover com `[--tick-color:var(--color-accent)]`. Cantos retos por
+   definição — não combinar com rounded-*.
+   ============================================================ */
+@utility corner-ticks {
+  --tick: 12px;
+  --tick-color: var(--color-hairline-strong);
+  position: relative;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: var(--tick);
+    height: var(--tick);
+    pointer-events: none;
+    border: 0 solid var(--tick-color);
+    transition: border-color var(--motion-fast) var(--ease-standard);
+  }
+  &::before {
+    top: 0;
+    left: 0;
+    border-top-width: 1px;
+    border-left-width: 1px;
+  }
+  &::after {
+    right: 0;
+    bottom: 0;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+  }
+}
+
+
+/* ============================================================
+   F5 (2026-09-02): Featured Work — os tiles vizinhos recuam quando um
+   está em hover/focus (`:has()`, zero JS, só opacity — compositor). O tile
+   ativo fica; os outros baixam pra 0.78 e voltam ao sair. Hierarquia real
+   sem borda neon (R1 §3 A3 / pick 3). Só com pointer fino: no touch o
+   hover é ficção.
+   ============================================================ */
+@media (hover: hover) and (pointer: fine) {
+  [data-slot='featured-work']:has(a[href^='/work/']:is(:hover, :focus-visible))
+    a[href^='/work/']:not(:hover, :focus-visible) {
+    opacity: 0.78;
   }
 }
