@@ -8,12 +8,12 @@ import { buildBreadcrumbJsonLd, buildCaseStudyJsonLd } from '@/lib/work/json-ld'
 const CS = getCaseStudy('estetica-md');
 
 export const metadata: Metadata = {
-  title: `${CS?.title ?? 'Estética MD'} — Case Study`,
+  title: `${CS?.title ?? 'Estética MD'} · case study`,
   description:
     'Site institucional + conversão pra Dra. Martina Dona. Clínicas premium de estética, odonto, med spa. Vanilla JS + PHP antes do React. Custom cursor, parallax trigonométrico, navbar inteligente, formulário CORS bilateral.',
   openGraph: {
     type: 'article',
-    title: `${CS?.title ?? 'Estética MD'} — Case Study · Stefan Heinz Screpka`,
+    title: `${CS?.title ?? 'Estética MD'} · case study · Stefan Heinz Screpka`,
     description:
       'Site institucional pra clínica premium. Vanilla JS + PHP + ScrollReveal + Typed.js. Prova de motion design antes do React. Primeiro produto em produção.',
     url: '/work/estetica-md',
@@ -49,14 +49,14 @@ export default function EsteticaMDPage() {
               o LCP — fica logo abaixo do hero textual curto. Next avisava
               "LCP lazy"; `eager` adianta o fetch (aqui a prop de fato vira
               loading="eager", PATH 1 com <img>, ≠ do diagrama do flagship). */}
-          <CaseStudyCover caseStudy={CS} aspectRatio="3/2" tilt="subtle" eager />
+          <CaseStudyCover caseStudy={CS} eager caption sizes="(min-width: 1024px) 58vw, 100vw" />
         </div>
         <div className="order-1 flex flex-col gap-6 lg:order-2">
           <p
             className="text-xl font-semibold leading-relaxed"
             style={{ color: 'var(--color-amber)' }}
           >
-            Feito pra clínicas premium — estética, odonto, med spa.
+            Feito pra clínicas premium: estética, odonto, med spa.
           </p>
           <ul className="flex flex-col gap-2.5 text-sm leading-relaxed text-(--color-text-2)">
             {CS.details.map((d) => (
@@ -86,7 +86,7 @@ export default function EsteticaMDPage() {
           style={{
             border: '1px solid var(--color-hairline-strong)',
             backgroundColor: 'var(--color-surface)',
-            boxShadow: 'var(--shadow-md), 0 0 32px oklch(82% 0.18 75 / 0.12)',
+            boxShadow: 'var(--shadow-md)',
           }}
         >
           <p

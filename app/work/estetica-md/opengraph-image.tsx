@@ -3,7 +3,7 @@ import { CASE_STUDIES } from '@/lib/work/data';
 
 const cs = CASE_STUDIES['estetica-md'];
 
-export const alt = `${cs.title} — case study`;
+export const alt = `${cs.title} · case study`;
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

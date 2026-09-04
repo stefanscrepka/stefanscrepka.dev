@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ViewTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { CaseStudy } from '@/lib/work/data';
@@ -7,7 +8,7 @@ import type { CaseStudy } from '@/lib/work/data';
 //
 // Premium decisions:
 //   • Back link mono sutil pro topo ("← Outros cases").
-//   • Eyebrow status com pulse dot ao lado (mono lime).
+//   • Eyebrow status com ponto estático ao lado (mono).
 //   • Título massivo tracking-tight -0.025em leading 1.05.
 //   • Tagline editorial maior, max-w-3xl (não confunde com description).
 //   • Description body text neutro, max-w-prose.
@@ -24,7 +25,7 @@ interface CaseStudyHeroProps {
 export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
   const isAmber = cs.accent === 'amber';
   const accentColor = isAmber ? 'var(--color-amber)' : 'var(--color-accent)';
-  const accentGlow = isAmber ? '0 0 24px oklch(82% 0.18 75 / 0.45)' : 'var(--shadow-glow-lime-sm)';
+  const accentGlow = isAmber ? 'var(--shadow-glow-amber-sm)' : 'var(--shadow-glow-lime-sm)';
 
   return (
     <header
@@ -74,19 +75,14 @@ export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
 
       {/* Eyebrow status — mono + pulse dot lime (ou amber) */}
       <div className="flex items-center gap-2.5">
+        {/* F6 (2026-09-04): o ping (animate-ping) saiu — um ponto pulsando é
+            o sinal universal de "ao vivo", e a página não lê estado nenhum.
+            Ponto estático: o status é texto, o ponto é só marcador. */}
         <span
           aria-hidden="true"
-          className="relative inline-flex h-2 w-2 items-center justify-center"
-        >
-          <span
-            className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-60"
-            style={{ backgroundColor: accentColor }}
-          />
-          <span
-            className="relative inline-flex h-2 w-2 rounded-full"
-            style={{ backgroundColor: accentColor, boxShadow: accentGlow }}
-          />
-        </span>
+          className="inline-flex h-2 w-2 shrink-0 rounded-full"
+          style={{ backgroundColor: accentColor }}
+        />
         <p
           className="font-mono text-2xs uppercase tracking-widest"
           style={{ color: 'var(--color-text-3)' }}
@@ -96,15 +92,24 @@ export function CaseStudyHero({ cs, className }: CaseStudyHeroProps) {
       </div>
 
       {/* Title massive — tracking tight + leading 1.05 cinema */}
-      <h1
-        className={cn(
-          'font-semibold text-(--color-text-1)',
-          'text-4xl sm:text-5xl lg:text-6xl xl:text-[5.25rem]',
-          '!tracking-tight !leading-[1.02]'
-        )}
+      {/* F5 (2026-09-02): par do título do tile (featured-work / /work) —
+          morph tile → case via View Transition (`case-title-morph`). */}
+      <ViewTransition
+        name={`case-title-${cs.slug}`}
+        share="case-title-morph"
+        enter="none"
+        exit="none"
       >
-        {cs.title}
-      </h1>
+        <h1
+          className={cn(
+            'font-semibold text-(--color-text-1)',
+            'text-4xl sm:text-5xl lg:text-6xl xl:text-[5.25rem]',
+            '!tracking-tight !leading-[1.02]'
+          )}
+        >
+          {cs.title}
+        </h1>
+      </ViewTransition>
 
       {/* Tagline editorial — larger, max-w-3xl */}
       <p

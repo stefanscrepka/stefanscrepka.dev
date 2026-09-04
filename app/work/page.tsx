@@ -1,17 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ViewTransition } from 'react';
 import { CaseStudyCover } from '@/components/work/case-study-cover';
 import { CASE_STUDIES, CASE_STUDY_SLUGS } from '@/lib/work/data';
 
 export const metadata: Metadata = {
   title: 'Work',
   description:
-    'Quatro produtos com escopo real. Content Engine multi-agente, NexaCore SaaS clínicas, STJ App PWA cockpit, Estética MD site institucional. Stack honest, escopo entregue.',
+    'Quatro produtos com escopo real. Content Engine multi-agente, Caluna, secretária de clínica no WhatsApp, STARK passagem de turno industrial, Estética MD site institucional. Stack honest, escopo entregue.',
 };
 
 // Index gallery dos 4 case studies + link pra cada page detalhe.
 // F3.3 (2026-06-11): página estática sem loading.tsx — conteúdo inteiro no
 // HTML (CLS 0). Transição de rota = page-fade da raiz (app/layout.tsx).
+// F6 (2026-09-04): STJ App → STARK; covers em ArtifactFrame; hover sem halo.
 export default function WorkIndexPage() {
   return (
     <section className="container-max pt-32 pb-24 sm:pt-36">
@@ -23,9 +25,9 @@ export default function WorkIndexPage() {
           Escopo real.
         </h1>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
-          Três SaaS em produção (Content Engine, NexaCore, STJ App) + Estética MD, primeiro produto
-          antes do React. Cada case documentado com stack honest, escopo entregue e o que aprendi no
-          processo.
+          Dois SaaS em produção (Content Engine, Caluna), um sistema industrial em piloto (STARK) e
+          o primeiro produto antes do React (Estética MD). Cada case documentado com capturas reais,
+          stack honest, escopo entregue e o que aprendi no processo.
         </p>
       </header>
 
@@ -36,15 +38,26 @@ export default function WorkIndexPage() {
             <li key={slug}>
               <Link
                 href={`/work/${slug}`}
-                className="group/work-card block h-full rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-6 shadow-(--shadow-inset-bisel) outline-none transition-[border-color,transform,box-shadow] duration-(--motion-fast) hover:-translate-y-1 hover:border-(--color-accent) hover:shadow-[var(--shadow-inset-bisel),var(--shadow-glow-lime-sm)] focus-visible:-translate-y-1 focus-visible:border-(--color-accent) focus-visible:shadow-[var(--shadow-inset-bisel),var(--shadow-glow-lime-sm)]"
+                className="group/work-card block h-full rounded-2xl border border-(--color-hairline) bg-(--color-surface) p-6 shadow-(--shadow-inset-bisel) outline-none [--tick-color:var(--color-hairline-strong)] transition-[border-color,transform] duration-(--motion-fast) hover:-translate-y-1 hover:border-(--color-hairline-alpha-3) hover:[--tick-color:var(--color-accent)] focus-visible:-translate-y-1 focus-visible:border-(--color-accent) focus-visible:[--tick-color:var(--color-accent)]"
               >
-                <CaseStudyCover caseStudy={cs} aspectRatio="16/10" className="mb-5" />
+                <CaseStudyCover
+                  caseStudy={cs}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="mb-5"
+                />
                 <p className="font-mono text-[11px] uppercase tracking-widest text-(--color-text-3)">
                   {cs.status}
                 </p>
-                <h2 className="mt-2 text-xl font-semibold !tracking-[-0.02em] !leading-[1.15] text-(--color-text-1)">
-                  {cs.title}
-                </h2>
+                <ViewTransition
+                  name={`case-title-${slug}`}
+                  share="case-title-morph"
+                  enter="none"
+                  exit="none"
+                >
+                  <h2 className="mt-2 text-xl font-semibold !tracking-[-0.02em] !leading-[1.15] text-(--color-text-1)">
+                    {cs.title}
+                  </h2>
+                </ViewTransition>
                 <p className="mt-3 text-sm leading-relaxed text-(--color-text-2)">{cs.shortLine}</p>
                 <p className="mt-4 inline-flex items-center gap-1.5 font-mono text-xs text-(--color-accent)">
                   Ver case study →

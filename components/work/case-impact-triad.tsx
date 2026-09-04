@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import type { CaseStudy } from '@/lib/work/data';
 
 // W3.2 (2026-05-23): Triad "Problema · Solução · Impacto" pras páginas
-// /work/[slug]. Renderiza ENTRE o CaseStudyHero e o ScrollPinnedHorizontal.
+// /work/[slug]. Renderiza logo abaixo do CaseStudyHero, antes do corpo do case.
 // Decisor não-técnico lê primeiro: 3 frases, 3 colunas, 3 lentes diferentes
 // do mesmo caso. Depois vem o detalhe técnico (squads, stack, post-mortem).
 //
