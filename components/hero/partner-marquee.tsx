@@ -67,10 +67,14 @@ export function PartnerMarquee({ className }: PartnerMarqueeProps) {
         className
       )}
       style={{
+        // F9 (2026-09-05): o esvanecimento da direita cobre o botão de pausa
+        // (36px a 16–24px da borda): no mobile 10% eram só 39px e o logo passava
+        // por baixo do botão. min(90%, 100% − 5.5rem) = 10% no desktop, 88px no
+        // mobile (o disco do botão é opaco; o resto some no esvanecimento).
         maskImage:
-          'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+          'linear-gradient(to right, transparent 0%, black 10%, black min(90%, calc(100% - 5.5rem)), transparent 100%)',
         WebkitMaskImage:
-          'linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)',
+          'linear-gradient(to right, transparent 0%, black 10%, black min(90%, calc(100% - 5.5rem)), transparent 100%)',
       }}
     >
       <div className="marquee-track flex w-max items-center gap-10 will-change-transform">

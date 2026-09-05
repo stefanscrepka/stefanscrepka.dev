@@ -1,11 +1,10 @@
 import dynamic from 'next/dynamic';
 import { FeaturedWorkSection } from '@/components/sections/featured-work';
 import { HeroSection } from '@/components/sections/hero';
-import { SocialProofLine } from '@/components/sections/social-proof-line';
 
 // Home — single-page scroll storytelling.
-// SocialProofLine entre Hero e FeaturedWork = ponte narrativa de 3 linhas que
-// sinaliza "três produtos em produção" antes do mergulho nos cases.
+// F9 (2026-09-05): a SocialProofLine saiu — o índice do hero já lista os
+// cinco trabalhos com verbo e estado; a linha repetia três deles 300px abaixo.
 //
 // W1.2 (2026-05-23): eager = fold-1 (Hero + SocialProof + FeaturedWork). Tudo
 // abaixo carrega via next/dynamic com ssr=true (preserva SEO/HTML estático) +
@@ -41,7 +40,6 @@ export default function HomePage() {
   return (
     <div data-slot="home-page">
       <HeroSection />
-      <SocialProofLine />
       <FeaturedWorkSection />
       <OtherWorkSection />
       <BentoSkillsSection />

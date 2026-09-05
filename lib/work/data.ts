@@ -149,7 +149,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     tagline:
       'A secretária de clínica de estética que vive no WhatsApp: atende, agenda, confirma, lembra e cobra.',
     description:
-      'SaaS multi-tenant pra clínicas de estética. A cliente escreve no WhatsApp da clínica e uma assistente com 11 ferramentas responde, marca, remarca, manda o PIX e confirma o pagamento. A dona entra na conversa só quando faz diferença. Até maio de 2026 o produto chamava NexaCore.',
+      'SaaS multi-tenant pra clínicas de estética. A cliente escreve no WhatsApp da clínica e uma assistente com 11 ferramentas responde, marca, remarca, manda o PIX e confirma o pagamento. A dona entra na conversa só quando faz diferença. Até junho de 2026 o produto se chamava NexaCore.',
     status: 'Em produção desde 2025 · rebatizado Caluna em jun/2026',
     stack: [
       'Next 14 App Router · React 18 · TypeScript',
@@ -170,7 +170,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     ],
     ctas: [
       { label: 'Ver as telas ↓', href: '#telas', variant: 'default' },
-      { label: 'Agendar call 15min →', href: '/#contato', variant: 'outline' },
+      { label: 'Agendar 15min →', href: '/#contato', variant: 'outline' },
     ],
     // F7: capturas do build atual rodando em ambiente local com o seed do
     // repo. O striveos.shop (domínio da versão NexaCore) estava fora do ar no
@@ -241,7 +241,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
       'Prisma 6 · PostgreSQL 17 · migrations versionadas',
       'Sessão própria (jose + bcryptjs) · papéis operador, supervisor, leitura e admin',
       'Recharts (painel e telão) · @react-pdf/renderer (PDF A4) · exceljs (XLSX e CSV)',
-      'Importador dos .xlsm legados · fórmulas fechadas contra 3 planilhas oficiais',
+      'Importador dos .xlsm legados · fórmulas fechadas contra três planilhas oficiais',
       'vitest · 153 testes de lógica pura · serviço do Windows on-premises',
     ],
     details: [
@@ -254,7 +254,7 @@ export const CASE_STUDIES: Record<CaseStudySlug, CaseStudy> = {
     ],
     ctas: [
       { label: 'Ver as telas ↓', href: '#telas', variant: 'default' },
-      { label: 'Agendar call 15min →', href: '/#contato', variant: 'outline' },
+      { label: 'Agendar 15min →', href: '/#contato', variant: 'outline' },
     ],
     cover: {
       src: '/work-screenshots/stark-telao.avif',
@@ -406,3 +406,83 @@ export const CONTENT_ENGINE_DAILY_CRON = [
   { at: '07:30', expr: '30 7 * * *', job: 'daily-editor', who: 'E-0' },
   { at: '09:00', expr: 'publish', job: 'publicação', who: 'você aprovou' },
 ] as const;
+
+/* ============================================================
+   Índice do hero (F9, 2026-09-05): o corpo de trabalho, numerado, na primeira
+   tela. Os quatro cases reusam a capa dos tiles; o quinto é o estúdio de
+   impressão 3D, que não tem página própria e aponta pro card do Other Work.
+   Ano e estado são os do case (status em cada CaseStudy) — nenhum aqui diz
+   mais do que a página diz.
+   ============================================================ */
+export interface HeroIndexItem {
+  /** Numeração do índice ("01"). */
+  n: string;
+  title: string;
+  /** O que a coisa faz, com verbo. */
+  line: string;
+  year: string;
+  /** Estado real, em uma ou duas palavras. */
+  status: string;
+  /** Rota do case, ou âncora (#id) de uma seção da home. */
+  href: string;
+  cover: Artifact;
+  /** Recorte da capa na moldura 16/10 do hero (default: topo, pra manter a barra da UI). */
+  coverPosition?: 'top' | 'center';
+}
+
+export const HERO_INDEX: readonly HeroIndexItem[] = [
+  {
+    n: '01',
+    title: 'Content Engine',
+    line: 'Agentes que escrevem e esperam sua aprovação.',
+    year: '2026',
+    status: 'operacional',
+    href: '/work/content-engine',
+    cover: CASE_STUDIES['content-engine'].cover,
+  },
+  {
+    n: '02',
+    title: 'Caluna',
+    line: 'Atende e agenda pelo WhatsApp da clínica.',
+    year: '2025',
+    status: 'em produção',
+    href: '/work/caluna',
+    cover: CASE_STUDIES.caluna.cover,
+  },
+  {
+    n: '03',
+    title: 'STARK',
+    line: 'A passagem de turno saiu do Excel pro telão.',
+    year: '2026',
+    status: 'piloto',
+    href: '/work/stark',
+    cover: CASE_STUDIES.stark.cover,
+  },
+  {
+    n: '04',
+    title: 'Estética MD',
+    line: 'Site de clínica que converte pelo WhatsApp.',
+    year: '2024',
+    status: 'no ar',
+    href: '/work/estetica-md',
+    cover: CASE_STUDIES['estetica-md'].cover,
+  },
+  {
+    n: '05',
+    title: 'SK3D',
+    line: 'Quadros e peças que eu modelo e imprimo.',
+    year: '2026',
+    status: 'peças físicas',
+    href: '#other-work',
+    cover: {
+      src: '/work-screenshots/levita-gremio-angulo.avif',
+      alt: 'Quadro LEVITA do Grêmio em ângulo: o escudo em relevo azul, branco e preto flutuando sobre a moldura preta impressa',
+      aspect: '4/3',
+      width: 1500,
+      height: 1125,
+      label: 'sk3d · quadro levita',
+      meta: 'render cycles · 2026',
+    },
+    coverPosition: 'center',
+  },
+];

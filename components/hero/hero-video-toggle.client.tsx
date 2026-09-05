@@ -95,7 +95,7 @@ export function HeroVideoToggle({ className }: { className?: string }) {
       data-slot="hero-video-toggle"
       className={cn(
         'inline-flex size-9 items-center justify-center rounded-full',
-        'border border-(--color-hairline-strong) bg-(--color-bg)/70 text-(--color-text-3)',
+        'border border-(--color-hairline-strong) bg-(--color-bg) text-(--color-text-3)',
         'outline-none transition-[color,border-color,background-color] duration-(--motion-fast) ease-(--ease-standard)',
         'hover:border-(--color-accent) hover:text-(--color-accent)',
         'focus-visible:border-(--color-accent) focus-visible:text-(--color-accent) focus-visible:shadow-(--shadow-glow-lime-sm)',

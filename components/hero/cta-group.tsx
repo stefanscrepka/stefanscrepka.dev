@@ -50,7 +50,7 @@ export function CTAGroup({ className }: CTAGroupProps) {
             }}
             asChild
           >
-            <a href="#work">Ver os 3 produtos →</a>
+            <a href="#work">Ver os produtos →</a>
           </Button>
         </MagneticCTA>
       </m.div>
