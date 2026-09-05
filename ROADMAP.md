@@ -758,12 +758,74 @@ Feedback do Stefan sobre a F7 e o que foi feito:
 4. **Cursor de mira**: se incomodar, é um componente só (`target-cursor.client.tsx`) montado no layout.
 5. **Fila do acervo** (ver `_audit/f8/research-acervo-*.md`): ⌘K, índice do Other Work com preview, painel Lighthouse no case. Diga quais quer.
 
+## FASE 9 — ✅ Implementado + validado (sessão 2026-09-05, madrugada) — hero como índice, cursor fora, card XL por método, pesquisa em quatro frentes
+
+Pedido do Stefan: "o hero parece algo focado em 1 produto só, e não no meu portfólio"; "esse card [IA AGENTIC] fica como se tudo girasse em torno a 1 projeto"; "não quero cursor personalizado, está todo bugado, torna tudo amador". E, no meio da sessão, sobre a primeira tentativa: "por que você tirou aquela iluminação incrível do manifesto? e ainda deixou a hero mais poluída".
+
+Método: memória + estudos do dono (Estudo-STARK: síntese, Apple, top design, ciência da leitura) + plano original (Plano-Portfolio) + as 27 referências de `Portfolio/Prints`; filme de scroll da build; **quatro pesquisas em paralelo (Opus)** com relatórios em `_audit/f9/research/`: R1 heros de portfólio (27 sites medidos), R2 bibliotecas/MCPs (12 fontes, 38 fontes baixadas), R3 fontes e motion (14 itálicas com licença conferida, 4 APIs), R4 auditoria adversarial do site. Loop: patch (`_audit/f9/patch-f9*.py`, `assert count==1`) → build → :3001 → captura + zoom + chroma + sondas de geometria → reavaliar.
+
+### O que mudou
+
+| Onde | Antes | Agora |
+|---|---|---|
+| **Hero** | eyebrow sem nome; linha de prova e trilho "o turno de hoje" só do Content Engine; stats row com 5 números do mesmo produto; eyebrow que embaralhava glifos | eyebrow **com o nome**; manchete intacta (5 linhas em xl, tamanho pela largura da coluna: `min(7.25rem, 7.4vw)`); uma linha curta sobre o conjunto; à direita o **índice**: cinco trabalhos numerados, ano e estado real, cada linha um link (`components/hero/work-index.tsx`, Server Component, zero JS). Stats row, `SocialProofLine` (repetia o índice 300px abaixo) e o decrypt do eyebrow saíram. Botão de pausa (WCAG 2.2.2) mora na faixa da marquee, absoluto |
+| **Hero (o que o Stefan reprovou no meio)** | 1ª tentativa desta fase: captura do item ativo em `ArtifactFrame`, relógio, uma descrição por linha | "mais poluído": tudo isso saiu no mesmo dia. O que ficou é o mínimo que prova pluralidade |
+| **Cursor de mira** | `TargetCursor` no layout + 55 linhas de CSS | removido (componente, montagem, CSS) |
+| **Bento XL "IA AGENTIC"** | organograma dos 19 agentes do Content Engine | **o mesmo loop, três produtos**: linhas = gatilho → agente ou regra → validação → aprovação humana (acesa) → registro; colunas = Content Engine, Caluna, STARK (no STARK: "regra, não modelo"). Cada célula com origem em `data.ts`. Mobile: um bloco por produto |
+| **Manifesto** | — | **intacto**. A neutralização da luz que eu tinha feito foi revertida por `git checkout` na hora do pedido; os dois arquivos são idênticos ao HEAD |
+| **Viewer 3D** | `useGLTF(src, false)` → o drei ainda instanciava o **MeshoptDecoder** (WASM) e a CSP logava `CompileError` em toda visita à home | `useGLTF(src, false, false)`; 0 pageerror no filme |
+| **Estética MD (Other Work)** | ~400px de vazio no fim do card em lg (capa 16/10 fixa ao lado de dois mini-cards); frase em âmbar não clicável | capa em modo fill (`aspect="auto"`), âmbar só no CTA (a regra do estudo STARK do próprio dono) |
+| **Timeline → Playground** | cauda do feixe com blur + halo de 24px e ~190px de zona morta | linha esvaindo, 40+64px, sem glow |
+| **Playground H2** | `lg:text-5xl` = o mesmo tamanho do H1 do hero | `text-3xl sm:text-4xl`, como as outras seções |
+| **Contato** | eyebrow "12 / 12 · próximo passo" (arquitetura de 12 seções de maio; a home tem 8) | "Próximo passo" |
+| **Rodapé** | carimbo de coordenada quebrava no meio da hora em 1440px | duas linhas de propósito |
+| **Sobre este site** | "Hero · stats" (não existe mais) e "assinatura escrita no tempo (2 s)" (o F8 devolveu ao scroll) | índice do hero; assinatura guiada pelo scroll com as janelas reais |
+| **CSS de fontes** | 7 `font-feature-settings` que não existem nos arquivos Geist (`tnum`, `zero`, `calt`, `lnum` na Mono; `calt` na Sans e na PP Editorial), medidos com fontTools (R3) | removidos; a Mono já é tabular e o zero já vem cortado |
+| **Copy e metadados** | description, nav, OG da home e do /work falavam em "três produtos" e "19 agentes aprovados no Telegram" | cinco trabalhos, capturas reais; OG do /work bate com a página ("Quatro produtos. Escopo real.") |
+| **Infra de componentes** | sem `components.json` (o MCP do shadcn não enxergava registry nenhum) | `components.json` com 6 registries grátis verificados (react-bits, componentry, kibo, watermelon, aceternity, magicui); MCP do Watermelon em `.mcp.json` |
+
+### Medido (build final, :3001)
+
+| Medida | F8 | F9 |
+|---|---|---|
+| Massa cromática do fold, desktop / mobile (`chroma.py`) | 2,27% / 4,30% | **1,89% / 4,12%** |
+| Altura do hero no mobile (390px) | 1.327px (1,6 telas) | **1.036px (1,23 telas)**; três linhas do índice dentro da dobra |
+| CTA primário dentro da dobra em 1920×1080 / 1440×900 / 1280×800 (`probe-hero.mjs`) | — | 853 / 808 / 750px (dobra 1080 / 900 / 800) ✓; marquee inteira (1920) ou inteira fora (1440/1280), nunca cortada |
+| Nomes de produto na dobra (R1 mediu 0 no F8; mediana dos portfólios: 5) | 0 | **5** |
+| `pageerror` na home (filme de scroll) | 1 (WASM/CSP) | **0** |
+| s10 · f4 · vitest · e2e | 14/14 · 6/6 · 4/4 · 25 passed | 14/14 · 6/6 · 4/4 · 25 passed (+2 falhas conhecidas do `product-screenshots.spec`) |
+| Lighthouse desktop (mediana 3×5 URLs) | perf 0,97 home / 0,99 · a11y 1,00 · SEO 1,00 · CLS 0 | perf **0,96** home (LCP virou o poster do vídeo, 1,35 s; o H1 pinta a 334 ms) / **0,99** demais · a11y **1,00** · BP 0,96 (os 4 `/_vercel/*` 404 do ambiente local) · SEO 1,00 · **CLS 0 em 15 runs** |
+| Lighthouse mobile (mediana 3×2 URLs; **nunca tinha sido medido**, R4 F07) | — | home perf **0,76** · LCP **5,6 s** · TBT 207 ms · a11y **1,00** (era 0,97 antes do `<dl>`) · CLS 0; `/work/content-engine` perf 0,84 · LCP 4,5 s. É o próximo alvo (fila abaixo) |
+
+### O que as pesquisas disseram e o que entrou
+
+- **R1 (heros)**: 27 portfólios abertos; na dobra, mediana de 5 trabalhos nomeados e 15 links, nome da pessoa em 23 de 24, maior texto mediana 32px (o nosso: 120px). Conceito recomendado ("O ARQUIVO": manchete intacta + índice numerado à direita) é o que ficou, menos a 6ª linha (Playground) e a faixa de números por trabalho (repetiria o índice). Bônus adotado: o card XL como "o mesmo loop" (opção B).
+- **R2 (bibliotecas)**: 8 das 12 fontes já estavam no acervo; motion.so é gerador de vídeo (não a Motion), craftwork é marketplace de ilustração, originkit é quase todo pago; shadcnblocks revende primitivos MIT do Kibo. MCP do 21st funciona (busca grátis, código 2/dia). Entrou: `components.json` + registries, MCP do Watermelon. Fila (não entrou): `componentry/hover-transition` (wipe por clip-path), `aceternity/pointer-highlight`, `componentry/ascii-effect`, `watermelon/fluid-tabs` como indicador da nav.
+- **R3 (fontes/motion)**: PP Editorial "free for personal use" mora numa FAQ, não na EULA; licença web real **US$ 480**, não US$ 40; Instrument Serif Italic (OFL, 21,6 KB vs 40,8 KB, ajuste 1,039em) é a substituta medida. Geist Mono sem `tnum/zero/calt/lnum` (limpo). string-tune e anime.js: não adicionar. Lenis: o relatório pede 1.3.26 por reduced-motion, mas o `LenisProvider` já não inicializa o Lenis sob reduced-motion (bail-out antes do import); sem ação.
+- **R4 (auditoria adversarial)**: 50 achados (12 P0, 14 P1, 24 P2), 114 capturas, 16 scripts re-rodáveis (`r4-*.mjs`). Corrigidos nesta fase e re-verificados por `probe-r4-fixes.mjs`: **F06** canonical de `/work` e `/playground` apontava pra home (agora próprio) · **F04** submit vazio fazia POST (validação Zod síncrona antes do `preventDefault`; 0 POSTs medidos, foco no 1º erro) · **F05** falha de rede no envio derrubava a página inteira pelo error boundary (action envolvida em try/catch, campos restaurados) · **F08** `<dl>` inválido no card XL mobile (a11y mobile 0,97 → 1,00) · **F13** flip card virava no foco e o Enter desvirava; CTA do WhatsApp inalcançável (foco não vira, Enter vira, Tab chega no CTA) · **F14** indicador da nav preso em "Contato" ao voltar ao topo (conjunto visível no IO; `[]` no topo) · **F15** fechar o Cal.com jogava o foco no `<body>` (volta pro botão que abriu) · **F16** `/process` era seis de seis Content Engine e dizia "em produção há meses": entraram "OEE somado antes de dividir" (STARK) e "tenantId em 27 dos 35 modelos" (Caluna); a frase virou "com número e com o arquivo onde vive" · **F09/F10** "19 agentes acordados às 03h" (o cron acorda 4 às 03h e 17 no dia): timeline e card XL reescritos · **F01/F02** manifesto cita o STARK; nav "Produtos e cases"; JSON-LD com SK3D · **F11** uma data só pro rebrand da Caluna · **F17** poster do hub em 960×720 (25 KB, era 61 KB) e `sizes` da capa flagship · **F22** avatar sem sombra de 64px nem filete lime · **F23** glifos das instituições sem lime · **F24** promessa de resposta unificada ("até 12h, dias úteis") em nav, form, e-mail, `/process` · **F25** marquee não é mais cortada na dobra · **F26** índice alinhado ao topo · **F44** vídeo do hub com botão de pausa (WCAG 2.2.2) · **F48** alvos do rodapé ≥ 24px · **F49** célula do bento sem lift/anel (não é clicável) · copy: F27, F28, F29, F30, F31, F34, F36, F37, F38, F40, F41, F42, F45, F46. **Discordo de um:** F03 ("STJ App" na timeline é história de 2025, não foi rebatizado STARK; são produtos diferentes). **Ficaram pra você:** F07 (Lighthouse mobile), F18 (fonte), F20/F21 (escala tipográfica, Other Work em 3,8 telas), F23 (mostrar marcas de instituições), F43 (vídeo do hero), F50 (lime fora de ação como decisão de direção), confidencialidade do STARK.
+
+### Fila (não entrou nesta fase)
+
+- **Lighthouse mobile** (R4 F07): o portão de CI só media desktop. O caminho é a dieta de JS da home (R3 B6: os quatro reveals de `useInView` pra `animation-timeline: view()`, `MagneticCTA` em CSS, `motion` fora do caminho da home) e o LCP do poster no mobile.
+
+- Migrar os quatro reveals `m` + `useInView` (bento, other-work, teaser, timeline) pra `animation-timeline: view()` com o fallback da `tracing-beam` (tira ~18 KB gz de motion do caminho da home; R3 B6).
+- `componentry/hover-transition` (wipe) se algum dia houver capa no índice; `pointer-highlight` como marca de corte numa palavra do manifesto; `ascii-effect` no retrato do contato.
+- Indicador deslizante na nav (`anchor-name` já é universal; R3).
+
+### 🔴 Decisões SUAS (F9)
+
+1. **Tamanho e peso do H1**: R1 mediu 24 heros de pessoa; nenhum passa de 58px numa proposta de valor, e o cânone do próprio estudo (linear.app) roda 72px/510. Hoje: 106px em 1440 (era 120), peso 600. Reduzir mais é decisão sua; a manchete não muda em nenhum cenário.
+2. **PP Editorial New**: a FAQ da Pangram Pangram cobre "personal portfolios (web)", a EULA não define "personal use"; a licença web custa US$ 480. Trocar por **Instrument Serif Italic** (OFL, `next/font/google`, −19 KB) é uma linha em `layout.tsx` + `font-size: 1.039em` no `EditorialAccent`. Espécimes lado a lado em `_audit/f9/research/shots-R3/specimen-*.png`.
+3. **components.json e MCP do Watermelon** entraram como infraestrutura (não mudam o site). Se não quiser registries no repo, é só apagar o arquivo.
+4. **Índice do hero**: cinco linhas (Content Engine, Caluna, STARK, Estética MD, SK3D). R1 sugeria uma 6ª (Playground). Diga se quer.
+
 ## Artefatos de validação
 
 - `_audit/logs/s10-validate.json` — resultado das 14 sondas (PASS/FAIL com números)
 - `_audit/shots/v-*.png` — provas visuais (headline sem replay, CTA visível, anel lime, timeline)
 - `_audit/video/` — vídeo da navegação com View Transition (blackdetect: zero)
 - `_audit/s10-validate.mjs` — suíte re-rodável: `BASE_URL=http://localhost:3001 node _audit/s10-validate.mjs`
+- **Fase 9 (2026-09-05, madrugada)** — `_audit/f9/` (gitignored): `research/R1-hero-portfolio.md`, `R2-componentes.md`, `R3-fontes-e-motion.md`, `R4-auditoria-adversarial.md` (+ `shots-R*/`, `src-R2/`, `fonts/`), `patch-f9*.py`, `probe-hero.mjs` (geometria em 6 viewports), `probe-index.mjs` (hover/foco/âncora do índice), `probe-js.mjs` (JS da home), `cap-now.mjs` (filme + fold), `shots-now/` (F8) → `shots-d/` (final), `prints-sheet/` (as 27 referências em folha de contato), `lighthouserc.f9.json`, `commit-series.sh`
 - **Fase 8 (2026-09-05)** — `_audit/f8/` (gitignored): `research-acervo-digest.md`, `research-3d-e-hero-digest.md`, `roadmap-f8-section.md`, `patch-f8*.py`, `blender-shot.ps1` + `blender-ui-setup.py` (captura da UI do Blender), `3d/levita_glb.py`, `hub/` (vídeo), `masters/`, `avif/`, `shots/`, `shots-hero.mjs`, `probe-skip.mjs`, `sig/`
 - **Fase 7 (2026-09-04, noite)** — `_audit/f7/` (gitignored): `sig/` (skeleton.py, trace.py, gen-sig.py, ductus.json, overlays), `sig-probe.mjs` / `sig-timing.mjs` / `sig-frames.mjs`, `cap-site.mjs` (captura assentada no pixel 0), `site-settle.mjs`, `shots.mjs` (seções desktop+mobile), `find-404.mjs`, `3d/` (blend_prep.py, GLBs e previews), `patch-f7*.py`, `lighthouserc.f7.json`, `roadmap-f7-section.md`
 - **Fase 6 (2026-09-04)** — `_audit/f6/` (gitignored): `raw/` capturas 2× de todos os sistemas · `masters/` recortes · `avif/` encodes · `cap*.mjs`/`ce-*.mjs`/`nexacore-*.mjs` scripts de captura por sistema · `probe-overflow.mjs` (largura de scroll por rota/viewport) · `shot-sections.mjs` (recorte por seção) · `patch-f6*.py` (patches idempotentes com `assert count==1`) · `lighthouserc.ce.json` · `logs/` (server, seed, capturas) · `roadmap-f6-section.md`

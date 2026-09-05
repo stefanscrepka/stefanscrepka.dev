@@ -9,6 +9,20 @@
 
 ---
 
+## 🔴 F9 (2026-09-05, madrugada) — decisões que ficaram com você (evidência no `ROADMAP.md` → FASE 9)
+
+> Hero como índice (nome no eyebrow, manchete intacta, uma linha sobre o conjunto, cinco trabalhos numerados com ano e estado; sem captura, sem relógio, sem trilho do cron), cursor de mira removido, card XL "IA AGENTIC" virou "o mesmo loop em três produtos" (gatilho → agente ou regra → validação → aprovação humana → registro), manifesto intacto (a luz que eu tirei voltou no mesmo minuto), erro de WASM do viewer 3D corrigido (meshopt), Estética MD sem vazio e sem âmbar em texto, cauda da timeline sem glow, H2 do playground no tamanho das outras seções, rodapé e "Sobre este site" atualizados. Quatro pesquisas em `_audit/f9/research/` (R1 heros, R2 bibliotecas, R3 fontes/motion, R4 auditoria adversarial).
+
+1. **H1**: 106px em 1440 (era 120), peso 600. R1 mediu 24 portfólios de pessoa: nenhum passa de 58px numa proposta; o linear.app (referência do seu estudo) usa 72px/510. Reduzir mais ou não é seu.
+2. **PP Editorial New**: a FAQ da Pangram cobre "personal portfolios (web)"; a EULA publicada não define "personal use" nem concede nada de graça; a licença web mais barata custa **US$ 480** no configurador (não US$ 40). Alternativa medida: **Instrument Serif Italic** (OFL 1.1, Google Fonts, 21,6 KB vs 40,8 KB, `font-size: 1.039em` na palavra). Espécimes: `_audit/f9/research/shots-R3/specimen-*.png`. Diga "troca" e eu troco.
+3. **`components.json` + MCP do Watermelon** (`.mcp.json`): infraestrutura pra instalar componentes de 6 registries grátis (react-bits, componentry, kibo, watermelon, aceternity, magicui) e consultar o catálogo do Watermelon. Não muda nada no site; apague se não quiser.
+4. **Índice do hero**: cinco linhas. A R1 sugeria uma sexta (Playground, "aberto"). Quer?
+5. **Lighthouse mobile** (R4 F07): o CI só media desktop; medido agora: home perf **0,76**, LCP 5,6 s (desktop 0,96 / 0,99; a11y 1,00 nos dois). Pra subir, a dieta de JS da home está especificada no ROADMAP (fila da F9). Diga se quer que eu ataque.
+6. **Auditoria R4, decisões suas**: lime fora de ação (palavra em itálico, títulos do bento, marcadores da timeline; F50), Other Work em 3,8 telas (F21), escala de display com 9 degraus (F20), vídeo do hero de 1 MB (F43), mostrar os glifos das instituições (F23; são pictogramas próprios, não logos), e "STJ App" na timeline (eu mantive: é história de 2025, produto diferente do STARK).
+7. **Commits**: F9 commitado em série na `f5/polish` (mensagens curtas, sem co-autor) e enviado, como nas fases anteriores.
+
+---
+
 ## 🔴 F8 (2026-09-05) — decisões que ficaram com você (evidência no `ROADMAP.md` → FASE 8)
 
 > Assinatura de volta ao scroll (sobre o ductus novo), Contact no fluxo normal como em 25/05, hero em duas colunas com o turno de hoje, card 3D com o LEVITA v4 + o hub da STARK + a peça de CAD (bola, patch, foto do Vasco e Correnteza fora), cursor de mira, e-mail copiável, pausa que também para a marquee, coordenada no rodapé. Acervo inteiro varrido (2.240 itens; fila em `_audit/f8/research-acervo-digest.md`). Commits em série na `f5/polish`, enviados.
@@ -16,9 +30,9 @@
 1. ~~**Peça de CAD**~~ — não é decisão: o nome do cliente **não pode** ir pro site sem autorização por escrito. Está nos seus próprios arquivos (`Estudo-STARK/red-team/04-juridico-e-negocio.md` J1: LPI art. 195 XI; `Referencias-logo/acervo/logos-clientes-DEV/LEIA-ME.md`). Como só existem duas fábricas de painéis em Ponta Grossa, até "fabricante de painéis" identifica; a nota do viewer virou "cliente industrial".
 2. **Escudos de clube**: o card diz "estudo pessoal". A memória do projeto registra a dúvida da Lei Pelé art. 87 pra venda; mostrar não é vender.
 3. **Hub da STARK**: a coreografia foi medida do vídeo de referência do cliente; a legenda não diz "conceito original". Se quiser, escrevo isso no card.
-4. **Cursor de mira**: se incomodar, é um componente só (`components/ui-effects/target-cursor.client.tsx`), montado no `app/layout.tsx`.
+4. ~~**Cursor de mira**~~ — ✅ F9: removido a seu pedido ("todo bugado, amador").
 5. **Fila do acervo**: ⌘K (21st/command-menu), índice do Other Work com preview (hyperiux/hover-slider), painel Lighthouse no case (lightswind/casestudy05), ASCII no avatar (componentry/ascii-effect). Diga quais quer.
-6. **Hero**: peso do H1 (600; cânone 400–510), vinheta de topo e blur da nav são três subtrações que a pesquisa recomenda e eu não fiz sem você ver o hero novo primeiro.
+6. **Hero**: ~~vinheta de topo~~ (✅ F9, saiu) · peso do H1 e blur da nav seguem com você (ver F9 #1).
 
 ---
 
