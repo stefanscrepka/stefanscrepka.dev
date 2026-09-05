@@ -296,7 +296,7 @@
   font-weight: 600;
   letter-spacing: -0.025em;
   line-height: var(--leading-display);
-  font-feature-settings: 'ss01' 1, 'calt' 1, 'liga' 1, 'kern' 1;
+  font-feature-settings: 'ss01' 1, 'liga' 1, 'kern' 1;
   font-optical-sizing: auto;
 }
 
@@ -304,23 +304,24 @@
   font-family: var(--font-editorial);
   font-style: italic;
   font-weight: 400;
-  font-feature-settings: 'dlig' 1, 'calt' 1, 'kern' 1;
+  font-feature-settings: 'dlig' 1, 'kern' 1;
 }
 
+/* F9 (2026-09-05): a Geist Mono não tem tnum, zero nem calt (medido com
+   fontTools no woff2 servido, _audit/f9/research/R3): monoespaçada já é
+   tabular e o zero já vem cortado. As features pedidas eram no-ops. */
 @utility mono-stats {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum' 1, 'calt' 1, 'zero' 1;
 }
 
 /* W3.6 (2026-05-23): year-editorial — variant pra datas grandes (timeline).
-   tabular-nums + lining-nums + figural ss01 dá glyphs de número com proporção
-   editorial, em vez do default proportional do Geist Mono. Mantém alinhamento
-   vertical (tabular) sem visual de "tabela financeira". */
+   F9: das cinco features pedidas, só `ss01` existe na Geist Mono; o resto era
+   no-op e o comentário descrevia um efeito que não acontecia por esse caminho. */
 @utility year-editorial {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums lining-nums;
-  font-feature-settings: 'tnum' 1, 'lnum' 1, 'ss01' 1, 'calt' 1, 'zero' 1;
+  font-feature-settings: 'ss01' 1;
 }
 
 /* W-mob2 #6: tracking-widest (0.16em) em 11px mono em 375px viewport ≈ 1.76px
@@ -333,7 +334,6 @@
   font-size: 0.6875rem;
   font-weight: 500;
   color: var(--color-text-3);
-  font-feature-settings: 'tnum' 1, 'calt' 1;
 
   @media (min-width: 640px) {
     letter-spacing: var(--tracking-widest);
@@ -592,7 +592,7 @@
     background-color: var(--color-bg);
     color: var(--color-text-1);
     font-family: var(--font-body);
-    font-feature-settings: 'ss01' 1, 'calt' 1, 'liga' 1, 'kern' 1;
+    font-feature-settings: 'ss01' 1, 'liga' 1, 'kern' 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -626,14 +626,14 @@
   }
 
   /* Tabular nums em stats sections + qualquer .font-mono.
-     Mono sem tabular-nums = '7' e '1' com widths diferentes → flicker em
-     count-ups e clocks. Force tabular sempre em mono. */
+     F9: a Geist Mono é monoespaçada (dígitos já tabulares) e não tem tnum,
+     calt nem zero; a declaração fica como intenção semântica pra qualquer
+     fallback proporcional, sem features fantasma. */
   .stats-row,
   [data-tabular],
   .font-mono,
   [class*='font-mono'] {
     font-variant-numeric: tabular-nums;
-    font-feature-settings: 'tnum' 1, 'calt' 1, 'zero' 1;
   }
 
   /* Display headlines (h1/h2 ≥ text-3xl) ganham kern + ss01 automaticamente
@@ -642,7 +642,7 @@
   h1,
   h2 {
     font-optical-sizing: auto;
-    font-feature-settings: 'ss01' 1, 'calt' 1, 'liga' 1, 'kern' 1;
+    font-feature-settings: 'ss01' 1, 'liga' 1, 'kern' 1;
   }
 
   /* text-balance universal em headlines (h1/h2/h3). Browser ajusta line-break
@@ -889,63 +889,6 @@ html[data-pre-hydration] .anim-pre-hidden {
 /* F8: o botão do hero pausa a marquee junto com o vídeo (WCAG 2.2.2). */
 [data-slot='partner-marquee'][data-paused] .marquee-track {
   animation-play-state: paused;
-}
-
-/* F8: cursor de mira (target-cursor.client.tsx). Só existe com ponteiro fino
-   e sem reduced-motion; sobre campos de texto o cursor nativo volta. */
-html[data-cursor='custom'],
-html[data-cursor='custom'] a,
-html[data-cursor='custom'] button,
-html[data-cursor='custom'] [role='button'] {
-  cursor: none;
-}
-html[data-cursor='custom'] input,
-html[data-cursor='custom'] textarea,
-html[data-cursor='custom'] select,
-html[data-cursor='custom'] [contenteditable='true'] {
-  cursor: auto;
-}
-[data-slot='target-cursor'] {
-  position: fixed;
-  inset: 0 auto auto 0;
-  z-index: 70;
-  pointer-events: none;
-}
-[data-slot='target-cursor'] [data-cursor-dot] {
-  position: absolute;
-  left: -4px;
-  top: -4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--color-text-1);
-  mix-blend-mode: difference;
-  will-change: transform;
-}
-[data-slot='target-cursor'] [data-cursor-corner] {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 12px;
-  height: 12px;
-  border: 1px solid var(--color-accent);
-  will-change: transform;
-}
-[data-slot='target-cursor'] [data-cursor-corner='tl'] {
-  border-right: 0;
-  border-bottom: 0;
-}
-[data-slot='target-cursor'] [data-cursor-corner='tr'] {
-  border-left: 0;
-  border-bottom: 0;
-}
-[data-slot='target-cursor'] [data-cursor-corner='bl'] {
-  border-right: 0;
-  border-top: 0;
-}
-[data-slot='target-cursor'] [data-cursor-corner='br'] {
-  border-left: 0;
-  border-top: 0;
 }
 
 @keyframes marquee-x {
