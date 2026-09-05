@@ -24,8 +24,8 @@ interface ContactConfirmationProps {
 }
 
 const PREFERE_COPY: Record<PrefereCanal, string> = {
-  whatsapp: 'Vou puxar conversa no WhatsApp em <12h.',
-  email: 'Resposta vem por este email em <12h.',
+  whatsapp: 'Vou puxar conversa no WhatsApp em até 12h, dias úteis.',
+  email: 'Resposta vem por este email em até 12h, dias úteis.',
   calcom:
     'Te mando link de agendamento se fizer sentido, ou agenda direto em stefanscrepka.dev/#contato.',
 };
@@ -47,7 +47,7 @@ export function ContactConfirmation({ nome, prefere, mensagem }: ContactConfirma
             </Text>
 
             <Text className="mt-4 text-base leading-relaxed text-[#FAFAFA]">
-              Oi {nome}, mensagem chegou aqui. Respondo em &lt;12h em dias úteis.
+              Oi {nome}, mensagem chegou aqui. Respondo em até 12h em dias úteis.
             </Text>
 
             <Text className="mt-2 text-base leading-relaxed text-[#FAFAFA]">

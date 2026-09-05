@@ -122,7 +122,7 @@ export async function submitContact(
       from: FROM,
       to: input.email,
       replyTo: INTERNAL_TO,
-      subject: 'Recebido. Respondo em <12h.',
+      subject: 'Recebido. Respondo em até 12h.',
       react: ContactConfirmation({
         nome: input.nome,
         prefere: input.prefere,

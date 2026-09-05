@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { m } from 'motion/react';
-import { useActionState, useEffect, useId, useRef, useState } from 'react';
+import { useActionState, useCallback, useEffect, useId, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,7 @@ import {
 //   - Inputs hairline strong + focus lime glow (signature inset-bisel premium)
 //   - "Como prefere conversar?" vira pill segmented control (não radio circle)
 //   - Submit é pill lime grande com hover -2px translateY + glow expand
-//   - Success state: TextGenerateEffect-like word reveal "Recebido. Respondo em <12h."
+//   - Success state: TextGenerateEffect-like word reveal "Recebido. Respondo em até 12h."
 //
 // States: idle / submitting / success / error / validation.
 // aria-live polite + spring overshoot na success card pra fechar o loop emocional.
@@ -42,12 +42,26 @@ const PREFERE_LABELS: Record<PrefereCanal, string> = {
 
 const initialState: ContactState = { status: 'idle' };
 
-const SUCCESS_HEADLINE = 'Recebido. Respondo em <12h.';
+const SUCCESS_HEADLINE = 'Recebido. Respondo em até 12h.';
 
 export function ContactForm() {
   const reduced = useReducedMotionSafe();
   const formId = useId();
-  const [state, action, isPending] = useActionState(submitContact, initialState);
+  // F9 (R4 F05): uma falha de rede no meio do envio rejeitava a Promise da
+  // Server Action, subia pro error boundary global e destruía a página inteira
+  // com a mensagem digitada. Aqui a rejeição vira {status:'error'}; os campos
+  // são restaurados abaixo. (Sem JS a action não roda; o BotID já exigia JS.)
+  const safeSubmit = useCallback(
+    async (prev: ContactState, formData: FormData): Promise<ContactState> => {
+      try {
+        return await submitContact(prev, formData);
+      } catch {
+        return { status: 'error', message: 'Não foi. Tenta WhatsApp direto: (42) 99859-2522.' };
+      }
+    },
+    []
+  );
+  const [state, action, isPending] = useActionState(safeSubmit, initialState);
   const [showSuccess, setShowSuccess] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -59,6 +73,7 @@ export function ContactForm() {
     trigger,
     setError,
     setFocus,
+    getValues,
   } = useForm<ContactInput>({
     resolver: zodResolver(ContactSchema),
     defaultValues: {
@@ -104,19 +119,33 @@ export function ContactForm() {
     }
   }, [state, setError, setFocus]);
 
-  // W1.1+W1.3 (2026-05-23): submit nativo via React 19 form action.
-  // RHF agora SÓ valida (trigger()), não controla submit. Se inválido, bloqueia
-  // o submit nativo via preventDefault — erros renderizam via formState.errors.
-  // Se válido, deixa o submit nativo passar — browser monta FormData a partir
-  // dos inputs com name="..." e React invoca action={action} com esse FormData.
-  // Antes: onValid() chamava requestSubmit() recursivo + jsonToFormData
-  // descartado com void fd → bug + radio "prefere" sem name → null no server.
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const ok = await trigger();
-    if (!ok) {
-      e.preventDefault();
-    }
+  // W1.1+W1.3 (2026-05-23): submit nativo via React 19 form action; o RHF só
+  // valida. F9 (R4 F04): a versão anterior fazia `await trigger()` e só depois
+  // `preventDefault()`, quando o evento já não era cancelável: um clique com o
+  // formulário vazio disparava um POST de FormData vazio (medido). Agora o Zod
+  // roda síncrono sobre getValues(); se falhar, o submit é cancelado no mesmo
+  // tick, trigger() renderiza os erros e o foco vai pro primeiro campo inválido.
+  const lastValuesRef = useRef<ContactInput | null>(null);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const values = getValues();
+    lastValuesRef.current = values;
+    const result = ContactSchema.safeParse(values);
+    if (result.success) return;
+    e.preventDefault();
+    const first = result.error.issues[0]?.path[0];
+    void trigger().then(() => {
+      if (typeof first === 'string') setFocus(first as keyof ContactInput);
+    });
   };
+
+  // O React 19 limpa o <form> depois da action; em erro (rede ou servidor) os
+  // campos voltam do último snapshot, com os erros de validação preservados.
+  useEffect(() => {
+    if (state.status !== 'error' && state.status !== 'validation') return;
+    const last = lastValuesRef.current;
+    if (last) reset(last, { keepErrors: true });
+  }, [state, reset]);
 
   const handleSendAnother = () => {
     setShowSuccess(false);
@@ -124,7 +153,7 @@ export function ContactForm() {
   };
 
   // ───────────── SUCCESS STATE ─────────────
-  // Word-stagger reveal do headline ("Recebido. Respondo em <12h.") —
+  // Word-stagger reveal do headline ("Recebido. Respondo em até 12h.") —
   // ecoa o pattern do Manifesto e fecha o loop motion. Spring overshoot
   // no container + check icon com glow lime.
   if (showSuccess) {
@@ -414,7 +443,7 @@ export function ContactForm() {
             Ao enviar, você aceita a{' '}
             <a
               href="/privacidade"
-              className="text-(--color-accent) underline underline-offset-4 decoration-(--color-accent)/50 transition-[text-decoration-color] hover:decoration-(--color-accent)"
+              className="inline-block py-1 -my-1 text-(--color-accent) underline underline-offset-4 decoration-(--color-accent)/50 transition-[text-decoration-color] hover:decoration-(--color-accent)"
             >
               política de privacidade
             </a>
