@@ -24,7 +24,7 @@ const STACK_CREDITS = [
   {
     label: 'Styling',
     value:
-      'Tailwind v4 com tokens OKLCH · Geist + Geist Mono · PP Editorial New italic (uma palavra)',
+      'Tailwind v4 com tokens OKLCH · Geist + Geist Mono · PP Editorial New italic (três momentos: hero, manifesto, contato)',
   },
   {
     label: 'Motion',
@@ -58,12 +58,12 @@ const MOTION_NARRATIVE = [
     why: 'Cada palavra é um <span> renderizado no servidor; a entrada é CSS puro (600ms, stagger 45ms) e roda do primeiro paint, antes de qualquer JS. Não existe estado "aparece, some e volta".',
   },
   {
-    section: 'Hero · stats',
-    why: 'Contagem 0→N com duração em escala log: 19 e 2.059 chegam com a mesma velocidade percebida. Tabular-nums pra nada pular.',
+    section: 'Hero · índice',
+    why: 'Cinco trabalhos numerados, com ano e estado real, cada linha um link. Server Component, zero JS; o único lime é a seta que aparece no hover ou no foco.',
   },
   {
     section: 'Hero · marquee',
-    why: 'Loop linear de 40s com os logos do stack; pausa no hover. Em reduced-motion fica parado.',
+    why: 'Loop linear de 40s com os logos do stack; pausa no hover e no botão de pausa da faixa, que também para o vídeo. Em reduced-motion fica parado.',
   },
   {
     section: 'Hero · CTA magnético',
@@ -87,11 +87,11 @@ const MOTION_NARRATIVE = [
   },
   {
     section: 'Manifesto',
-    why: 'Sticky CSS no padrão do landonorris.com: o texto encolhe até virar um cartão e, quando o palco passa de 30%, a assinatura é escrita no tempo (2 s) na ordem real da caneta: S, "tefan", a barra do t, o ponto. A ponta da caneta corre na frente do traço. Reduced-motion: estado final, estático.',
+    why: 'Sticky CSS no padrão do landonorris.com: o texto encolhe até virar um cartão e a assinatura é guiada pelo scroll, na ordem real da caneta: o S entre 30% e 50% do palco, "tefan" até 76%, a barra do t, o ponto. A ponta da caneta corre na frente do traço. Reduced-motion: estado final, estático.',
   },
   {
     section: 'Contato · sucesso',
-    why: 'Spring (stiffness 280) no "Recebido. Respondo em <12h.": a recompensa física de ter enviado.',
+    why: 'Spring (stiffness 280) no "Recebido. Respondo em até 12h.": a recompensa física de ter enviado.',
   },
   {
     section: 'Troca de rota',

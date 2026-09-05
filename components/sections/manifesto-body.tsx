@@ -13,7 +13,7 @@ export const MANIFESTO_PULL_QUOTE =
   'Software sério tem o mesmo padrão de qualquer sistema crítico: ou funciona 24/7 ou alguém perde dinheiro.';
 
 export const MANIFESTO_BODY_PARAGRAPHS = [
-  'Eu construo nesse padrão. TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude orquestrado em squads. Três produtos em produção provam: Content Engine, Caluna, Estética MD.',
+  'Eu construo nesse padrão. TypeScript strict. Contratos de teste. Observabilidade real. Prompts que não inventam. Multi-agente Claude orquestrado em squads. Três produtos em produção provam: Content Engine, Caluna, Estética MD. O STARK, em piloto, leva o mesmo padrão pro chão de fábrica.',
   'Não vendo “ajudo empresas a inovar”. Vendo entrega que paga conta. Aprovação humana em três botões por dia. Anti-slop com 28 regex pt-BR. GPU local subsidiando o custo de inferência.',
 ];
 

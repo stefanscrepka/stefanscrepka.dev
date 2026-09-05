@@ -37,7 +37,7 @@ export function DialogsSection() {
             <DialogHeader>
               <DialogTitle>Recebido</DialogTitle>
               <DialogDescription>
-                Sua mensagem caiu na inbox. Respondo em &lt;12h em dias úteis. Se for urgente,
+                Sua mensagem caiu na inbox. Respondo em até 12h em dias úteis. Se for urgente,
                 WhatsApp direto.
               </DialogDescription>
             </DialogHeader>

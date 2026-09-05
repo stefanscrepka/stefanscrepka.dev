@@ -24,7 +24,7 @@ export function FooterAboutButton() {
         'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
       )}
     >
-      About this site →
+      Sobre este site →
     </button>
   );
 }

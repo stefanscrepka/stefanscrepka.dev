@@ -22,7 +22,7 @@ import { FooterClock } from './footer-clock.client';
 // Estrutura:
 //   ROW 1: fecho (frase) · ação (Falar comigo → / WhatsApp)
 //   ROW 2: marca + lugar/hora/status · Navegação · Conexão direta
-//   ROW 3: © · Sobre este site · Privacidade · GitHub source
+//   ROW 3: © · Sobre este site · Privacidade · Código no GitHub
 
 const NAV_LINKS = [
   { label: 'Work', href: '/#work' },
@@ -39,7 +39,8 @@ const SOCIAL_LINKS = [
 ] as const;
 
 const linkClass = cn(
-  'inline-flex items-center gap-1.5 py-2 sm:py-0 text-sm text-(--color-text-2)',
+  // F9 (R4 F48): 23,9px de altura no desktop; py-1 leva a 30px (WCAG 2.5.8).
+  'inline-flex items-center gap-1.5 py-2 sm:py-1 text-sm text-(--color-text-2)',
   'transition-colors duration-(--motion-fast) ease-(--ease-standard)',
   'hover:text-(--color-accent) focus-visible:text-(--color-accent)'
 );
@@ -121,21 +122,24 @@ export function Footer() {
                 IA multi-agente em produção, e o produto inteiro ao redor dela.
               </p>
               {/* F8: coordenada + hora, o carimbo de fim de página (acervo:
-                  refero/dope.security "coordinate footer"). */}
-              <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
-                25.09° S · 50.16° W{' '}
-                <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
-                  ·
+                  refero/dope.security "coordinate footer"). F9: duas linhas
+                  de propósito — numa só, a hora quebrava no meio ("00:04 /
+                  GMT-3") em 1440px. */}
+              <p className="flex flex-col gap-1 font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
+                <span>
+                  25.09° S · 50.16° W
+                  <span aria-hidden="true" className="mx-1.5 text-(--color-hairline-strong)">
+                    ·
+                  </span>
+                  Ponta Grossa, Paraná
                 </span>
-                Ponta Grossa, Paraná{' '}
-                <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
-                  ·
+                <span>
+                  <FooterClock />
+                  <span aria-hidden="true" className="mx-1.5 text-(--color-hairline-strong)">
+                    ·
+                  </span>
+                  <span className="text-(--color-accent)">disponível</span>
                 </span>
-                <FooterClock />{' '}
-                <span aria-hidden="true" className="mx-1 text-(--color-hairline-strong)">
-                  ·
-                </span>
-                <span className="text-(--color-accent)">disponível</span>
               </p>
             </div>
 
@@ -198,7 +202,7 @@ export function Footer() {
                 rel="noreferrer"
                 className={metaLinkClass}
               >
-                GitHub source →
+                Código no GitHub →
               </a>
             </div>
           </div>

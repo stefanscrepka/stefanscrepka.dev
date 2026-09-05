@@ -25,7 +25,7 @@ const LAST_UPDATED = '4 de setembro de 2026';
 const IN_SHORT = [
   'Coleto só o que você digita no formulário: nome, email, canal preferido e a mensagem.',
   'Uso pra responder sobre o seu projeto. Não vendo, não compartilho, não treino modelo com isso.',
-  'Quatro serviços técnicos tocam nos dados: Resend, Vercel, Vercel Analytics e Sentry.',
+  'Quatro serviços técnicos tocam nos dados: Resend, Vercel, Vercel Analytics com Speed Insights, e Sentry.',
   'Guardo por 12 meses depois do último contato. Depois apago.',
   'Um email com “LGPD” no assunto resolve acesso, correção, exclusão ou portabilidade.',
 ];
@@ -70,7 +70,7 @@ const BLOCKS: Block[] = [
     lines: [
       'Acesso, correção, exclusão, portabilidade e oposição. Mande um email com “LGPD” no assunto; respondo em até 12 horas em dias úteis.',
       'Exclusão sai em até 24 horas. Acesso e portabilidade em até 7 dias, em JSON ou texto.',
-      'Mudanças relevantes nesta política aparecem em /#contato por 30 dias antes de valer.',
+      'Mudanças relevantes entram nesta página, com a data da atualização no topo.',
     ],
   },
 ];
