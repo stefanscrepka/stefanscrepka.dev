@@ -1,12 +1,10 @@
 import { type TechId, TechLogo } from '@/components/shared/tech-logo';
 import { cn } from '@/lib/utils';
-import { CE_ONBOARDING_TEMPLATES, ceAgentsOf } from '@/lib/work/content-engine-artifacts';
-import { CONTENT_ENGINE_SQUADS } from '@/lib/work/data';
 import { BentoRevealGrid } from './bento-skills.client';
 
 // Section 9 — Stack confirmado em formato Bento Grid asimétrico.
 // Hierarquia declarada (não tudo importante):
-//   - IA AGENTIC XL (col-span 4 row-span 3) — o registro dos agentes (F8)
+//   - IA AGENTIC XL (col-span 4 row-span 3) — o mesmo loop em três produtos (F9)
 //   - RAG/FRONTEND/BACKEND stack vertical à direita (col-span 2 cada)
 //   - INFRA + OBSERVABILITY full-width abaixo (col-span 6) com as superfícies
 //     de runtime + INTEGRAÇÕES chip strip embedded
@@ -74,13 +72,14 @@ const CELLS: BentoSkillsCell[] = [
       'Opus 4.7',
       'Sonnet 4.6',
       'Haiku 4.5',
+      'OpenAI na Caluna',
       'MCP',
       'prompt caching',
       'tool use',
       'vision',
       'streaming SSE',
     ],
-    note: 'Cada papel tem prompt versionado, modo scripted pra testar sem LLM e uma tabela própria no Postgres. Substitui uma equipe de quatro a seis pessoas.',
+    note: 'O que muda é o gatilho e quem assina. No STARK não há modelo nenhum: é regra fechada contra o Excel oficial. Nos outros dois a IA propõe e uma pessoa decide antes de publicar ou cobrar.',
   },
   {
     size: 'small',
@@ -187,13 +186,12 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         'shadow-(--shadow-inset-bisel)',
         'transition-[border-color,transform,box-shadow]',
         'duration-(--motion-fast) ease-(--ease-standard)',
-        'hover:border-(--color-accent-emissive)',
-        'focus-within:border-(--color-accent-emissive)',
-        'hover:shadow-[var(--shadow-inset-bisel),var(--shadow-glow-lime-sm)]',
+        // F9 (R4 F49): a célula não é link nem botão; o hover só clareia a borda
+        // um degrau e desenha o contorno (PerimeterTrace). Sem lift, sem anel.
+        'hover:border-(--color-hairline-alpha-3)',
         // Reduced-motion: zero transform (border + glow already conveys
         // interactivity) — variante CSS, sem gate JS.
         // Default: translateY lift -2px (Linear/Vercel hover signature, NO scale).
-        'motion-safe:hover:-translate-y-0.5',
         isXL && 'lg:p-10',
         isWide && 'lg:p-8'
       )}
@@ -222,8 +220,8 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
         </span>
       </header>
 
-      {/* Feature visual XL — diagrama de orquestração (F5) */}
-      {cell.feature === 'orchestration' ? <AgentsRegistry /> : null}
+      {/* Feature XL — o mesmo loop, três produtos (F9) */}
+      {cell.feature === 'orchestration' ? <LoopRegistry /> : null}
 
       {/* Tech logos */}
       {cell.techs.length > 0 ? (
@@ -331,68 +329,166 @@ function BentoCell({ cell }: { cell: BentoSkillsCell }) {
 }
 
 // =================================================================
-// AgentsRegistry — a equipe, como o Studio a registra (F8, 2026-09-05).
+// LoopRegistry — o mesmo loop, três produtos (F9, 2026-09-05).
 //
-// O ledger do cron subiu pro hero (day-rail.tsx); aqui fica o outro registro
-// verdadeiro: os 19 papéis do ciclo diário + os 6 do onboarding, copiados de
-// apps/web/src/lib/agent-roles.ts e packages/prompts/templates
-// (lib/work/content-engine-artifacts.ts), agrupados por squad com o horário
-// em que o cron os acorda. Um único elemento aceso: o Editor-Chefe.
-// RSC puro, zero JS, zero SVG.
+// O card anterior era o organograma dos 19 agentes do Content Engine: o
+// registro de UM produto no lugar da competência ("esse card fica como se
+// tudo girasse em torno a 1 projeto"). A pesquisa R1 propôs mostrar o método
+// que atravessa os produtos: gatilho → agente ou regra → validação →
+// aprovação humana → registro. Linhas = os cinco passos; colunas = os três
+// cases. No STARK o passo "agente" é regra, não modelo, e o card diz isso.
+// Cada célula tem origem em lib/work/data.ts (números da auditoria F7). Um
+// só elemento aceso: a aprovação humana. RSC puro, zero JS, zero SVG.
 // =================================================================
 
-const REGISTRY_GROUPS = [
-  {
-    code: 'S0',
-    name: 'Onboarding',
-    when: 'uma vez por marca',
-    rows: CE_ONBOARDING_TEMPLATES.map((t) => ({ id: t.id, name: t.file.replace(/\.md$/, '') })),
-  },
-  { code: 'S1', name: 'Inteligência', when: '03h00', rows: ceAgentsOf('inteligencia') },
-  { code: 'S2', name: 'Estratégia', when: '05h30', rows: ceAgentsOf('estrategia') },
-  { code: 'S3', name: 'Criação', when: '06h00', rows: ceAgentsOf('criacao') },
-  { code: 'S4', name: 'Revisão', when: '07h15', rows: ceAgentsOf('revisao') },
-  { code: 'E-0', name: 'Direção', when: '07h30', rows: ceAgentsOf('direcao'), lit: true },
+const LOOP_STEPS = [
+  { key: 'gatilho', label: 'Gatilho' },
+  { key: 'agente', label: 'Agente ou regra' },
+  { key: 'validacao', label: 'Validação' },
+  { key: 'aprovacao', label: 'Aprovação humana', lit: true },
+  { key: 'registro', label: 'Registro' },
 ] as const;
 
-function AgentsRegistry() {
+type LoopStepKey = (typeof LOOP_STEPS)[number]['key'];
+
+const LOOP_PRODUCTS: readonly { name: string; cells: Record<LoopStepKey, string> }[] = [
+  {
+    name: 'Content Engine',
+    cells: {
+      gatilho: 'cron das 03h00 às 07h30, fuso de São Paulo',
+      agente: '19 papéis Claude em 5 squads, 17 no ciclo diário',
+      validacao: '28 regex anti-slop, surprisal e um juiz LLM',
+      aprovacao: 'três botões no Telegram, às 07h30',
+      registro: '57 tabelas Postgres, 45 migrations',
+    },
+  },
+  {
+    name: 'Caluna',
+    cells: {
+      gatilho: 'uma mensagem no WhatsApp da clínica',
+      agente: 'assistente com 11 ferramentas',
+      validacao: 'pede confirmação antes de marcar ou cobrar',
+      aprovacao: 'acima de um teto chama a dona; handoff pelo inbox',
+      registro: '35 modelos Prisma, 27 com tenantId',
+    },
+  },
+  {
+    name: 'STARK',
+    cells: {
+      gatilho: 'o fim do turno',
+      agente: 'regra, não modelo: as fórmulas do Excel oficial',
+      validacao: 'fechadas contra três planilhas, dígito a dígito',
+      aprovacao: 'o supervisor fecha o turno; o telão atualiza',
+      registro: 'Postgres 17 com migrations; PDF e Excel',
+    },
+  },
+];
+
+const LOOP_GRID = 'grid grid-cols-[minmax(0,8.5rem)_repeat(3,minmax(0,1fr))]';
+
+function LoopRegistry() {
   return (
     <figure className="relative my-1 w-full">
-      <dl className="grid gap-px overflow-hidden rounded-md border border-(--color-hairline) bg-(--color-hairline) sm:grid-cols-2 lg:grid-cols-3">
-        {REGISTRY_GROUPS.map((g) => (
-          <div key={g.code} className="flex flex-col gap-2 bg-(--color-surface-elevated) px-3 py-3">
-            <dt className="flex items-baseline justify-between gap-2 font-mono text-2xs uppercase tracking-widest">
+      {/* md+: matriz passos × produtos. */}
+      <div
+        role="table"
+        aria-label="O mesmo loop em três produtos"
+        className="hidden overflow-hidden rounded-md border border-(--color-hairline) md:block"
+      >
+        <div role="row" className={LOOP_GRID}>
+          <span role="columnheader" className="px-3 py-2" />
+          {LOOP_PRODUCTS.map((p) => (
+            <span
+              key={p.name}
+              role="columnheader"
+              className="border-l border-(--color-hairline) px-3 py-2 font-mono text-2xs uppercase tracking-widest text-(--color-text-1)"
+            >
+              {p.name}
+            </span>
+          ))}
+        </div>
+        {LOOP_STEPS.map((step) => {
+          const lit = 'lit' in step && step.lit;
+          return (
+            <div
+              key={step.key}
+              role="row"
+              className={cn(LOOP_GRID, 'border-t border-(--color-hairline)')}
+            >
               <span
-                className={'lit' in g && g.lit ? 'text-(--color-accent)' : 'text-(--color-text-1)'}
+                role="rowheader"
+                className={cn(
+                  'flex items-baseline gap-2 px-3 py-2.5 font-mono text-2xs uppercase tracking-widest',
+                  lit ? 'text-(--color-accent)' : 'text-(--color-text-3)'
+                )}
               >
-                {g.code} · {g.name}
+                {step.label}
+                {lit ? (
+                  <span aria-hidden="true" className="inline-block size-1.5 bg-(--color-accent)" />
+                ) : null}
               </span>
-              <span className="text-(--color-text-3)">{g.when}</span>
-            </dt>
-            <dd className="flex flex-col gap-1 font-mono text-2xs leading-snug">
-              {g.rows.map((r) => (
-                <span key={r.id} className="grid grid-cols-[2.75rem_minmax(0,1fr)] gap-2">
-                  <span className="tabular-nums text-(--color-text-2)">{r.id}</span>
-                  <span className="truncate text-(--color-text-3)">
-                    {'role' in r ? r.role : r.name}
-                  </span>
+              {LOOP_PRODUCTS.map((p) => (
+                <span
+                  key={p.name}
+                  role="cell"
+                  className={cn(
+                    'border-l border-(--color-hairline) px-3 py-2.5 font-mono text-2xs leading-relaxed',
+                    lit ? 'text-(--color-text-1)' : 'text-(--color-text-3)'
+                  )}
+                >
+                  {p.cells[step.key]}
                 </span>
               ))}
-            </dd>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* < md: um bloco por produto, os cinco passos empilhados. */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {LOOP_PRODUCTS.map((p) => (
+          // F9 (R4 F08): o nome do produto fica FORA do <dl> (um <div> com texto
+          // solto dentro de <dl> é HTML inválido e derrubava a a11y mobile a 0,97).
+          <div key={p.name} className="overflow-hidden rounded-md border border-(--color-hairline)">
+            <p className="px-3 py-2 font-mono text-2xs uppercase tracking-widest text-(--color-text-1)">
+              {p.name}
+            </p>
+            <dl aria-label={p.name}>
+              {LOOP_STEPS.map((step) => {
+                const lit = 'lit' in step && step.lit;
+                return (
+                  <div
+                    key={step.key}
+                    className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] gap-x-3 border-t border-(--color-hairline) px-3 py-1.5"
+                  >
+                    <dt
+                      className={cn(
+                        'font-mono text-2xs uppercase tracking-wider',
+                        lit ? 'text-(--color-accent)' : 'text-(--color-text-3)'
+                      )}
+                    >
+                      {step.label}
+                    </dt>
+                    <dd
+                      className={cn(
+                        'font-mono text-2xs leading-relaxed',
+                        lit ? 'text-(--color-text-1)' : 'text-(--color-text-3)'
+                      )}
+                    >
+                      {p.cells[step.key]}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
           </div>
         ))}
-      </dl>
+      </div>
+
       <figcaption className="mt-3 text-balance font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
-        <span className="text-(--color-text-1)">19 agentes</span>&nbsp;· 5 squads&nbsp;· 6 no
-        onboarding&nbsp;· apps/web/src/lib/agent-roles.ts
+        <span className="text-(--color-text-1)">3 produtos</span>&nbsp;· o loop é o mesmo, muda o
+        gatilho e quem assina&nbsp;· números conferidos no código&nbsp;· set/2026
       </figcaption>
-      <p className="sr-only">
-        Registro dos agentes do Content Engine por squad:{' '}
-        {CONTENT_ENGINE_SQUADS.map((sq) => `${sq.name} (${sq.agents} agentes, ${sq.when})`).join(
-          ', '
-        )}
-        ; o Editor-Chefe fecha o dia às 07h30.
-      </p>
     </figure>
   );
 }
@@ -410,7 +506,7 @@ function PerimeterTrace() {
       preserveAspectRatio="none"
       viewBox="0 0 100 100"
     >
-      <title>perimeter glow</title>
+      <title>contorno da célula</title>
       <rect
         x="1"
         y="1"
