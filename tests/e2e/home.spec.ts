@@ -10,8 +10,8 @@ test.describe('home', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('multi-agente');
     // Subhead técnica (no hero — Footer também tem essa string, então pegue a primeira).
     await expect(page.getByText(/AI Product Engineer/i).first()).toBeVisible();
-    // CTA principal — "Ver os 3 produtos →" (W-copy Sprint 5).
-    await expect(page.getByRole('link', { name: /Ver os 3 produtos/ })).toBeVisible();
+    // CTA principal (F9: "Ver os produtos →" — o índice tem cinco trabalhos).
+    await expect(page.getByRole('link', { name: /Ver os produtos/ })).toBeVisible();
   });
 
   test('has correct lang attribute', async ({ page }) => {
