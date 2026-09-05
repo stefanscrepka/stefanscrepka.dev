@@ -47,15 +47,14 @@ export function ContactSection() {
               className={cn(
                 'relative overflow-hidden rounded-2xl',
                 'border border-(--color-hairline-strong)',
-                'shadow-(--shadow-cinema)',
                 // W-mob2 #5: w-28 (era w-32) em mobile — column single + headline editorial
                 // não compete por largura. Mantém 3:4 portrait ratio.
                 'h-40 w-28 sm:h-56 sm:w-40 lg:h-64 lg:w-48'
               )}
-              style={{
-                transform: 'rotate(-2deg)',
-                boxShadow: 'var(--shadow-cinema)',
-              }}
+              // F9 (R4 F22): sem a sombra de 64px e sem o filete lime decorativo
+              // (brand book §17; acento só em ação). O tilt fica: é o único
+              // gesto de mão do site.
+              style={{ transform: 'rotate(-2deg)' }}
             >
               {/* W0.4 (2026-05-23): avatar PNG 3.07 MB → AVIF 384×512 15 KB
                   (-99.5%). next/image continua negociando densidade via sizes. */}
@@ -67,36 +66,15 @@ export function ContactSection() {
                 className="object-cover"
                 style={{ objectPosition: 'center top' }}
               />
-              {/* Hairline highlight top — inset border lime sutil */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-0 h-px"
-                style={{
-                  background:
-                    'linear-gradient(to right, transparent, var(--color-accent) 50%, transparent)',
-                  opacity: 0.4,
-                }}
-              />
             </div>
           </div>
 
           {/* Headline editorial + sub */}
           <div className="flex max-w-4xl flex-col gap-5 sm:gap-6">
-            {/* Eyebrow numeric final — "12 / 12" sequence (esta e a ultima section
-                substantiva antes do footer). Anti-padrao mono uppercase universal. */}
-            {/* W1.4 (2026-05-23): separadores /60 ficavam ~1.5:1 sobre base
-                (invisível). Trocados por hairline-strong + aria-hidden — sai
-                de scope de WCAG e mantém visual de "receipt". */}
+            {/* F9 (2026-09-05): o "12 / 12" era da arquitetura de 12 seções do
+                plano de maio; a home tem oito. Só o rótulo. */}
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
-              <span className="text-(--color-accent) tabular-nums">12</span>
-              <span aria-hidden="true" className="mx-1.5 text-(--color-hairline-strong)">
-                /
-              </span>
-              <span className="tabular-nums">12</span>
-              <span aria-hidden="true" className="mx-2.5 text-(--color-hairline-strong)">
-                ·
-              </span>
-              <span>próximo passo</span>
+              Próximo passo
             </p>
             <h2
               className={cn(
@@ -125,7 +103,7 @@ export function ContactSection() {
         <div
           className={cn(
             'mx-auto w-full max-w-3xl',
-            'rounded-3xl border border-(--color-hairline) bg-(--color-surface)',
+            'rounded-2xl border border-(--color-hairline) bg-(--color-surface)',
             'shadow-(--shadow-inset-bisel)',
             'p-6 sm:p-10 lg:p-12'
           )}

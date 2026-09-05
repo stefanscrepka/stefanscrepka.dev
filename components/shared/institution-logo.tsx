@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 // Stylized institution marks — não logos oficiais 1:1, mas glyphs custom
-// que evocam cada instituição em tom monocromático + accent lime.
+// que evocam cada instituição em tom monocromático (F9: sem lime).
 
 export type InstitutionId =
   | 'senai'
@@ -52,7 +52,8 @@ function InstitutionGlyph({ id, size }: { id: InstitutionId; size: number }) {
     fill: 'none',
     'aria-hidden': true,
     focusable: false,
-    className: 'shrink-0 text-(--color-accent)',
+    // F9 (R4 F23): sem lime em seis marcas que não são ação nem estado.
+    className: 'shrink-0 text-(--color-text-2)',
   } as const;
 
   switch (id) {

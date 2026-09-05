@@ -61,18 +61,27 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
           {/* F7: uma captura só, no pixel 0 e na moldura de navegador (a seção
               Tratamentos fica no case). Com duas, a coluna do card ficava mais
               alta que os dois blocos de código ao lado. */}
-          <CaseStudyCover caseStudy={esteticaCs} browser sizes="(min-width: 1024px) 60vw, 100vw" />
-          <div className="flex flex-col gap-3 lg:flex-1">
+          {/* F9: modo fill — em lg a captura preenche a altura que sobra ao lado
+              dos dois mini-cards (o F7 voltou pra 16/10 fixo e abriu ~400px de
+              vazio no fim do card). Abaixo de lg, 16/10. */}
+          <CaseStudyCover
+            caseStudy={esteticaCs}
+            browser
+            aspect="auto"
+            mediaClassName="aspect-[16/10] lg:aspect-auto"
+            className="lg:min-h-0 lg:flex-1"
+            sizes="(min-width: 1024px) 60vw, 100vw"
+          />
+          <div className="flex flex-col gap-3">
             <p className="font-mono text-2xs uppercase tracking-widest text-(--color-text-3)">
               Em produção desde Dez/2024
             </p>
             <h3 className="text-xl font-semibold leading-tight text-(--color-text-1)">
               Estética MD
             </h3>
-            <p
-              className="text-sm leading-relaxed font-semibold"
-              style={{ color: 'var(--color-amber)' }}
-            >
+            {/* F9: sem âmbar em texto — a regra da casa (e o estudo STARK do
+                próprio Stefan) reserva o acento pra ação. O âmbar fica no CTA. */}
+            <p className="text-sm leading-relaxed font-medium text-(--color-text-1)">
               Feito pra clínicas premium: estética, odonto, med spa.
             </p>
             <p className="text-sm leading-relaxed text-(--color-text-2)">
@@ -100,10 +109,7 @@ export function EsteticaFlipCardClient({ deeplink }: EsteticaFlipCardClientProps
             <li>Formulário PHP + JS + CORS bilateral · emails dual</li>
           </ul>
 
-          <p
-            className="text-sm leading-relaxed font-semibold pt-2"
-            style={{ color: 'var(--color-amber)' }}
-          >
+          <p className="pt-2 text-sm leading-relaxed font-semibold text-(--color-text-1)">
             Quer um site assim pra sua clínica?
           </p>
           <p className="text-xs leading-relaxed text-(--color-text-2)">

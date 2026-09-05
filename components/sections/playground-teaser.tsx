@@ -30,8 +30,7 @@ const TEASER_CARDS: TeaserCard[] = [
     index: '01',
     name: 'Hanoi 3D',
     subtitle: 'r3f · recursão visualizada',
-    description:
-      'Torre de Hanoi rodando em react-three-fiber. Move 8 discos, vê recursão acontecer.',
+    description: 'Torre de Hanoi em react-three-fiber. Escolhe os discos, vê a recursão acontecer.',
     preview: 'hanoi',
   },
   {
@@ -46,7 +45,7 @@ const TEASER_CARDS: TeaserCard[] = [
     href: '/playground#tab-parens',
     index: '03',
     name: 'Parênteses',
-    subtitle: 'SVG · pilha balanceamento',
+    subtitle: 'SVG · pilha de balanceamento',
     description: 'Stack visualizada. Digita expressão, vê push/pop, sabe na hora se balanceia.',
     preview: 'parens',
   },
@@ -85,7 +84,7 @@ export function PlaygroundTeaser() {
         <h2
           className={cn(
             'font-semibold text-(--color-text-1)',
-            'text-3xl sm:text-4xl lg:text-5xl',
+            'text-3xl sm:text-4xl',
             '!tracking-[-0.025em] !leading-[1.02] text-balance'
           )}
         >
@@ -95,7 +94,7 @@ export function PlaygroundTeaser() {
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Algoritmos em C da faculdade virando demos interativos. Visualizar é entender: recursão,
-          complexidade, pilha. Cada um vive numa página própria, isolado, sem custo na home.
+          complexidade, pilha. Vivem numa página própria, isolados, sem custo na home.
         </p>
       </header>
 
@@ -273,7 +272,7 @@ function HanoiPreview() {
         textAnchor="middle"
         letterSpacing="2"
       >
-        n=4 · 15 moves
+        n=4 · 15 movimentos
       </text>
     </svg>
   );
@@ -428,7 +427,7 @@ function ParensPreview() {
         textAnchor="middle"
         letterSpacing="2"
       >
-        stack · top → bottom
+        pilha · topo → base
       </text>
     </svg>
   );

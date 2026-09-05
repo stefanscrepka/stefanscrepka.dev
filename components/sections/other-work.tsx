@@ -86,7 +86,9 @@ const SK3D_MODELS: readonly ViewerModel[] = [
 const HUB_VIDEO = {
   webm: '/work-video/stark-hub.webm',
   mp4: '/work-video/stark-hub.mp4',
-  poster: '/work-screenshots/stark-hub-f130.avif',
+  // F9 (R4 F17): poster de 960×720 (25 KB) no lugar do master de 2133×1600 (61 KB),
+  // que o mobile baixava pra mostrar em 320×240.
+  poster: '/work-screenshots/stark-hub-f130-poster.avif',
 };
 
 export function OtherWorkSection() {

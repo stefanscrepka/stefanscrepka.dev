@@ -67,15 +67,15 @@ export function TimelineReveal({ items }: TimelineRevealProps) {
           `marginLeft: var(--beam-line)` o glow caía 56px à direita da linha
           (medido no filme de scroll, desktop) — lia como mancha solta. Mesma
           derivação do MarkerDot: linha − recuo do conteúdo. */}
+      {/* F9 (2026-09-05): a cauda tinha 64+128px, blur e um halo de 24px —
+          um glow (brand book §17) e ~190px de zona morta antes do playground.
+          Agora é a própria linha esvaindo, 40+64px. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none mt-16 h-32 w-px"
+        className="pointer-events-none mt-10 h-16 w-px"
         style={{
           marginLeft: 'calc(var(--beam-line) - var(--beam-pad))',
-          background:
-            'linear-gradient(to bottom, var(--color-accent) 0%, oklch(94% 0.22 124 / 0.4) 40%, transparent 100%)',
-          filter: 'blur(2px)',
-          boxShadow: '0 0 24px var(--color-accent-emissive)',
+          background: 'linear-gradient(to bottom, var(--color-accent) 0%, transparent 100%)',
         }}
       />
     </TracingBeam>

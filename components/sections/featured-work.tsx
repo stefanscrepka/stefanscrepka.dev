@@ -219,7 +219,7 @@ function HeroTile({
         <CaseStudyCover
           caseStudy={caseStudy}
           eager
-          sizes="(min-width: 1280px) 780px, (min-width: 1024px) 58vw, 100vw"
+          sizes="(min-width: 1280px) 780px, (min-width: 1024px) 58vw, (min-width: 640px) calc(100vw - 4.5rem), calc(100vw - 2.5rem)"
           className="relative z-10"
         />
       </div>

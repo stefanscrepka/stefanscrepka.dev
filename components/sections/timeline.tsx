@@ -60,7 +60,7 @@ const MARKERS: TimelineMarker[] = [
     year: '2026',
     place: 'Content Engine · AI Product Engineer',
     title: 'Agora · multi-agente em produção',
-    body: '19 agentes Claude em 5 squads, acordados por cron às 03h. Anti-slop com 28 regex pt-BR, inference local numa RTX 3070, aprovação humana em três botões no Telegram. E o STARK leva a mesma disciplina de volta ao chão de fábrica.',
+    body: '19 papéis Claude em 5 squads, num cron que começa às 03h e fecha o pacote às 07h30. Anti-slop com 28 regex pt-BR, inference local numa RTX 3070, aprovação humana em três botões no Telegram. E o STARK leva a mesma disciplina de volta ao chão de fábrica.',
     institutions: ['content-engine'],
     isCurrent: true,
   },
@@ -88,7 +88,7 @@ export function TimelineSection() {
           Da automação industrial pra IA multi-agente.
         </h2>
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
-          Cinco anos. Quatro estágios. Um fio condutor: construir sistemas que funcionam quando
+          De 2021 a 2026, quatro estágios. Um fio condutor: construir sistemas que funcionam quando
           ninguém está olhando.
         </p>
       </header>
