@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { TracingBeam } from '@/components/ui-effects/tracing-beam';
 import { cn } from '@/lib/utils';
 
-// /process — Como construo: método multi-agente.
+// /process — Como construo: oito decisões, três produtos (F9: era seis de seis
+// Content Engine; entraram o OEE do STARK e o tenantId da Caluna).
 // Layout: container-narrow + TracingBeam side rail (Aceternity) + prose editorial.
 // Cinco seções: anti-slop validator, prompt cache 2 camadas, HITL Telegram,
 // cron 03h–07h30, stack local GPU.
@@ -12,13 +13,13 @@ import { cn } from '@/lib/utils';
 // 17–19px com leading 1.6. Hairlines lime entre seções pra ritmo editorial.
 
 export const metadata: Metadata = {
-  title: 'Process · método multi-agente',
+  title: 'Process · oito decisões, três produtos',
   description:
-    'Como construo IA multi-agente em produção: anti-slop em cascata com 28 regex pt-BR, prompt cache com dois TTLs, aprovação em três botões no Telegram, cron das 03h às 07h30 e inference local numa RTX 3070.',
+    'Como construo: oito decisões de engenharia em três produtos. Anti-slop em cascata, prompt cache com dois TTLs, aprovação em três botões no Telegram, cron das 03h às 07h30, inference local numa RTX 3070, OEE somado antes de dividir no STARK e tenantId em 27 dos 35 modelos da Caluna.',
   openGraph: {
     title: 'Process · Stefan Heinz Screpka',
     description:
-      'Método multi-agente em produção: anti-slop, prompt cache, aprovação no Telegram, cron e inference local.',
+      'Oito decisões de engenharia em três produtos: anti-slop, prompt cache, aprovação no Telegram, cron, inference local, OEE somado e tenantId.',
   },
   robots: { index: true, follow: true },
   alternates: { canonical: '/process' },
@@ -110,13 +111,43 @@ const SECTIONS: Section[] = [
     ],
   },
   {
-    id: 'closing',
+    id: 'oee',
     index: '06',
+    eyebrow: 'Cálculo',
+    title: 'OEE somado antes de dividir',
+    body: [
+      'No STARK, o painel do período não pode ser a média dos OEEs de cada turno: turnos de duração diferente pesariam igual e o número do mês não fecharia com o Excel oficial da fábrica.',
+      'O motor soma os numeradores e os denominadores de cada turno e só então divide, com as mesmas fórmulas da planilha, fechadas dígito a dígito contra três planilhas oficiais. Não há modelo nenhum aqui: é regra, e regra se testa.',
+    ],
+    highlights: [
+      'src/lib/servicos/painel.ts: razão das somas, não média de razões',
+      '153 testes de lógica pura no vitest',
+      'Roda on-premises, sem internet, como serviço do Windows; o telão da sala de controle mostra o resultado',
+    ],
+  },
+  {
+    id: 'tenant',
+    index: '07',
+    eyebrow: 'Isolamento',
+    title: 'tenantId em 27 dos 35 modelos',
+    body: [
+      'Na Caluna, cada clínica é um tenant, e um vazamento entre contas seria o fim do produto. Dos 35 modelos do Prisma, 27 carregam tenantId; a assistente só enxerga a agenda, os serviços e as clientes da clínica que está falando com ela.',
+      'A mesma cautela vale pra IA: antes de marcar ou cobrar, ela pede confirmação; acima de um teto de valor, chama a dona; e o handoff humano acontece no inbox, com o histórico inteiro.',
+    ],
+    highlights: [
+      'prisma/schema.prisma: 35 modelos, 27 com tenantId',
+      'Assistente com 11 ferramentas sobre OpenAI, com tool calling',
+      '554 testes (vitest e Playwright); Sentry com redator de PII',
+    ],
+  },
+  {
+    id: 'closing',
+    index: '08',
     eyebrow: 'Resumo',
     title: 'Disciplina, não milagre',
     body: [
-      'Nada acima é "AI breakthrough". É engenharia: um gate de qualidade que recusa, um cache que mede antes de ligar, uma aprovação que cabe no celular, um cron que respeita o fuso e uma GPU que dilui custo. Cada peça com o arquivo onde ela vive.',
-      'É assim que multi-agente sobrevive em produção sem virar buraco de dinheiro ou pesadelo de moderação. Se vai trabalhar comigo, é esse o padrão.',
+      'Nada acima é "AI breakthrough". É engenharia: um gate de qualidade que recusa, um cache que mede antes de ligar, uma aprovação que cabe no celular, um cron que respeita o fuso, uma GPU que dilui custo, um OEE que soma antes de dividir e um tenantId em cada tabela que importa. Cada peça com o arquivo onde ela vive.',
+      'É assim que um produto sobrevive em produção sem virar buraco de dinheiro ou pesadelo de moderação. Se vai trabalhar comigo, é esse o padrão.',
     ],
   },
 ];
@@ -132,9 +163,9 @@ function buildHowToJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
     '@id': `${baseUrl}/process#howto`,
-    name: 'Como construo IA multi-agente em produção',
+    name: 'Como construo: oito decisões de engenharia em três produtos',
     description:
-      'Método de cinco etapas pra rodar IA multi-agente em produção sem virar buraco de dinheiro: anti-slop em cascata, prompt cache medido, aprovação no Telegram, cron no fuso certo e inference local.',
+      'Sete decisões de engenharia em três produtos: anti-slop em cascata, prompt cache medido, aprovação no Telegram, cron no fuso certo, inference local, OEE somado antes de dividir e tenantId em 27 dos 35 modelos.',
     inLanguage: 'pt-BR',
     totalTime: 'PT8M',
     author: { '@id': `${baseUrl}/#person` },
@@ -166,11 +197,11 @@ export default function ProcessPage() {
               '!tracking-[-0.025em] !leading-[1.02] text-balance'
             )}
           >
-            Como construo. O método multi-agente.
+            Como construo. Oito decisões, três produtos.
           </h1>
           <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
-            Seis decisões de engenharia que tornam multi-agente um sistema previsível em vez de uma
-            promessa de slide. Cada uma medida, defendida com número, em produção há meses.
+            Oito decisões de engenharia, do Content Engine ao chão de fábrica, que tornam o sistema
+            previsível em vez de promessa de slide. Cada uma com número e com o arquivo onde vive.
           </p>
         </header>
 
@@ -238,7 +269,7 @@ export default function ProcessPage() {
         {/* Footer CTA pair — back to home + contato */}
         <footer className="mt-24 flex flex-col gap-6 border-t border-(--color-hairline) pt-10 sm:flex-row sm:items-center sm:justify-between">
           <p className="max-w-prose text-sm text-(--color-text-3)">
-            Quer aplicar esse método no seu produto? Respondo em menos de 12h.
+            Quer aplicar esse método no seu produto? Respondo em até 12h, dias úteis.
           </p>
           <div className="flex items-center gap-6">
             <Link

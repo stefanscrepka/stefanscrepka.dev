@@ -9,6 +9,6 @@ export default function ProcessOgImage() {
     eyebrow: 'PROCESS',
     title: 'Disciplina, não milagre.',
     tagline:
-      'Anti-slop em cascata · prompt cache · aprovação no Telegram · cron das 03h às 07h30 · inference local. Como construo IA multi-agente em produção.',
+      'Anti-slop em cascata · prompt cache · três botões no Telegram · cron · inference local · OEE somado · tenantId. Oito decisões, três produtos.',
   });
 }
