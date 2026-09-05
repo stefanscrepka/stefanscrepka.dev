@@ -6,8 +6,11 @@ import { CASE_STUDIES, CASE_STUDY_SLUGS } from '@/lib/work/data';
 
 export const metadata: Metadata = {
   title: 'Work',
+  // F9 (R4 F06): sem isto a rota herdava o canonical da home e pedia pra ser
+  // tratada como duplicata, contra o próprio sitemap.
+  alternates: { canonical: '/work' },
   description:
-    'Quatro produtos com escopo real. Content Engine multi-agente, Caluna, secretária de clínica no WhatsApp, STARK passagem de turno industrial, Estética MD site institucional. Stack honest, escopo entregue.',
+    'Quatro produtos com escopo real. Content Engine multi-agente, Caluna, secretária de clínica no WhatsApp, STARK passagem de turno industrial, Estética MD site institucional. Stack honesto, escopo entregue.',
 };
 
 // Index gallery dos 4 case studies + link pra cada page detalhe.
@@ -27,7 +30,7 @@ export default function WorkIndexPage() {
         <p className="mt-2 max-w-prose text-reading text-(--color-text-2)">
           Dois SaaS em produção (Content Engine, Caluna), um sistema industrial em piloto (STARK) e
           o primeiro produto antes do React (Estética MD). Cada case documentado com capturas reais,
-          stack honest, escopo entregue e o que aprendi no processo.
+          stack honesto, escopo entregue e o que aprendi no processo.
         </p>
       </header>
 
@@ -60,7 +63,7 @@ export default function WorkIndexPage() {
                 </ViewTransition>
                 <p className="mt-3 text-sm leading-relaxed text-(--color-text-2)">{cs.shortLine}</p>
                 <p className="mt-4 inline-flex items-center gap-1.5 font-mono text-xs text-(--color-accent)">
-                  Ver case study →
+                  Ver case →
                 </p>
               </Link>
             </li>

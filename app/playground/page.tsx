@@ -11,6 +11,7 @@ import { PlaygroundPage } from '@/components/playground/playground-page';
 
 export const metadata: Metadata = {
   title: 'Playground · algoritmos C visualizados',
+  alternates: { canonical: '/playground' },
   description:
     'Hanoi 3D, Fibonacci comparativo (O(2^n) vs O(n)) e balanceamento de parênteses. Algoritmos da Estrutura de Dados em C virando demos interativos.',
   openGraph: {

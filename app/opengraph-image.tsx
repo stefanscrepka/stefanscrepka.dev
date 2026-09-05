@@ -9,6 +9,6 @@ export default function OpengraphImage() {
     eyebrow: 'PORTFOLIO',
     title: 'Construo IA multi-agente em produção.',
     tagline:
-      'E o produto inteiro ao redor dela. Claude SDK + Next 16 + TypeScript · três produtos rodando 24/7.',
+      'E o produto inteiro ao redor dela. Content Engine, Caluna, STARK, Estética MD e SK3D, com capturas reais.',
   });
 }

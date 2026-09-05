@@ -11,7 +11,6 @@ import { MotionProvider } from '@/components/providers/motion-provider';
 import { Footer } from '@/components/sections/footer';
 import { ContactIcon, ManifestoIcon, ProcessIcon, WorkIcon } from '@/components/shared/nav-icons';
 import { GrainOverlay } from '@/components/ui-effects/grain-overlay';
-import { TargetCursor } from '@/components/ui-effects/target-cursor.client';
 import { TopBarNav, type TopBarNavItem } from '@/components/ui-effects/top-bar-nav';
 import { CalModalProvider } from '@/lib/contact/cal-modal-context';
 import './globals.css';
@@ -43,10 +42,15 @@ const ppEditorial = localFont({
 // `#work` eram dead em páginas internas — usuário clicava e nada acontecia.
 // O TopBarNav detecta pathname + faz scroll local quando estamos na home.
 export const navItems: TopBarNavItem[] = [
-  { label: 'Work', href: '/#work', icon: <WorkIcon />, subtitle: 'Três produtos em produção' },
+  {
+    label: 'Work',
+    href: '/#work',
+    icon: <WorkIcon />,
+    subtitle: 'Produtos e cases',
+  },
   { label: 'Process', href: '/process', icon: <ProcessIcon />, subtitle: 'Como eu construo' },
   { label: 'Manifesto', href: '/#manifesto', icon: <ManifestoIcon />, subtitle: 'Princípios' },
-  { label: 'Contato', href: '/#contato', icon: <ContactIcon />, subtitle: 'Respondo em <12h' },
+  { label: 'Contato', href: '/#contato', icon: <ContactIcon />, subtitle: 'Respondo em até 12h' },
 ];
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://stefanscrepka.dev';
@@ -64,7 +68,7 @@ export const metadata: Metadata = {
     template: '%s · Stefan Heinz Screpka',
   },
   description:
-    'Construo IA multi-agente em produção, e o produto inteiro ao redor dela. 19 agentes Claude aprovados no Telegram. Três produtos rodando.',
+    'Construo IA multi-agente em produção, e o produto inteiro ao redor dela. Content Engine, Caluna, STARK, Estética MD e SK3D, com capturas reais e números conferidos no código.',
   authors: [{ name: 'Stefan Heinz Screpka' }],
   creator: 'Stefan Heinz Screpka',
   openGraph: {
@@ -116,7 +120,7 @@ const personJsonLd = {
   telephone: '+55-42-99859-2522',
   image: `${baseUrl}/avatar-stefan.avif`,
   description:
-    'AI Product Engineer brasileiro. Multi-agent IA com Claude SDK + product engineering full-stack. Content Engine (multi-agente), Caluna (secretária de clínica no WhatsApp), STARK (passagem de turno industrial) e Estética MD.',
+    'AI Product Engineer brasileiro. Multi-agent IA com Claude SDK + product engineering full-stack. Content Engine (multi-agente), Caluna (secretária de clínica no WhatsApp), STARK (passagem de turno industrial), Estética MD e SK3D (impressão 3D).',
   address: {
     '@type': 'PostalAddress',
     addressLocality: 'Ponta Grossa',
@@ -272,7 +276,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </MotionProvider>
         <AboutThisSiteGate />
         <GrainOverlay />
-        <TargetCursor />
         {IS_PROD ? (
           <>
             <Analytics />
