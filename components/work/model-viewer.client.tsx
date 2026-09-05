@@ -22,9 +22,11 @@ interface ModelViewerCanvasProps {
 }
 
 function PrintedPart({ src }: { src: string }) {
-  // useDraco=false: os GLBs não são comprimidos e a CSP do site bloqueia o
-  // WASM do decoder (o drei tentava instanciá-lo e logava CompileError).
-  const { scene } = useGLTF(src, false);
+  // useDraco=false E useMeshopt=false: os GLBs não são comprimidos e a CSP do
+  // site bloqueia WASM. O F8 desligou só o Draco; o terceiro parâmetro do drei
+  // (meshopt) fica ligado por padrão e instanciava o MeshoptDecoder em WASM —
+  // CompileError no console da home em toda visita (medido em F9).
+  const { scene } = useGLTF(src, false, false);
   const bounds = useBounds();
   const materials = useMemo(() => [] as THREE.MeshStandardMaterial[], []);
 
