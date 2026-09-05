@@ -306,14 +306,25 @@ function useActiveHash(items: TopBarNavItem[]): string | null {
       return;
     }
 
+    // F9 (R4 F14): o callback só recebe as entradas que MUDARAM. Guardando o
+    // conjunto visível, o item ativo some quando nenhuma seção intersecta (voltar
+    // ao topo deixava "Contato" aceso e aria-current mentindo com o hero na tela).
+    const visible = new Map<string, number>();
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) {
-          setActiveHash(`#${visible[0].target.id}`);
+        for (const e of entries) {
+          if (e.isIntersecting) visible.set(e.target.id, e.intersectionRatio);
+          else visible.delete(e.target.id);
         }
+        let best: string | null = null;
+        let bestRatio = -1;
+        for (const [id, ratio] of visible) {
+          if (ratio > bestRatio) {
+            best = id;
+            bestRatio = ratio;
+          }
+        }
+        setActiveHash(best ? `#${best}` : null);
       },
       {
         // Trigger zone: top 96px (clear nav) -> bottom 60% (focus de cima).

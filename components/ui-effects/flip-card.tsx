@@ -19,6 +19,11 @@ import { cn } from '@/lib/utils';
 //      unreachable em mobile (onClick=undefined).
 //   3. onKeyDown manual pra Enter/Space funcionar como botão real (div com
 //      role="button" precisa de keyboard handler explícito).
+//   F9 (R4 F13): o onFocus/onBlur que virava o card sozinho saiu. Ele deixava
+//      aria-pressed="true" ao focar e o Enter DESVIRAVA; o CTA do WhatsApp na
+//      face de trás ficava inert e inalcançável por Tab. Agora: foco não vira;
+//      Enter/Espaço viram; virado, a face de trás sai do inert e o Tab chega
+//      no CTA.
 
 type FlipAxis = 'y' | 'x';
 type TriggerMode = 'hover' | 'click' | 'auto';
@@ -122,8 +127,6 @@ export function FlipCard({
       onKeyDown={handleKeyDown}
       onMouseEnter={effectiveTrigger === 'hover' ? () => setFlipped(true) : undefined}
       onMouseLeave={effectiveTrigger === 'hover' ? () => setFlipped(false) : undefined}
-      onFocus={() => setFlipped(true)}
-      onBlur={() => setFlipped(false)}
       aria-pressed={flipped}
       aria-label={ariaLabel}
       data-slot="flip-card"
